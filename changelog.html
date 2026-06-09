@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changelog &mdash; Multi-Protocol Flow Executor</title>
+  <meta name="description" content="Release notes and version history for Multi-Protocol Flow Executor.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">
+        <span class="logo-icon">MP</span>
+        MPE Flow
+      </a>
+      <nav aria-label="Main navigation">
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="download.html">Download</a></li>
+          <li><a href="changelog.html" class="active">Changelog</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Changelog Content -->
+  <section class="changelog-page">
+    <div class="container">
+      <h1>Changelog</h1>
+
+      <div id="cl-status" class="download-status">
+        <div class="spinner"></div>
+        <p>Loading release history...</p>
+      </div>
+
+      <div id="release-list" class="release-list" style="display:none;">
+        <!-- populated by JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; <span id="footer-year">2026</span> MPE Flow. MIT License.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="download.html">Download</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // ---- Configurable R2 URLs ----
+    var R2_BASE = 'https://downloads.mpe-flow.com';
+    var MANIFEST_URL = R2_BASE + '/manifest.json';
+
+    // ---- Render a release card ----
+    function renderRelease(release) {
+      var notes = release.notes || release.body || 'No release notes available.';
+      var date = release.date || release.published_at || '';
+      var version = release.version || release.tag_name || 'v?.?.?';
+
+      // Format date if it looks like ISO
+      if (date && date.indexOf('T') !== -1) {
+        try { date = new Date(date).toISOString().split('T')[0]; } catch (e) { /* keep original */ }
+      }
+
+      return '<div class="release-card">'
+        + '<div class="release-header">'
+        + '<span class="release-version">' + version + '</span>'
+        + (date ? '<span class="release-date">' + date + '</span>' : '')
+        + '</div>'
+        + '<div class="release-notes">' + escapeHtml(notes) + '</div>'
+        + '</div>';
+    }
+
+    // ---- Simple HTML escaping ----
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+
+    // ---- Main ----
+    (function init() {
+      var statusEl = document.getElementById('cl-status');
+      var listEl = document.getElementById('release-list');
+
+      fetch(MANIFEST_URL)
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function (manifest) {
+          // manifest can be a single version object or an array of releases
+          var releases = [];
+          if (Array.isArray(manifest)) {
+            releases = manifest;
+          } else if (manifest.releases && Array.isArray(manifest.releases)) {
+            releases = manifest.releases;
+          } else {
+            // Single version object — treat as one release
+            releases = [manifest];
+          }
+
+          if (releases.length === 0) {
+            listEl.innerHTML = '<div class="error-state"><h2>No releases found</h2></div>';
+          } else {
+            var html = '';
+            for (var i = 0; i < releases.length; i++) {
+              html += renderRelease(releases[i]);
+            }
+            listEl.innerHTML = html;
+          }
+
+          statusEl.style.display = 'none';
+          listEl.style.display = '';
+        })
+        .catch(function (err) {
+          statusEl.className = 'download-status error';
+          statusEl.innerHTML = '<h2>Could not load release history</h2><p>Unable to reach the release server. Please try again later.</p>';
+        });
+    })();
+
+    // ---- Footer year ----
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

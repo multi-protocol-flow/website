@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download &mdash; Multi-Protocol Flow Executor</title>
+  <meta name="description" content="Download the latest version of Multi-Protocol Flow Executor for Windows or macOS.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">
+        <span class="logo-icon">MP</span>
+        MPE Flow
+      </a>
+      <nav aria-label="Main navigation">
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="download.html" class="active">Download</a></li>
+          <li><a href="changelog.html">Changelog</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Download Content -->
+  <section class="download-page">
+    <div class="container">
+      <h1>Download MPE Flow</h1>
+
+      <div id="download-status" class="download-status">
+        <div class="spinner"></div>
+        <p>Fetching latest release info...</p>
+      </div>
+
+      <div id="download-card" class="download-card" style="display:none;">
+        <span class="version-badge">Version <span id="dl-version">--</span></span>
+        <h2>Choose your platform</h2>
+        <p id="dl-recommend-text">Select the installer for your operating system below.</p>
+
+        <div class="download-options" id="download-options">
+          <!-- populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; <span id="footer-year">2026</span> MPE Flow. MIT License.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="changelog.html">Changelog</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // ---- Configurable R2 URLs ----
+    var R2_BASE = 'https://downloads.mpe-flow.com';
+    var MANIFEST_URL = R2_BASE + '/manifest.json';
+    var WIN_DOWNLOAD_URL = R2_BASE + '/releases/v{VERSION}/mpe-{VERSION}-x64-setup.exe';
+    var MAC_DOWNLOAD_URL = R2_BASE + '/releases/v{VERSION}/mpe-{VERSION}-universal.dmg';
+
+    // ---- OS detection ----
+    function detectOS() {
+      var platform = navigator.platform.toLowerCase();
+      if (platform.indexOf('win') !== -1) return 'windows';
+      if (platform.indexOf('mac') !== -1) return 'macos';
+      return 'other';
+    }
+
+    // ---- Build download URL ----
+    function buildUrl(template, version) {
+      return template.replace(/\{VERSION\}/g, version);
+    }
+
+    // ---- Render download options ----
+    function renderDownloads(version, detectedOs) {
+      var winUrl = buildUrl(WIN_DOWNLOAD_URL, version);
+      var macUrl = buildUrl(MAC_DOWNLOAD_URL, version);
+
+      var optionsEl = document.getElementById('download-options');
+      var recommendText = document.getElementById('dl-recommend-text');
+
+      var winRecommended = detectedOs === 'windows' || detectedOs === 'other';
+      var macRecommended = detectedOs === 'macos';
+
+      if (detectedOs === 'other') {
+        recommendText.textContent = 'We detected an unsupported OS. Please choose your installer below.';
+      } else if (detectedOs === 'windows') {
+        recommendText.textContent = 'We detected Windows &mdash; the Windows installer is recommended for you.';
+      } else if (detectedOs === 'macos') {
+        recommendText.textContent = 'We detected macOS &mdash; the macOS disk image is recommended for you.';
+      }
+
+      var html = '';
+
+      // Windows option
+      html += '<div class="download-option' + (winRecommended ? ' recommended' : '') + '">';
+      html += '  <div class="download-option-info">';
+      html += '    <strong>Windows (x64)</strong>';
+      html += '    <span>Installer &bull; v' + version + '</span>';
+      html += '  </div>';
+      html += '  <a href="' + winUrl + '" class="btn btn-primary" download>Download</a>';
+      html += '</div>';
+
+      // macOS option
+      html += '<div class="download-option' + (macRecommended ? ' recommended' : '') + '">';
+      html += '  <div class="download-option-info">';
+      html += '    <strong>macOS (Universal)</strong>';
+      html += '    <span>Disk Image &bull; v' + version + '</span>';
+      html += '  </div>';
+      html += '  <a href="' + macUrl + '" class="btn btn-success" download>Download</a>';
+      html += '</div>';
+
+      optionsEl.innerHTML = html;
+    }
+
+    // ---- Main ----
+    (function init() {
+      var statusEl = document.getElementById('download-status');
+      var cardEl = document.getElementById('download-card');
+      var versionEl = document.getElementById('dl-version');
+
+      var os = detectOS();
+
+      fetch(MANIFEST_URL)
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function (manifest) {
+          var ver = manifest.version || '0.0.0';
+          versionEl.textContent = ver;
+          renderDownloads(ver, os);
+          statusEl.style.display = 'none';
+          cardEl.style.display = '';
+        })
+        .catch(function (err) {
+          statusEl.className = 'download-status error';
+          statusEl.innerHTML = '<h2>Could not fetch release info</h2><p>Please try again later, or check the <a href="changelog.html">changelog</a> for manual download links.</p>';
+          // Still show fallback options with a placeholder version
+          versionEl.textContent = '?.?.?';
+          renderDownloads('?.?.?', os);
+          cardEl.style.display = '';
+        });
+    })();
+
+    // ---- Footer year ----
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
