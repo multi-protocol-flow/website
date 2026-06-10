@@ -1,2 +1,0 @@
-# Proxy R2 manifest through same domain to avoid CORS
-/manifest.json https://mpe-downloads.sunanzhi.com/manifest.json 200
