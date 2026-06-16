@@ -56,28 +56,46 @@
   </footer>
 
   <script>
-    // ---- Configurable R2 URLs ----
+    // ---- Config ----
+    var GITHUB_API = 'https://api.github.com/repos/multi-protocol-flow/multi-protocol-flow-executor/releases';
     var R2_BASE = 'https://mpe-downloads.sunanzhi.com';
-    var MANIFEST_URL = R2_BASE + '/manifest.json';
+    var DOWNLOAD_URL_WIN = R2_BASE + '/releases/{VERSION}/mpe-{VERSION}-x64-setup.exe';
+    var DOWNLOAD_URL_MAC = R2_BASE + '/releases/{VERSION}/mpe-{VERSION}-universal.dmg';
 
     // ---- Render a release card ----
     function renderRelease(release) {
-      var notes = release.notes || release.body || 'No release notes available.';
-      var date = release.date || release.published_at || '';
-      var version = release.version || release.tag_name || 'v?.?.?';
+      var notes = release.body || 'No release notes available.';
+      var date = release.published_at || '';
+      var version = release.tag_name || 'v?.?.?';
+      var isPrerelease = release.prerelease;
 
-      // Format date if it looks like ISO
+      // Format date
       if (date && date.indexOf('T') !== -1) {
         try { date = new Date(date).toISOString().split('T')[0]; } catch (e) { /* keep original */ }
       }
 
-      return '<div class="release-card">'
-        + '<div class="release-header">'
-        + '<span class="release-version">' + version + '</span>'
-        + (date ? '<span class="release-date">' + date + '</span>' : '')
-        + '</div>'
-        + '<div class="release-notes">' + escapeHtml(notes) + '</div>'
-        + '</div>';
+      // Build download links
+      var ver = version.replace(/^v/, '');
+      var winUrl = DOWNLOAD_URL_WIN.replace(/\{VERSION\}/g, ver);
+      var macUrl = DOWNLOAD_URL_MAC.replace(/\{VERSION\}/g, ver);
+
+      var html = '<div class="release-card">';
+      html += '<div class="release-header">';
+      html += '<span class="release-version">' + escapeHtml(version) + '</span>';
+      if (isPrerelease) {
+        html += '<span class="release-badge prerelease">Pre-release</span>';
+      }
+      if (date) {
+        html += '<span class="release-date">' + date + '</span>';
+      }
+      html += '</div>';
+      html += '<div class="release-notes">' + escapeHtml(notes) + '</div>';
+      html += '<div class="release-downloads">';
+      html += '<a href="' + winUrl + '" class="btn btn-sm" download>Windows</a>';
+      html += '<a href="' + macUrl + '" class="btn btn-sm" download>macOS</a>';
+      html += '</div>';
+      html += '</div>';
+      return html;
     }
 
     // ---- Simple HTML escaping ----
@@ -92,24 +110,13 @@
       var statusEl = document.getElementById('cl-status');
       var listEl = document.getElementById('release-list');
 
-      fetch(MANIFEST_URL)
+      fetch(GITHUB_API + '?per_page=20')
         .then(function (r) {
           if (!r.ok) throw new Error('HTTP ' + r.status);
           return r.json();
         })
-        .then(function (manifest) {
-          // manifest can be a single version object or an array of releases
-          var releases = [];
-          if (Array.isArray(manifest)) {
-            releases = manifest;
-          } else if (manifest.releases && Array.isArray(manifest.releases)) {
-            releases = manifest.releases;
-          } else {
-            // Single version object — treat as one release
-            releases = [manifest];
-          }
-
-          if (releases.length === 0) {
+        .then(function (releases) {
+          if (!Array.isArray(releases) || releases.length === 0) {
             listEl.innerHTML = '<div class="error-state"><h2>No releases found</h2></div>';
           } else {
             var html = '';
@@ -118,13 +125,12 @@
             }
             listEl.innerHTML = html;
           }
-
           statusEl.style.display = 'none';
           listEl.style.display = '';
         })
         .catch(function (err) {
           statusEl.className = 'download-status error';
-          statusEl.innerHTML = '<h2>Could not load release history</h2><p>Unable to reach the release server. Please try again later.</p>';
+          statusEl.innerHTML = '<h2>Could not load release history</h2><p>Unable to reach GitHub. Please try again later.</p>';
         });
     })();
 
