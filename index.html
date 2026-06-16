@@ -31,7 +31,7 @@
   <!-- Hero -->
   <section class="hero">
     <div class="container">
-      <span class="hero-tag">v1.0 &mdash; Now Available</span>
+      <span class="hero-tag" id="hero-tag">Loading...</span>
       <h1>
         <span>Multi-Protocol</span><br>
         Flow Executor
@@ -106,17 +106,44 @@
 
   <script>
     // ---- Configurable R2 URLs ----
-    const R2_BASE = 'https://mpe-downloads.sunanzhi.com';
-    const MANIFEST_URL = R2_BASE + '/manifest.json';
+    var R2_BASE = 'https://mpe-downloads.sunanzhi.com';
+    var MANIFEST_URL = R2_BASE + '/manifest.json';
+    var CHANGELOG_URL = R2_BASE + '/changelog.json';
 
     // ---- Fetch version for hero ----
     (function fetchVersion() {
-      var el = document.getElementById('hero-version');
-      if (!el) return;
-      fetch(MANIFEST_URL)
+      var tagEl = document.getElementById('hero-tag');
+      var verEl = document.getElementById('hero-version');
+
+      // Try changelog.json first (has prerelease info)
+      fetch(CHANGELOG_URL)
         .then(function (r) { if (!r.ok) throw new Error('Not found'); return r.json(); })
-        .then(function (m) { el.textContent = m.version || 'unknown'; })
-        .catch(function () { el.textContent = 'unavailable'; });
+        .then(function (releases) {
+          if (Array.isArray(releases) && releases.length > 0) {
+            var latest = releases[0];
+            var version = latest.tag || ('v' + latest.version);
+            var isPrerelease = latest.prerelease;
+            if (tagEl) {
+              tagEl.textContent = version + (isPrerelease ? ' — Pre-release' : ' — Now Available');
+            }
+            if (verEl) {
+              verEl.textContent = latest.version || 'unknown';
+            }
+          }
+        })
+        .catch(function () {
+          // Fallback to manifest.json
+          fetch(MANIFEST_URL)
+            .then(function (r) { if (!r.ok) throw new Error('Not found'); return r.json(); })
+            .then(function (m) {
+              if (tagEl) tagEl.textContent = 'v' + (m.version || '?') + ' — Now Available';
+              if (verEl) verEl.textContent = m.version || 'unknown';
+            })
+            .catch(function () {
+              if (tagEl) tagEl.textContent = 'Version info unavailable';
+              if (verEl) verEl.textContent = 'unavailable';
+            });
+        });
     })();
 
     // ---- Footer year ----
