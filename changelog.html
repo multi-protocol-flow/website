@@ -21,7 +21,7 @@
       <nav aria-label="Main navigation">
         <ul class="nav-links">
           <li><a href="index.html">Home</a></li>
-          <li><a href="download.html">Download</a></li>
+          <li><a href="docs.html">Docs</a></li>
           <li><a href="changelog.html" class="active">Changelog</a></li>
         </ul>
       </nav>
@@ -50,7 +50,7 @@
       <p>&copy; <span id="footer-year">2026</span> MPE Flow. MIT License.</p>
       <ul class="footer-links">
         <li><a href="index.html">Home</a></li>
-        <li><a href="download.html">Download</a></li>
+        <li><a href="docs.html">Docs</a></li>
       </ul>
     </div>
   </footer>
@@ -119,9 +119,20 @@
           if (!Array.isArray(releases) || releases.length === 0) {
             listEl.innerHTML = '<div class="error-state"><h2>No releases found</h2></div>';
           } else {
-            var html = '';
+            // Deduplicate: keep only the latest entry for each version
+            var seen = {};
+            var uniqueReleases = [];
             for (var i = 0; i < releases.length; i++) {
-              html += renderRelease(releases[i]);
+              var key = releases[i].tag || releases[i].version;
+              if (key && !seen[key]) {
+                seen[key] = true;
+                uniqueReleases.push(releases[i]);
+              }
+            }
+
+            var html = '';
+            for (var i = 0; i < uniqueReleases.length; i++) {
+              html += renderRelease(uniqueReleases[i]);
             }
             listEl.innerHTML = html;
           }

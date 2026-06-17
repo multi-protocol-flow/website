@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation &mdash; Multi-Protocol Flow Executor</title>
+  <meta name="description" content="Learn how to use MPE Flow: CLI commands, node types, variables, and flow file format.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">
+        <img src="mpe-logo.svg" alt="MPE Flow" class="logo-img">
+      </a>
+      <nav aria-label="Main navigation">
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="docs.html" class="active">Docs</a></li>
+          <li><a href="changelog.html">Changelog</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Docs Content -->
+  <section class="docs-page">
+    <div class="docs-layout">
+      <!-- Sidebar -->
+      <aside class="docs-sidebar">
+        <nav class="docs-nav">
+          <div class="docs-nav-section">
+            <h4>Getting Started</h4>
+            <ul>
+              <li><a href="#overview">Overview</a></li>
+              <li><a href="#installation">Installation</a></li>
+              <li><a href="#quick-example">Quick Example</a></li>
+            </ul>
+          </div>
+          <div class="docs-nav-section">
+            <h4>CLI Reference</h4>
+            <ul>
+              <li><a href="#commands">Commands</a></li>
+              <li><a href="#output-format">Output Format</a></li>
+              <li><a href="#exit-codes">Exit Codes</a></li>
+            </ul>
+          </div>
+          <div class="docs-nav-section">
+            <h4>Flow Files</h4>
+            <ul>
+              <li><a href="#flow-structure">File Structure</a></li>
+              <li><a href="#node-structure">Node Structure</a></li>
+              <li><a href="#connections">Connections</a></li>
+              <li><a href="#variables">Variables</a></li>
+            </ul>
+          </div>
+          <div class="docs-nav-section">
+            <h4>Node Types</h4>
+            <ul>
+              <li><a href="#node-entry">Entry / End</a></li>
+              <li><a href="#node-http">HTTP</a></li>
+              <li><a href="#node-conditional">Conditional</a></li>
+              <li><a href="#node-script">Script</a></li>
+              <li><a href="#node-assertion">Assertion</a></li>
+              <li><a href="#node-websocket">WebSocket</a></li>
+              <li><a href="#node-database">Database</a></li>
+              <li><a href="#node-grpc">gRPC</a></li>
+              <li><a href="#node-mqtt">MQTT</a></li>
+              <li><a href="#node-kafka">Kafka</a></li>
+              <li><a href="#node-redis">Redis</a></li>
+              <li><a href="#node-smtp-imap">SMTP / IMAP</a></li>
+              <li><a href="#node-other">Other Protocols</a></li>
+            </ul>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="docs-content">
+        <!-- Overview -->
+        <article id="overview" class="docs-section">
+          <h2>Overview</h2>
+          <p>MPE Flow is a multi-protocol workflow orchestration engine. It runs as either a desktop GUI or a CLI tool &mdash; from the same binary.</p>
+          
+          <div class="docs-info">
+            <h4>Two Modes, One Binary</h4>
+            <ul>
+              <li><strong>No arguments</strong> &rarr; Opens the Tauri desktop GUI</li>
+              <li><strong>With arguments</strong> &rarr; Runs in CLI mode</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Installation -->
+        <article id="installation" class="docs-section">
+          <h2>Installation</h2>
+          <p>Visit the <a href="changelog.html">Changelog</a> page to download installers for Windows and macOS.</p>
+        </article>
+
+        <!-- Quick Example -->
+        <article id="quick-example" class="docs-section">
+          <h2>Quick Example</h2>
+          <p>Create a file <code>hello.mpf</code>:</p>
+          <div class="docs-code">
+            <pre><code>{
+  "_version": 1,
+  "flow": {
+    "uuid": "example-flow",
+    "name": "Hello World",
+    "nodes": [
+      {
+        "uuid": "entry-1",
+        "type": "entry",
+        "name": "Start",
+        "data": { "type": "entry" }
+      },
+      {
+        "uuid": "http-1",
+        "type": "http",
+        "name": "Fetch Data",
+        "data": {
+          "type": "http",
+          "url": "https://httpbin.org/get",
+          "method": "get"
+        }
+      },
+      {
+        "uuid": "end-1",
+        "type": "end",
+        "name": "End",
+        "data": { "type": "end" }
+      }
+    ],
+    "connections": [
+      {
+        "id": "conn-1",
+        "source_node_uuid": "entry-1",
+        "target_node_uuid": "http-1",
+        "source_port_id": "out",
+        "target_port_id": "in"
+      },
+      {
+        "id": "conn-2",
+        "source_node_uuid": "http-1",
+        "target_node_uuid": "end-1",
+        "source_port_id": "true",
+        "target_port_id": "in"
+      }
+    ]
+  }
+}</code></pre>
+          </div>
+          <p>Run it:</p>
+          <div class="docs-code">
+            <pre><code>mpe run -f hello.mpf</code></pre>
+          </div>
+        </article>
+
+        <!-- Commands -->
+        <article id="commands" class="docs-section">
+          <h2>CLI Commands</h2>
+          
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Command</th>
+                <th>Description</th>
+                <th>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>mpe run</code></td>
+                <td>Execute a flow</td>
+                <td><code>mpe run -f flow.mpf</code></td>
+              </tr>
+              <tr>
+                <td><code>mpe validate</code></td>
+                <td>Validate flow structure without executing</td>
+                <td><code>mpe validate -f flow.mpf</code></td>
+              </tr>
+              <tr>
+                <td><code>mpe debug</code></td>
+                <td>Run with debug output (NDJSON protocol)</td>
+                <td><code>mpe debug -f flow.mpf</code></td>
+              </tr>
+              <tr>
+                <td><code>mpe stress</code></td>
+                <td>Run stress test</td>
+                <td><code>mpe stress run -f flow.mpf</code></td>
+              </tr>
+              <tr>
+                <td><code>mpe flow</code></td>
+                <td>Manage flows (list, show, create, delete)</td>
+                <td><code>mpe flow list</code></td>
+              </tr>
+              <tr>
+                <td><code>mpe report</code></td>
+                <td>Manage reports (list, show, delete)</td>
+                <td><code>mpe report list</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="docs-code">
+            <pre><code># View all commands
+mpe --help
+
+# View command-specific help
+mpe run --help</code></pre>
+          </div>
+        </article>
+
+        <!-- Output Format -->
+        <article id="output-format" class="docs-section">
+          <h2>Output Format</h2>
+          <p>All commands output JSON to stdout:</p>
+          <div class="docs-code">
+            <pre><code>{
+  "success": true,
+  "data": null,
+  "error": null,
+  "execution_time": 156,
+  "node_reports": [
+    {
+      "node_uuid": "entry-001",
+      "node_type": "entry",
+      "node_name": "Start",
+      "status": "success",
+      "duration_ms": 1,
+      "used_port_id": "out"
+    },
+    {
+      "node_uuid": "http-001",
+      "node_type": "http",
+      "node_name": "Fetch Data",
+      "status": "success",
+      "duration_ms": 233,
+      "output_data": {
+        "success": true,
+        "status": 200,
+        "body": { ... },
+        "headers": { ... }
+      }
+    }
+  ],
+  "flow_report": {
+    "flow_name": "Hello World",
+    "total_nodes": 3,
+    "executed_count": 3,
+    "status": "success",
+    "duration_ms": 234
+  }
+}</code></pre>
+          </div>
+        </article>
+
+        <!-- Exit Codes -->
+        <article id="exit-codes" class="docs-section">
+          <h2>Exit Codes</h2>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>0</code></td>
+                <td>Success</td>
+              </tr>
+              <tr>
+                <td><code>1</code></td>
+                <td>Failure (error details in stderr and JSON output)</td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+
+        <!-- Flow File Structure -->
+        <article id="flow-structure" class="docs-section">
+          <h2>Flow File Structure</h2>
+          <p>MPE flow files use the <code>.mpf</code> extension and follow the <code>FlowFile</code> wrapper format:</p>
+          
+          <div class="docs-code">
+            <pre><code>{
+  "_version": 1,
+  "flow": {
+    "uuid": "my-flow",
+    "name": "My Flow",
+    "initial_variables": {
+      "api_base": "https://api.example.com",
+      "token": "abc123"
+    },
+    "nodes": [ ... ],
+    "connections": [ ... ]
+  }
+}</code></pre>
+          </div>
+
+          <h3>Top-level Fields</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>_version</code></td>
+                <td>number</td>
+                <td>No</td>
+                <td>File format version (default: 1)</td>
+              </tr>
+              <tr>
+                <td><code>flow</code></td>
+                <td>object</td>
+                <td>Yes</td>
+                <td>Flow data container</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Flow Fields</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>uuid</code></td>
+                <td>string</td>
+                <td>Yes</td>
+                <td>Unique flow identifier</td>
+              </tr>
+              <tr>
+                <td><code>name</code></td>
+                <td>string</td>
+                <td>Yes</td>
+                <td>Human-readable flow name</td>
+              </tr>
+              <tr>
+                <td><code>initial_variables</code></td>
+                <td>object</td>
+                <td>No</td>
+                <td>Variables available via <code>{{key}}</code> syntax</td>
+              </tr>
+              <tr>
+                <td><code>nodes</code></td>
+                <td>array</td>
+                <td>Yes</td>
+                <td>List of nodes</td>
+              </tr>
+              <tr>
+                <td><code>connections</code></td>
+                <td>array</td>
+                <td>Yes</td>
+                <td>Connections between nodes</td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+
+        <!-- Node Structure -->
+        <article id="node-structure" class="docs-section">
+          <h2>Node Structure</h2>
+          <div class="docs-code">
+            <pre><code>{
+  "uuid": "node-uuid",
+  "type": "http",
+  "name": "My HTTP Request",
+  "data": {
+    "type": "http",
+    "url": "https://api.example.com",
+    "method": "get"
+  }
+}</code></pre>
+          </div>
+
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>uuid</code></td>
+                <td>string</td>
+                <td>Yes</td>
+                <td>Unique node identifier</td>
+              </tr>
+              <tr>
+                <td><code>type</code></td>
+                <td>string</td>
+                <td>Yes</td>
+                <td>Node type (e.g. <code>http</code>, <code>entry</code>)</td>
+              </tr>
+              <tr>
+                <td><code>name</code></td>
+                <td>string</td>
+                <td>Yes</td>
+                <td>Display name</td>
+              </tr>
+              <tr>
+                <td><code>data</code></td>
+                <td>object</td>
+                <td>Yes</td>
+                <td>Node configuration. <strong>Must include <code>"type"</code></strong> matching the node type</td>
+              </tr>
+              <tr>
+                <td><code>on_error</code></td>
+                <td>string</td>
+                <td>No</td>
+                <td>Error strategy: <code>"route_to_false"</code> (default), <code>"ignore"</code>, <code>"abort_flow"</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="docs-warning">
+            <h4>Important: data.type Field</h4>
+            <p>Every <code>data</code> object must include <code>"type": "&lt;node_type&gt;"</code> for Rust deserialization. The value must match the node's top-level <code>type</code> field.</p>
+          </div>
+        </article>
+
+        <!-- Connections -->
+        <article id="connections" class="docs-section">
+          <h2>Connections</h2>
+          <p>Connections define the execution flow between nodes.</p>
+          <div class="docs-code">
+            <pre><code>{
+  "id": "conn-1",
+  "source_node_uuid": "entry-1",
+  "target_node_uuid": "http-1",
+  "source_port_id": "out",
+  "target_port_id": "in"
+}</code></pre>
+          </div>
+
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>source_node_uuid</code></td>
+                <td>UUID of the source node</td>
+              </tr>
+              <tr>
+                <td><code>target_node_uuid</code></td>
+                <td>UUID of the target node</td>
+              </tr>
+              <tr>
+                <td><code>source_port_id</code></td>
+                <td>Output port: <code>out</code> (single output), <code>true</code>/<code>false</code> (dual output)</td>
+              </tr>
+              <tr>
+                <td><code>target_port_id</code></td>
+                <td><strong>Must be <code>"in"</code></strong> for all nodes</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="docs-warning">
+            <h4>Critical Port Rules</h4>
+            <ul>
+              <li><code>target_port_id</code> must always be <code>"in"</code> (not <code>"input"</code>)</li>
+              <li>Nodes with dual output (<code>true</code>/<code>false</code>) should have both ports connected to prevent flow termination on failure</li>
+              <li><code>entry</code> uses <code>out</code>, <code>end</code> has no output</li>
+            </ul>
+          </div>
+
+          <h3>Port Reference</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Node Type</th>
+                <th>Input</th>
+                <th>Output</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>entry</code></td><td>none</td><td><code>out</code></td></tr>
+              <tr><td><code>end</code></td><td><code>in</code></td><td>none</td></tr>
+              <tr><td><code>http</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
+              <tr><td><code>conditional</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
+              <tr><td><code>script</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
+              <tr><td><code>assertion</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
+              <tr><td><code>variable_extractor</code></td><td><code>in</code></td><td><code>out</code></td></tr>
+              <tr><td><code>ws_*</code>, <code>db_*</code>, <code>grpc_*</code>, etc.</td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
+              <tr><td><code>db_close</code>, <code>ws_close</code>, <code>redis_close</code>, etc.</td><td><code>in</code></td><td><code>out</code></td></tr>
+            </tbody>
+          </table>
+        </article>
+
+        <!-- Variables -->
+        <article id="variables" class="docs-section">
+          <h2>Variables</h2>
+          
+          <div class="docs-warning">
+            <h4>Variable Pool vs Node Output</h4>
+            <p><code>{{var}}</code> syntax can <strong>only</strong> access the Variable Pool. Protocol node outputs are stored separately in <code>last_node_output</code> and do NOT automatically become variables.</p>
+            <p>To use node output data with <code>{{var}}</code>, you must first extract it using a <code>variable_extractor</code> or <code>script</code> node.</p>
+          </div>
+
+          <h3>Syntax</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Syntax</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>{{variable_name}}</code></td>
+                <td>Reference a variable from the pool</td>
+              </tr>
+              <tr>
+                <td><code>{{obj.field}}</code></td>
+                <td>Access nested field with dot notation</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Adding Variables to the Pool</h3>
+          <ol>
+            <li><strong>Initial variables</strong>: Define in <code>flow.initial_variables</code></li>
+            <li><strong>variable_extractor</strong>: Extract from <code>last_node_output</code> using JSONPath</li>
+            <li><strong>script</strong>: Use <code>fn.variables.set(name, value)</code></li>
+          </ol>
+
+          <div class="docs-code">
+            <pre><code>// variable_extractor example
+{
+  "type": "variable_extractor",
+  "data": {
+    "type": "variable_extractor",
+    "output_mappings": [
+      { "source": "$.body.id", "target": "user_id" },
+      { "source": "$.status", "target": "http_status" }
+    ]
+  }
+}
+
+// Later use: {{user_id}}, {{http_status}}</code></pre>
+          </div>
+
+          <h3>Conditional / Assertion Paths</h3>
+          <p><code>conditional</code> and <code>assertion</code> nodes read directly from <code>last_node_output</code>:</p>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Node</th>
+                <th>Path Format</th>
+                <th>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>conditional.field_path</code></td>
+                <td>Plain name, <code>{{var}}</code>, or <code>$.path</code></td>
+                <td><code>status</code>, <code>$.body.id</code></td>
+              </tr>
+              <tr>
+                <td><code>assertion.target</code></td>
+                <td>JSONPath with <code>$.</code> prefix (required)</td>
+                <td><code>$.status</code>, <code>$.body.data.id</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="docs-warning">
+            <h4>Limitations</h4>
+            <ul>
+              <li>Only dot notation: <code>{{obj.field.subfield}}</code></li>
+              <li>No array indexing: <code>{{items[0]}}</code> &mdash; not supported</li>
+              <li>No function calls: <code>{{func()}}</code> &mdash; not supported</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Node Types: Entry / End -->
+        <article id="node-entry" class="docs-section">
+          <h2>Entry &amp; End Nodes</h2>
+          
+          <h3>Entry Node</h3>
+          <p>Starting point of every flow. Exactly one required.</p>
+          <div class="docs-code">
+            <pre><code>{
+  "uuid": "entry-1",
+  "type": "entry",
+  "name": "Start",
+  "data": { "type": "entry" }
+}</code></pre>
+          </div>
+
+          <h3>End Node</h3>
+          <p>Terminal node. Flow ends when reaching <code>end</code>.</p>
+          <div class="docs-code">
+            <pre><code>{
+  "uuid": "end-1",
+  "type": "end",
+  "name": "End",
+  "data": { "type": "end" }
+}</code></pre>
+          </div>
+        </article>
+
+        <!-- Node Types: HTTP -->
+        <article id="node-http" class="docs-section">
+          <h2>HTTP Node</h2>
+          <p>Send HTTP requests. Supports GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS.</p>
+          <div class="docs-code">
+            <pre><code>{
+  "uuid": "http-1",
+  "type": "http",
+  "name": "API Call",
+  "data": {
+    "type": "http",
+    "url": "{{api_base}}/users",
+    "method": "post",
+    "headers": {
+      "Authorization": "Bearer {{token}}"
+    },
+    "body_type": "body",
+    "content_type": "json",
+    "body": "{\"name\": \"test\"}",
+    "timeout_ms": 30000
+  }
+}</code></pre>
+          </div>
+
+          <h3>Core Fields</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Default</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>url</code></td>
+                <td>string</td>
+                <td>&mdash;</td>
+                <td>Request URL (supports <code>{{var}}</code>)</td>
+              </tr>
+              <tr>
+                <td><code>method</code></td>
+                <td>string</td>
+                <td><code>get</code></td>
+                <td>HTTP method</td>
+              </tr>
+              <tr>
+                <td><code>headers</code></td>
+                <td>object</td>
+                <td><code>{}</code></td>
+                <td>Request headers</td>
+              </tr>
+              <tr>
+                <td><code>body_type</code></td>
+                <td>string</td>
+                <td><code>none</code></td>
+                <td><code>none</code> / <code>body</code> / <code>form-data</code> / <code>x-www-form-urlencoded</code> / <code>binary</code></td>
+              </tr>
+              <tr>
+                <td><code>content_type</code></td>
+                <td>string</td>
+                <td><code>json</code></td>
+                <td><code>json</code> / <code>text</code> / <code>html</code> / <code>xml</code></td>
+              </tr>
+              <tr>
+                <td><code>timeout_ms</code></td>
+                <td>number</td>
+                <td><code>30000</code></td>
+                <td>Timeout (1000&ndash;300000ms)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>HTTP Output</h3>
+          <div class="docs-code">
+            <pre><code>{
+  "success": true,
+  "status": 200,
+  "body": { "id": 1, "name": "test" },
+  "headers": { "content-type": "application/json" },
+  "timing": { "connect_ms": 45, "total_ms": 150 }
+}</code></pre>
+          </div>
+        </article>
+
+        <!-- Node Types: Conditional -->
+        <article id="node-conditional" class="docs-section">
+          <h2>Conditional Node</h2>
+          <p>Branch execution based on conditions. Routes to <code>true</code> or <code>false</code> port.</p>
+          
+          <h3>Simple Condition</h3>
+          <div class="docs-code">
+            <pre><code>{
+  "uuid": "cond-1",
+  "type": "conditional",
+  "name": "Check Status",
+  "data": {
+    "type": "conditional",
+    "condition_type": "simple",
+    "field_path": "status",
+    "operator": "equal",
+    "expected_value": 200
+  }
+}</code></pre>
+          </div>
+
+          <h3>Advanced Expression</h3>
+          <div class="docs-code">
+            <pre><code>{
+  "data": {
+    "type": "conditional",
+    "condition_type": "advanced",
+    "advanced_expression": "status >= 200 && status < 300"
+  }
+}</code></pre>
+          </div>
+
+          <h3>Operators</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Operator</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>equal</code></td><td>Equals</td></tr>
+              <tr><td><code>not_equal</code></td><td>Not equals</td></tr>
+              <tr><td><code>greater</code></td><td>Greater than</td></tr>
+              <tr><td><code>greater_or_equal</code></td><td>Greater or equal</td></tr>
+              <tr><td><code>less</code></td><td>Less than</td></tr>
+              <tr><td><code>less_or_equal</code></td><td>Less or equal</td></tr>
+              <tr><td><code>contains</code></td><td>Contains substring</td></tr>
+              <tr><td><code>starts_with</code></td><td>Starts with</td></tr>
+              <tr><td><code>ends_with</code></td><td>Ends with</td></tr>
+              <tr><td><code>exists</code></td><td>Field exists</td></tr>
+            </tbody>
+          </table>
+        </article>
+
+        <!-- Node Types: Script -->
+        <article id="node-script" class="docs-section">
+          <h2>Script Node</h2>
+          <p>Execute JavaScript code in a QuickJS runtime (ES2020 subset).</p>
+          <div class="docs-code">
+            <pre><code>{
+  "uuid": "script-1",
+  "type": "script",
+  "name": "Process Data",
+  "data": {
+    "type": "script",
+    "script": "const data = JSON.parse(fn.response.raw); fn.variables.set('user_id', data.body.id);",
+    "timeout_ms": 5000
+  }
+}</code></pre>
+          </div>
+
+          <h3>Script API</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>API</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>fn.variables.get(name)</code></td><td>Read variable from pool</td></tr>
+              <tr><td><code>fn.variables.set(name, value)</code></td><td>Write variable to pool</td></tr>
+              <tr><td><code>fn.response.raw</code></td><td>Full upstream node output (JSON string)</td></tr>
+              <tr><td><code>fn.response.code</code></td><td>HTTP status code (HTTP nodes only)</td></tr>
+              <tr><td><code>fn.console.log(msg)</code></td><td>Log to execution output</td></tr>
+              <tr><td><code>fn.flow.stop(reason)</code></td><td>Stop flow execution</td></tr>
+              <tr><td><code>fn.util.encodeBase64(str)</code></td><td>Base64 encode</td></tr>
+              <tr><td><code>fn.util.md5(str)</code></td><td>MD5 hash</td></tr>
+              <tr><td><code>fn.util.sha256(str)</code></td><td>SHA-256 hash</td></tr>
+              <tr><td><code>fn.util.uuid()</code></td><td>Generate UUID v4</td></tr>
+              <tr><td><code>fn.util.sleep(ms)</code></td><td>Pause execution</td></tr>
+            </tbody>
+          </table>
+        </article>
+
+        <!-- Node Types: Assertion -->
+        <article id="node-assertion" class="docs-section">
+          <h2>Assertion Node</h2>
+          <p>Validate conditions with detailed pass/fail reporting.</p>
+          <div class="docs-code">
+            <pre><code>{
+  "uuid": "assert-1",
+  "type": "assertion",
+  "name": "Validate Response",
+  "data": {
+    "type": "assertion",
+    "mode": "all",
+    "assertions": [
+      { "id": "a1", "description": "Status is 200", "target": "$.status", "operator": "eq", "expected": 200 },
+      { "id": "a2", "description": "Has data", "target": "$.body.data", "operator": "exists" }
+    ]
+  }
+}</code></pre>
+          </div>
+
+          <h3>Assertion Operators</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Operators</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Comparison</td><td><code>eq</code>, <code>ne</code></td></tr>
+              <tr><td>Numeric</td><td><code>gt</code>, <code>gte</code>, <code>lt</code>, <code>lte</code></td></tr>
+              <tr><td>String</td><td><code>contains</code>, <code>not_contains</code>, <code>matches</code></td></tr>
+              <tr><td>Existence</td><td><code>exists</code>, <code>not_exists</code></td></tr>
+              <tr><td>Collection</td><td><code>in</code>, <code>not_in</code></td></tr>
+              <tr><td>Type</td><td><code>type_is</code></td></tr>
+              <tr><td>Range</td><td><code>between</code></td></tr>
+            </tbody>
+          </table>
+
+          <div class="docs-warning">
+            <h4>Target Path Format</h4>
+            <p>Assertion <code>target</code> must use JSONPath with <code>$.</code> prefix (e.g. <code>$.status</code>, <code>$.body.id</code>). Do not add <code>body.</code> prefix for non-HTTP nodes.</p>
+          </div>
+        </article>
+
+        <!-- Node Types: WebSocket -->
+        <article id="node-websocket" class="docs-section">
+          <h2>WebSocket Nodes</h2>
+          <p>Three nodes for WebSocket communication: connect, send/collect, close.</p>
+          <div class="docs-code">
+            <pre><code>// Connect
+{ "type": "ws_connect", "data": { "type": "ws_connect", "url": "wss://echo.example.com/ws" } }
+
+// Send and collect response
+{ "type": "ws_send_collect", "data": {
+    "type": "ws_send_collect",
+    "connection_id": "ws-connect-uuid",
+    "message": "{\"type\":\"ping\"}",
+    "collect_timeout_ms": 10000
+  }
+}
+
+// Close
+{ "type": "ws_close", "data": { "type": "ws_close", "connection_id": "ws-connect-uuid" } }</code></pre>
+          </div>
+        </article>
+
+        <!-- Node Types: Database -->
+        <article id="node-database" class="docs-section">
+          <h2>Database Nodes</h2>
+          <p>Support PostgreSQL, MySQL, SQLite. Use <code>connection_uuid</code> (not <code>connection_id</code>).</p>
+          <div class="docs-code">
+            <pre><code>// Connect
+{ "type": "db_connect", "data": {
+    "type": "db_connect",
+    "connection_uuid": "pg-conn",
+    "driver": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "database": "mydb",
+    "username": "user",
+    "password": "pass"
+  }
+}
+
+// Query
+{ "type": "db_query", "data": {
+    "type": "db_query",
+    "connection_uuid": "pg-conn",
+    "sql": "SELECT * FROM users WHERE id = $1",
+    "params": ["123"]
+  }
+}
+
+// Transaction
+{ "type": "db_begin", "data": { "type": "db_begin", "connection_uuid": "pg-conn" } }
+{ "type": "db_commit", "data": { "type": "db_commit", "connection_uuid": "pg-conn" } }
+{ "type": "db_close", "data": { "type": "db_close", "connection_uuid": "pg-conn" } }</code></pre>
+          </div>
+        </article>
+
+        <!-- Node Types: gRPC -->
+        <article id="node-grpc" class="docs-section">
+          <h2>gRPC Nodes</h2>
+          <div class="docs-code">
+            <pre><code>// Connect
+{ "type": "grpc_connect", "data": { "type": "grpc_connect", "url": "https://localhost:50051", "use_tls": false } }
+
+// Call
+{ "type": "grpc_call", "data": {
+    "type": "grpc_call",
+    "connection_id": "grpc-connect-uuid",
+    "service_name": "helloworld.Greeter",
+    "method_name": "SayHello",
+    "request_json": "{\"name\":\"world\"}"
+  }
+}
+
+// Close
+{ "type": "grpc_close", "data": { "type": "grpc_close", "connection_id": "grpc-connect-uuid" } }</code></pre>
+          </div>
+        </article>
+
+        <!-- Node Types: MQTT -->
+        <article id="node-mqtt" class="docs-section">
+          <h2>MQTT Nodes</h2>
+          <p>Supports MQTT 3.1.1 / 5.0, TLS, WebSocket.</p>
+          <div class="docs-code">
+            <pre><code>// Connect
+{ "type": "mqtt_connect", "data": { "type": "mqtt_connect", "url": "mqtt://localhost:1883", "client_id": "mpe-client" } }
+
+// Publish
+{ "type": "mqtt_publish", "data": {
+    "type": "mqtt_publish",
+    "connection_id": "mqtt-connect-uuid",
+    "topic": "sensors/temp",
+    "payload": "{\"value\":25.5}",
+    "qos": 1
+  }
+}
+
+// Subscribe
+{ "type": "mqtt_subscribe", "data": {
+    "type": "mqtt_subscribe",
+    "connection_id": "mqtt-connect-uuid",
+    "topic": "sensors/#",
+    "max_messages": 10
+  }
+}
+
+// Disconnect
+{ "type": "mqtt_disconnect", "data": { "type": "mqtt_disconnect", "connection_id": "mqtt-connect-uuid" } }</code></pre>
+          </div>
+        </article>
+
+        <!-- Node Types: Kafka -->
+        <article id="node-kafka" class="docs-section">
+          <h2>Kafka Nodes</h2>
+          <div class="docs-code">
+            <pre><code>// Connect
+{ "type": "kafka_connect", "data": { "type": "kafka_connect", "bootstrap_servers": "localhost:9092" } }
+
+// Produce
+{ "type": "kafka_produce", "data": {
+    "type": "kafka_produce",
+    "connection_id": "kafka-connect-uuid",
+    "topic": "my-topic",
+    "value": "{\"name\":\"Alice\"}"
+  }
+}
+
+// Consume
+{ "type": "kafka_consume", "data": {
+    "type": "kafka_consume",
+    "connection_id": "kafka-connect-uuid",
+    "topic": "my-topic",
+    "group_id": "my-group",
+    "max_messages": 1
+  }
+}
+
+// Close
+{ "type": "kafka_close", "data": { "type": "kafka_close", "connection_id": "kafka-connect-uuid" } }</code></pre>
+          </div>
+        </article>
+
+        <!-- Node Types: Redis -->
+        <article id="node-redis" class="docs-section">
+          <h2>Redis Nodes</h2>
+          <div class="docs-code">
+            <pre><code>// Connect
+{ "type": "redis_connect", "data": { "type": "redis_connect", "host": "127.0.0.1", "port": 6379 } }
+
+// Command
+{ "type": "redis_command", "data": {
+    "type": "redis_command",
+    "connection_id": "redis-connect-uuid",
+    "command": "SET",
+    "args": ["mykey", "Hello Redis"]
+  }
+}
+
+// Close
+{ "type": "redis_close", "data": { "type": "redis_close", "connection_id": "redis-connect-uuid" } }</code></pre>
+          </div>
+        </article>
+
+        <!-- Node Types: SMTP / IMAP -->
+        <article id="node-smtp-imap" class="docs-section">
+          <h2>SMTP &amp; IMAP Nodes</h2>
+          
+          <h3>SMTP (Send Email)</h3>
+          <div class="docs-code">
+            <pre><code>// Connect
+{ "type": "smtp_connect", "data": {
+    "type": "smtp_connect",
+    "host": "smtp.gmail.com",
+    "port": 587,
+    "tls_mode": "starttls",
+    "auth": { "type": "plain", "username": "user@example.com", "encrypted_password": "xxx" }
+  }
+}
+
+// Send
+{ "type": "smtp_send", "data": {
+    "type": "smtp_send",
+    "connection_id": "smtp-connect-uuid",
+    "from": "sender@example.com",
+    "to": ["recipient@example.com"],
+    "subject": "Test Email",
+    "body": "Hello World"
+  }
+}
+
+// Disconnect
+{ "type": "smtp_disconnect", "data": { "type": "smtp_disconnect", "connection_id": "smtp-connect-uuid" } }</code></pre>
+          </div>
+
+          <h3>IMAP (Read Email)</h3>
+          <div class="docs-code">
+            <pre><code>// Connect
+{ "type": "imap_connect", "data": {
+    "type": "imap_connect",
+    "host": "imap.gmail.com",
+    "port": 993,
+    "tls_mode": "implicit",
+    "auth": { "type": "plain", "username": "user@example.com", "encrypted_password": "xxx" }
+  }
+}
+
+// Select mailbox
+{ "type": "imap_select", "data": { "type": "imap_select", "connection_id": "imap-connect-uuid", "mailbox": "INBOX" } }
+
+// Search
+{ "type": "imap_search", "data": { "type": "imap_search", "connection_id": "imap-connect-uuid", "criteria": "UNSEEN" } }
+
+// Fetch
+{ "type": "imap_fetch", "data": { "type": "imap_fetch", "connection_id": "imap-connect-uuid", "uids": "1:5" } }
+
+// Close
+{ "type": "imap_close", "data": { "type": "imap_close", "connection_id": "imap-connect-uuid" } }</code></pre>
+          </div>
+
+          <div class="docs-warning">
+            <h4>Auth Format</h4>
+            <p>SMTP and IMAP auth must be an object with <code>"type"</code> field:</p>
+            <p><code>{"type": "plain", "username": "xxx", "encrypted_password": "xxx"}</code></p>
+            <p>Not <code>"password"</code> &mdash; the field name is <code>encrypted_password</code>.</p>
+          </div>
+        </article>
+
+        <!-- Node Types: Other -->
+        <article id="node-other" class="docs-section">
+          <h2>Other Protocols</h2>
+          
+          <h3>TCP</h3>
+          <div class="docs-code">
+            <pre><code>{ "type": "tcp_connect", "data": { "type": "tcp_connect", "host": "localhost", "port": 8080 } }
+{ "type": "tcp_send", "data": { "type": "tcp_send", "connection_id": "uuid", "data": "Hello" } }
+{ "type": "tcp_receive", "data": { "type": "tcp_receive", "connection_id": "uuid" } }
+{ "type": "tcp_close", "data": { "type": "tcp_close", "connection_id": "uuid" } }</code></pre>
+          </div>
+
+          <h3>UDP</h3>
+          <div class="docs-code">
+            <pre><code>{ "type": "udp_bind", "data": { "type": "udp_bind", "local_addr": "0.0.0.0", "local_port": 8888 } }
+{ "type": "udp_send_to", "data": { "type": "udp_send_to", "connection_id": "uuid", "data": "Hello", "target_addr": "192.168.1.100", "target_port": 9999 } }
+{ "type": "udp_recv_from", "data": { "type": "udp_recv_from", "connection_id": "uuid" } }
+{ "type": "udp_close", "data": { "type": "udp_close", "connection_id": "uuid" } }</code></pre>
+          </div>
+
+          <h3>SSE (Server-Sent Events)</h3>
+          <div class="docs-code">
+            <pre><code>{ "type": "sse_connect", "data": { "type": "sse_connect", "url": "https://api.example.com/events" } }
+{ "type": "sse_listen", "data": { "type": "sse_listen", "connection_id": "uuid", "max_events": 100 } }
+{ "type": "sse_disconnect", "data": { "type": "sse_disconnect", "connection_id": "uuid" } }</code></pre>
+          </div>
+
+          <h3>GraphQL</h3>
+          <div class="docs-code">
+            <pre><code>{ "type": "graphql_connect", "data": { "type": "graphql_connect", "endpoint": "https://api.example.com/graphql" } }
+{ "type": "graphql_query", "data": { "type": "graphql_query", "connection_id": "uuid", "query": "query { users { id name } }" } }
+{ "type": "graphql_disconnect", "data": { "type": "graphql_disconnect", "connection_id": "uuid" } }</code></pre>
+          </div>
+
+          <h3>MCP (Model Context Protocol)</h3>
+          <div class="docs-code">
+            <pre><code>// HTTP transport
+{ "type": "mcp_connect", "data": { "type": "mcp_connect", "url": "https://mcp.example.com", "transport": "streamable_http" } }
+
+// Stdio transport
+{ "type": "mcp_connect", "data": { "type": "mcp_connect", "transport": "stdio", "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem"] } }
+
+{ "type": "mcp_call_tool", "data": { "type": "mcp_call_tool", "connection_id": "uuid", "tool_name": "get_weather", "arguments": {"city": "Beijing"} } }
+{ "type": "mcp_close", "data": { "type": "mcp_close", "connection_id": "uuid" } }</code></pre>
+          </div>
+
+          <h3>AMQP (RabbitMQ)</h3>
+          <div class="docs-code">
+            <pre><code>{ "type": "amqp_connect", "data": { "type": "amqp_connect", "url": "amqp://guest:guest@localhost:5672/%2f" } }
+{ "type": "amqp_exchange_declare", "data": { "type": "amqp_exchange_declare", "connection_id": "uuid", "exchange": "my.exchange", "exchange_type": "direct" } }
+{ "type": "amqp_queue_declare", "data": { "type": "amqp_queue_declare", "connection_id": "uuid", "queue": "my.queue" } }
+{ "type": "amqp_publish", "data": { "type": "amqp_publish", "connection_id": "uuid", "exchange": "my.exchange", "routing_key": "my.rk", "body": "{\"msg\":\"hello\"}" } }
+{ "type": "amqp_consume", "data": { "type": "amqp_consume", "connection_id": "uuid", "queue": "my.queue", "max_messages": 10 } }
+{ "type": "amqp_close", "data": { "type": "amqp_close", "connection_id": "uuid" } }</code></pre>
+          </div>
+        </article>
+      </main>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; <span id="footer-year">2026</span> MPE Flow. MIT License.</p>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="changelog.html">Changelog</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      var sections = document.querySelectorAll('.docs-section');
+      var navLinks = document.querySelectorAll('.docs-nav a');
+      var sidebar = document.querySelector('.docs-sidebar');
+      var isClickScrolling = false;
+
+      // Click handler: smooth scroll to section
+      navLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          var targetId = this.getAttribute('href').substring(1);
+          var targetSection = document.getElementById(targetId);
+          
+          if (targetSection) {
+            isClickScrolling = true;
+            
+            // Update active state immediately
+            navLinks.forEach(function(l) { l.classList.remove('active'); });
+            this.classList.add('active');
+            
+            // Scroll content area
+            var headerOffset = 80;
+            var elementPosition = targetSection.offsetTop;
+            var offsetPosition = elementPosition - headerOffset;
+
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+
+            // Reset flag after scroll completes
+            setTimeout(function() {
+              isClickScrolling = false;
+            }, 500);
+          }
+        });
+      });
+
+      // Scroll spy: highlight current section
+      function highlightNav() {
+        if (isClickScrolling) return;
+
+        var scrollPos = window.scrollY + 120;
+        var currentSection = null;
+
+        for (var i = sections.length - 1; i >= 0; i--) {
+          if (scrollPos >= sections[i].offsetTop) {
+            currentSection = sections[i];
+            break;
+          }
+        }
+
+        if (currentSection) {
+          var currentId = currentSection.getAttribute('id');
+          var activeLink = null;
+
+          navLinks.forEach(function(link) {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + currentId) {
+              link.classList.add('active');
+              activeLink = link;
+            }
+          });
+
+          // Scroll sidebar to keep active link visible
+          if (activeLink && sidebar) {
+            var linkTop = activeLink.offsetTop;
+            var linkHeight = activeLink.offsetHeight;
+            var sidebarScrollTop = sidebar.scrollTop;
+            var sidebarHeight = sidebar.clientHeight;
+
+            if (linkTop < sidebarScrollTop + 20) {
+              sidebar.scrollTo({ top: linkTop - 20, behavior: 'smooth' });
+            } else if (linkTop + linkHeight > sidebarScrollTop + sidebarHeight - 20) {
+              sidebar.scrollTo({ top: linkTop - sidebarHeight + linkHeight + 20, behavior: 'smooth' });
+            }
+          }
+        }
+      }
+
+      // Throttle scroll handler
+      var scrollTimeout;
+      window.addEventListener('scroll', function() {
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(highlightNav, 50);
+      });
+
+      // Initial highlight
+      highlightNav();
+    })();
+
+    // Footer year
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
