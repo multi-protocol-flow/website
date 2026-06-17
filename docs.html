@@ -93,13 +93,35 @@
               <li><strong>No arguments</strong> &rarr; Opens the Tauri desktop GUI</li>
               <li><strong>With arguments</strong> &rarr; Runs in CLI mode</li>
             </ul>
+            <p><em>On Linux, only the CLI binary is available &mdash; no GUI dependencies required.</em></p>
           </div>
         </article>
 
         <!-- Installation -->
         <article id="installation" class="docs-section">
           <h2>Installation</h2>
-          <p>Visit the <a href="changelog.html">Changelog</a> page to download installers for Windows and macOS.</p>
+
+          <h3>Windows &amp; macOS</h3>
+          <p>Download the installer from the <a href="changelog.html">Changelog</a> page. The same binary supports both GUI and CLI modes.</p>
+
+          <h3>Linux (CLI)</h3>
+          <p>Download the pre-built binary and add it to your <code>PATH</code>:</p>
+          <div class="docs-code">
+            <pre><code># Download and extract
+curl -LO https://mpe-downloads.sunanzhi.com/releases/latest/mpe-vX.Y.Z-linux-x86_64.tar.gz
+tar xzf mpe-vX.Y.Z-linux-x86_64.tar.gz
+
+# Make executable and move to PATH
+chmod +x mpe
+sudo mv mpe /usr/local/bin/
+
+# Verify
+mpe --help</code></pre>
+          </div>
+          <div class="docs-info">
+            <h4>Note</h4>
+            <p>The Linux build is CLI-only &mdash; no GUI, no GTK/WebKit dependencies required.</p>
+          </div>
         </article>
 
         <!-- Quick Example -->

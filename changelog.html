@@ -84,13 +84,16 @@
       }
       html += '</div>';
       html += '<div class="release-notes">' + escapeHtml(notes) + '</div>';
-      if (downloads.windows || downloads.macos) {
+      if (downloads.windows || downloads.macos || downloads.linux) {
         html += '<div class="release-downloads">';
         if (downloads.windows) {
           html += '<a href="' + downloads.windows + '" class="btn btn-sm" download>Windows</a>';
         }
         if (downloads.macos) {
           html += '<a href="' + downloads.macos + '" class="btn btn-sm" download>macOS</a>';
+        }
+        if (downloads.linux) {
+          html += '<a href="' + downloads.linux + '" class="btn btn-sm" download>Linux CLI</a>';
         }
         html += '</div>';
       }
