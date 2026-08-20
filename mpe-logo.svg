@@ -10,16 +10,9 @@
     </linearGradient>
   </defs>
   <style>
-    @media (prefers-color-scheme: dark) {
-      .logo-text { fill: #F1F5F9; }
-      .logo-sub { fill: #94A3B8; }
-      .port-fill { fill: #0F172A; }
-    }
-    @media (prefers-color-scheme: light) {
-      .logo-text { fill: #0F172A; }
-      .logo-sub { fill: #64748B; }
-      .port-fill { fill: #FFFFFF; }
-    }
+    .logo-text { fill: #F1F5F9; }
+    .logo-sub { fill: #94A3B8; }
+    .port-fill { fill: #0F172A; }
   </style>
 
   <!-- Logo Mark -->
