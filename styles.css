@@ -59,6 +59,25 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+html::-webkit-scrollbar {
+  width: 4px;
+}
+
+html::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-dim);
 }
 
 body {
@@ -749,6 +768,13 @@ code {
 
 .protocol-icon {
   font-size: 1.5rem;
+}
+
+.protocol-icon svg,
+.protocol-icon img {
+  width: 24px;
+  height: 24px;
+  display: block;
 }
 
 .protocol-name {
