@@ -22,6 +22,7 @@
         <ul class="nav-links">
           <li><a href="index.html">Home</a></li>
           <li><a href="/playground/">Playground</a></li>
+          <li><a href="plugins.html">Plugins</a></li>
           <li><a href="docs.html" class="active">Docs</a></li>
           <li><a href="changelog.html">Changelog</a></li>
         </ul>
@@ -46,9 +47,7 @@
           <div class="docs-nav-section">
             <h4>CLI Reference</h4>
             <ul>
-              <li><a href="#commands">Commands</a></li>
-              <li><a href="#output-format">Output Format</a></li>
-              <li><a href="#exit-codes">Exit Codes</a></li>
+              <li><a href="#ci-cd">CI/CD Integration</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
@@ -199,12 +198,15 @@ mpe --help</code></pre>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td><code>mpe run</code></td>
-                <td>Execute a flow</td>
-                <td><code>mpe run -f flow.mpf</code></td>
+                <td><code>--report-format</code></td>
+                <td>Report export format for <code>mpe run</code>: <code>json</code> (default) or <code>junit</code></td>
+                <td><code>mpe run -f flow.mpf --report-format junit</code></td>
               </tr>
               <tr>
+                <td><code>--report-file</code></td>
+                <td>Export the execution report (JUnit XML or JSON) to this file path</td>
+                <td><code>mpe run -f flow.mpf --report-format junit --report-file results.xml</code></td>
+              </tr>
                 <td><code>mpe validate</code></td>
                 <td>Validate flow structure without executing</td>
                 <td><code>mpe validate -f flow.mpf</code></td>
@@ -249,10 +251,54 @@ mpe --help
 # View command-specific help
 mpe run --help
 
-# Run with table output (global --format json|table option)
-mpe run -f flow.mpf --format table</code></pre>
+        <!-- CI/CD Integration -->
+        <article id="ci-cd" class="docs-section">
+          <h2>CI/CD Integration (GitHub Actions)</h2>
+          <p><code>mpe run</code> can export execution results as standard JUnit XML, which is natively understood by Jenkins, GitHub Actions, and GitLab CI. Each node in the flow becomes a <code>&lt;testcase&gt;</code>; failed and skipped nodes map to <code>&lt;failure&gt;</code> and <code>&lt;skipped&gt;</code> elements.</p>
+
+          <div class="docs-code">
+            <pre><code># Export a JUnit XML report for CI consumers
+mpe run -f flow.mpf --report-format junit --report-file results.xml
+
+# Or print the JUnit XML directly to stdout (no --report-file)
+mpe run -f flow.mpf --report-format junit</code></pre>
+          </div>
+
+          <p>Add a workflow step in your repository to run flows and publish the report on pull requests with <a href="https://github.com/dorny/test-reporter">dorny/test-reporter</a>:</p>
+
+          <div class="docs-code">
+            <pre><code>name: Flow Tests
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run MPE flows
+        run: |
+          mpe run -f tests/flows/api-smoke.mpf --report-format junit --report-file results.xml
+
+      - name: Publish test report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: MPE Flow Results
+          path: results.xml
+          reporter: java-junit
+          fail-on-error: 'true'</code></pre>
+          </div>
+
+          <div class="docs-info">
+            <h4>Note</h4>
+            <p>The JUnit report reflects node-level results: assertion, HTTP, WebSocket, and other protocol nodes map to individual test cases. A failed node produces a non-zero exit code, so plain <code>mpe run --report-format junit --report-file results.xml</code> also fails the job by default.</p>
           </div>
         </article>
+
+        <!-- Output Format -->
 
         <!-- Output Format -->
         <article id="output-format" class="docs-section">
@@ -991,7 +1037,7 @@ mpe run -f flow.mpf --format table</code></pre>
           </table>
 
           <h3>Protocol Plugins in This Repository</h3>
-          <p>The <code>plugins/</code> directory ships protocol plugins for: amqp, db (SQLite/MySQL/PostgreSQL), grpc, imap, kafka, mcp, mongo, mqtt, redis, smtp. Install by building a plugin and placing its directory into the plugin directory, or via the marketplace (see below).</p>
+          <p>The <code>plugins/</code> directory ships protocol plugins for: amqp, db (SQLite/MySQL/PostgreSQL), grpc, imap, kafka, mcp, mongo, mqtt, redis, smtp. Install by building a plugin and placing its directory into the plugin directory, or install from the <a href="plugins.html">Plugins page</a>.</p>
         </article>
 
         <!-- Plugin Development: SDK -->
@@ -1030,7 +1076,7 @@ mpe plugin install &lt;name&gt; [--version &lt;v&gt;] [--registry &lt;url&gt;] [
             <li>Platform keys: <code>windows-x64</code> | <code>windows-arm64</code> | <code>linux-x64</code> | <code>linux-arm64</code> | <code>macos-x64</code> | <code>macos-arm64</code>.</li>
             <li>The zip root must contain a single top-level directory named after the plugin, holding <code>plugin.json</code> and the plugin files.</li>
           </ul>
-          <p>The registry base URL is configured via the <code>MPE_PLUGIN_REGISTRY</code> environment variable or the <code>--registry</code> flag. No public marketplace server exists yet; the contract and types (<code>flow-engine-plugin-marketplace</code>) are defined and ready for future integration.</p>
+          <p>The registry base URL is configured via the <code>MPE_PLUGIN_REGISTRY</code> environment variable or the <code>--registry</code> flag. The public registry is served from GitHub Pages (<a href="https://multi-protocol-flow.github.io/mpe-plugin-registry/plugins" target="_blank" rel="noopener">multi-protocol-flow.github.io/mpe-plugin-registry</a>) as a static JSON implementing this contract &mdash; browse and install plugins on the <a href="plugins.html">Plugins page</a>.</p>
         </article>
       </main>
     </div>
