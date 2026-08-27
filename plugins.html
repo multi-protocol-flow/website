@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plugin Marketplace — Multi-Protocol Flow Executor (MPE Flow)</title>
-  <meta name="description" content="Browse and install protocol plugins for MPE Flow: Redis, MongoDB, gRPC, MCP, Kafka, LLM, SMTP, IMAP, and more.">
-  <meta name="keywords" content="mpe plugins, protocol plugins, mcp server debug, grpc testing, redis flow, mongodb workflow, kafka testing">
+  <meta name="description" content="Explore and install MPE Flow plugins: Model Context Protocol (MCP), Apache Kafka, Redis, MongoDB, gRPC, SMTP, IMAP, and LLM automation tools.">
+  <meta name="keywords" content="mpe plugins, protocol plugins, mcp server debug, grpc testing, redis flow, mongodb workflow, kafka testing, smtp automation, imap polling, llm testing">
   <meta name="author" content="MPE Flow Team">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mpe.run/plugins.html">
@@ -20,7 +20,9 @@
   <meta property="og:site_name" content="MPE Flow">
   <meta property="og:url" content="https://mpe.run/plugins.html">
   <meta property="og:title" content="Plugin Marketplace — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta property="og:description" content="Browse and install protocol plugins for MPE Flow: Redis, MongoDB, gRPC, MCP, Kafka, LLM, SMTP, IMAP, and more.">
+  <meta property="og:description" content="Explore and install MPE Flow plugins: MCP, Apache Kafka, Redis, MongoDB, gRPC, SMTP, IMAP, and LLM tools.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="zh_CN">
   <meta property="og:image" content="https://mpe.run/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -29,7 +31,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Plugin Marketplace — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta name="twitter:description" content="Browse and install protocol plugins for MPE Flow: Redis, MongoDB, gRPC, MCP, Kafka, LLM, SMTP, IMAP, and more.">
+  <meta name="twitter:description" content="Explore and install MPE Flow plugins: MCP, Apache Kafka, Redis, MongoDB, gRPC, SMTP, IMAP, and LLM tools.">
   <meta name="twitter:image" content="https://mpe.run/og-image.png">
 
   <!-- Manifest & Theme -->
@@ -43,13 +45,82 @@
     "@graph": [
       {
         "@type": "CollectionPage",
+        "@id": "https://mpe.run/plugins.html#page",
         "name": "MPE Flow Plugin Marketplace",
-        "description": "Directory of protocol and extension plugins for Multi-Protocol Flow Executor.",
+        "description": "Directory of protocol and extension plugins for Multi-Protocol Flow Executor: MCP, Kafka, Redis, MongoDB, gRPC, SMTP, and IMAP.",
         "url": "https://mpe.run/plugins.html",
-        "image": "https://mpe.run/og-image.png"
+        "image": "https://mpe.run/og-image.png",
+        "mainEntity": {
+          "@id": "https://mpe.run/plugins.html#itemlist"
+        }
+      },
+      {
+        "@type": "ItemList",
+        "@id": "https://mpe.run/plugins.html#itemlist",
+        "name": "MPE Flow Plugins",
+        "numberOfItems": 8,
+        "itemListElement": [
+          {
+            "@type": "SoftwareApplication",
+            "position": 1,
+            "name": "mpe-plugin-mcp",
+            "applicationCategory": "DeveloperApplication",
+            "description": "Model Context Protocol (MCP) tool invocation, resource reading, and server debugging plugin."
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 2,
+            "name": "mpe-plugin-kafka",
+            "applicationCategory": "DeveloperApplication",
+            "description": "Apache Kafka message producer, consumer, and schema registry integration plugin."
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 3,
+            "name": "mpe-plugin-redis",
+            "applicationCategory": "DeveloperApplication",
+            "description": "Redis in-memory data store, cache, and pub/sub messaging plugin."
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 4,
+            "name": "mpe-plugin-mongo",
+            "applicationCategory": "DeveloperApplication",
+            "description": "MongoDB document database CRUD operations and aggregation pipeline plugin."
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 5,
+            "name": "mpe-plugin-grpc",
+            "applicationCategory": "DeveloperApplication",
+            "description": "gRPC RPC execution with Protobuf reflection and streaming support."
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 6,
+            "name": "mpe-plugin-smtp",
+            "applicationCategory": "DeveloperApplication",
+            "description": "SMTP email sending and notification automation plugin."
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 7,
+            "name": "mpe-plugin-imap",
+            "applicationCategory": "DeveloperApplication",
+            "description": "IMAP email polling and verification plugin."
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 8,
+            "name": "mpe-plugin-llm",
+            "applicationCategory": "DeveloperApplication",
+            "description": "Large Language Model prompting, evaluation, and AI agent workflow testing plugin."
+          }
+        ]
       },
       {
         "@type": "BreadcrumbList",
+        "@id": "https://mpe.run/plugins.html#breadcrumbs",
         "itemListElement": [
           {
             "@type": "ListItem",

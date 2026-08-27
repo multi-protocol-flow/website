@@ -1,0 +1,63 @@
+# MPE Flow (Multi-Protocol Flow Executor)
+
+> MPE Flow is an ultra-fast, offline-first, multi-protocol flow execution engine and visual orchestration platform built in Rust and Tauri 2. It bridges HTTP/REST, WebSocket, TCP, UDP, SSE, and GraphQL natively in a single unified workflow, with an extensible plugin architecture supporting MCP, Kafka, Redis, MongoDB, gRPC, SMTP, and IMAP.
+
+## Project Information
+
+- **Website:** https://mpe.run/
+- **Documentation:** https://mpe.run/docs.html
+- **Full LLM Knowledge Base:** https://mpe.run/llms-full.txt
+- **Plugins:** https://mpe.run/plugins.html
+- **Web Playground:** https://mpe.run/playground/
+- **Changelog:** https://mpe.run/changelog.html
+- **Repository:** https://github.com/multi-protocol-flow
+- **License:** Apache-2.0 / MIT
+
+## Core Built-in Protocols & Nodes
+
+- **HTTP / REST:** Full HTTP client with methods (GET, POST, PUT, DELETE, PATCH, etc.), headers, multipart/form-data, URL params, proxy support, body formatting, and JSON path extraction.
+- **WebSocket:** Session lifecycle management (Connect, Send/Collect with bidirectional matching, Close, Ping/Pong heartbeat).
+- **TCP Socket:** Direct raw socket communication (Connect, Send, Receive with framing/delimiter/fixed length, Close, TLS/mTLS).
+- **UDP:** Connectionless datagram networking (Bind, SendTo, RecvFrom, Close, Broadcast).
+- **Server-Sent Events (SSE):** Streaming event streams (Connect, Event listener with filter/type matching, Disconnect).
+- **GraphQL:** Full GraphQL operations (Query, Mutation, Schema Introspection, WebSocket-based Subscriptions).
+- **Flow Control & Data Ops:** Entry, End, Conditional Branching (JS / CEL expressions), Script Execution (JavaScript via Boa / Rhai), Assertions (JSON schema, status code, response time, headers), and Variable Extractors.
+
+## Extensible Plugin Ecosystem
+
+Plugins run as isolated, high-performance sidecar processes via the `mpe-plugin-sdk`:
+- **MCP (Model Context Protocol):** Connect to MCP servers, list tools/resources, call LLM tools, debug agentic toolchains.
+- **Apache Kafka:** Produce/consume messages, topic management, schema registry integration, consumer groups.
+- **Redis:** Key-value, hashes, lists, sets, pub/sub, Lua scripts, pipeline operations.
+- **MongoDB:** BSON CRUD, aggregation pipelines, transaction support.
+- **gRPC:** Protobuf reflection, unary and streaming RPC calls.
+- **Email (SMTP & IMAP):** Automated email sending and inbox polling / message retrieval.
+
+## CLI Commands & Automation
+
+MPE delivers a dual-mode single binary (`mpe` for GUI + CLI, or pure headless `mpe-cli`):
+
+- `mpe run <file.mpf>`: Execute a workflow file headlessly with JSON/JUnit/HTML output.
+  - `--env <file.env>`: Inject environment variables.
+  - `--report <format>`: Export report (`junit`, `json`, `html`, `markdown`).
+  - `--var <key=val>`: Override workflow variables.
+- `mpe validate <file.mpf>`: Statically validate node schemas, circular dependencies, and variable references.
+- `mpe stress <file.mpf>`: Run multi-protocol load and stress tests (concurrency, ramp-up, RPS targets, latency percentiles p50/p90/p99).
+- `mpe flow <list|show|export>`: Inspect and manage workflow structures.
+- `mpe debug <file.mpf>`: Interactive CLI step debugger with breakpoint support.
+
+## Workflow File Format (.mpf)
+
+`.mpf` (Multi-Protocol Flow) is a declarative, human-readable JSON format:
+- `id`, `name`, `version`, `description`
+- `nodes`: Array of protocol and logic nodes with typed configurations.
+- `edges`: Directed edges with source/target handles (`default`, `true`, `false`, `error`).
+- `variables`: Global and workflow-scoped variables with templating syntax `{{variable_name}}` or `{{$nodes.node_id.output.field}}`.
+- `settings`: Execution error policies (`RouteToFalse`, `Ignore`, `AbortFlow`), timeout configs, and concurrency limits.
+
+## Key Advantages over Postman, JMeter, and Bruno
+
+1. **True Cross-Protocol Chaining:** Chain HTTP -> WebSocket -> TCP -> Kafka -> Redis in a single execution graph.
+2. **Local-First & Zero Cloud Lock-In:** All workflows, secrets, and test data stay on local disk; no mandatory account or cloud sync.
+3. **Rust-Powered High Performance:** Sub-millisecond execution overhead, low memory footprint, and high-throughput stress testing.
+4. **CI/CD Native:** Direct exit codes, JUnit XML output, GitHub Actions / GitLab CI ready without wrapper node scripts.

@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MPE Flow — 多协议工作流执行引擎与可视化接口测试工具 (桌面端 + CLI)</title>
-  <meta name="description" content="支持 HTTP、WebSocket、SSE、TCP、UDP、GraphQL 和 Kafka 跨协议串联与自动化测试。基于 Rust 构建的单一可执行文件，GUI 桌面端与独立 CLI 一体化。">
-  <meta name="keywords" content="多协议测试, 接口测试工具, WebSocket测试, TCP测试工具, SSE调试, 工作流自动化, Postman替代, JMeter替代, Rust, Tauri">
+  <meta name="description" content="基于 Rust 构建的开源多协议工作流编排与可视化接口测试平台。单一可执行文件原生支持 HTTP、WebSocket、TCP、UDP、SSE、GraphQL 与 MCP 智能体调试，GUI 与 CLI 一体化。">
+  <meta name="keywords" content="多协议接口测试, WebSocket测试工具, TCP套接字调试, SSE流式测试, GraphQL客户端, MCP服务调试, Postman替代品, JMeter压测替代, Rust自动化测试, 跨协议编排">
   <meta name="author" content="MPE Flow 团队">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mpe.run/zh/">
@@ -20,7 +20,9 @@
   <meta property="og:site_name" content="MPE Flow">
   <meta property="og:url" content="https://mpe.run/zh/">
   <meta property="og:title" content="MPE Flow — 多协议工作流执行引擎与可视化接口测试工具 (桌面端 + CLI)">
-  <meta property="og:description" content="支持 HTTP、WebSocket、SSE、TCP、UDP、GraphQL 和 Kafka 跨协议串联与自动化测试。基于 Rust 构建的单一可执行文件，GUI 桌面端与独立 CLI 一体化。">
+  <meta property="og:description" content="基于 Rust 构建的开源多协议工作流编排与可视化接口测试平台。原生支持 HTTP、WebSocket、TCP、UDP、SSE、GraphQL 与 MCP 智能体调试。">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:locale:alternate" content="en_US">
   <meta property="og:image" content="https://mpe.run/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -29,13 +31,12 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="MPE Flow — 多协议工作流执行引擎与可视化接口测试工具 (桌面端 + CLI)">
-  <meta name="twitter:description" content="支持 HTTP、WebSocket、SSE、TCP、UDP、GraphQL 和 Kafka 跨协议串联与自动化测试。基于 Rust 构建的单一可执行文件，GUI 桌面端与独立 CLI 一体化。">
+  <meta name="twitter:description" content="基于 Rust 构建的开源多协议工作流编排与可视化接口测试平台。原生支持 HTTP、WebSocket、TCP、UDP、SSE、GraphQL 与 MCP 智能体调试。">
   <meta name="twitter:image" content="https://mpe.run/og-image.png">
 
   <!-- Manifest & Theme -->
   <link rel="manifest" href="/site.webmanifest">
   <meta name="theme-color" content="#0f172a">
-
   <!-- Structured Data (JSON-LD) -->
   <script type="application/ld+json">
   {
@@ -46,22 +47,65 @@
         "@id": "https://mpe.run/zh/#software",
         "name": "MPE Flow",
         "alternateName": "Multi-Protocol Flow Executor 多协议工作流执行器",
-        "operatingSystem": "Windows, macOS, Linux",
         "applicationCategory": "DeveloperApplication",
-        "description": "基于 Rust + Tauri 构建的跨平台多协议工作流执行引擎与可视化测试工具，原生内置 7 种核心协议，支持丰富的侧边进程插件生态。",
+        "applicationSubCategory": "API 测试与跨协议工作流自动化工具",
+        "operatingSystem": "Windows, macOS, Linux",
+        "softwareRequirements": "Rust, Tauri 2",
+        "softwareVersion": "1.0.0",
+        "downloadUrl": "https://mpe.run/zh/changelog.html",
+        "license": "https://opensource.org/licenses/MIT",
+        "releaseNotes": "https://mpe.run/zh/changelog.html",
+        "description": "基于 Rust + Tauri 构建的跨平台多协议工作流执行引擎与可视化接口测试工具，原生内置 7 种核心协议，支持丰富的 MCP、Kafka、Redis 等侧边进程插件生态。",
         "url": "https://mpe.run/zh/",
         "image": "https://mpe.run/og-image.png",
         "screenshot": "https://mpe.run/og-image.png",
+        "featureList": [
+          "原生支持 HTTP、WebSocket、TCP、UDP、SSE 与 GraphQL 跨协议链路串联",
+          "Model Context Protocol (MCP) 智能体服务可视化调试与自动化评测",
+          "单二进制双模式：桌面端可视化 GUI 与无头高并发 CLI 执行引擎",
+          "内置异步 Rust 压测引擎，实时统计 p50/p90/p99 延迟分位数分布",
+          "100% 本地离线优先，Git 友好纯文本 .mpf JSON 工作流存储",
+          "原生支持 JUnit XML、JSON、HTML 测试报告输出，无缝接入 CI/CD 流水线"
+        ],
         "offers": {
           "@type": "Offer",
           "price": "0",
           "priceCurrency": "USD"
         },
         "author": {
-          "@type": "Organization",
-          "name": "Multi-Protocol Flow Organization",
-          "url": "https://github.com/multi-protocol-flow"
+          "@id": "https://mpe.run/#organization"
         }
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "@id": "https://mpe.run/zh/#sourcecode",
+        "name": "MPE Flow 源代码",
+        "programmingLanguage": ["Rust", "TypeScript", "JavaScript"],
+        "codeRepository": "https://github.com/multi-protocol-flow",
+        "license": "https://opensource.org/licenses/MIT",
+        "targetProduct": {
+          "@id": "https://mpe.run/zh/#software"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://mpe.run/#organization",
+        "name": "Multi-Protocol Flow Organization",
+        "url": "https://mpe.run/",
+        "logo": "https://mpe.run/mpe-logo.svg",
+        "sameAs": [
+          "https://github.com/multi-protocol-flow"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://mpe.run/#website",
+        "name": "MPE Flow",
+        "url": "https://mpe.run/",
+        "publisher": {
+          "@id": "https://mpe.run/#organization"
+        },
+        "inLanguage": ["en", "zh-CN"]
       },
       {
         "@type": "FAQPage",

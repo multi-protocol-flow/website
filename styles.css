@@ -1024,10 +1024,15 @@ a.protocol-item:hover .protocol-name {
 }
 
 .comparison-table .highlight {
-  color: var(--color-success);
+  color: var(--color-primary-light, #38bdf8);
   font-weight: 600;
+  background: rgba(14, 165, 233, 0.06);
 }
 
+.comparison-table th.highlight {
+  color: var(--color-primary, #0ea5e9);
+  background: rgba(14, 165, 233, 0.12);
+}
 /* --- Quick Start Section --- */
 .quick-start {
   padding: var(--spacing-16) 0;

@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>更新日志与版本下载 — Multi-Protocol Flow Executor (MPE Flow)</title>
-  <meta name="description" content="MPE Flow 官方发布历史、更新日志以及适用于 Windows、macOS、Linux 各平台的二进制安装包与便携版下载。">
-  <meta name="keywords" content="MPE下载, MPE发布日志, 更新日志, windows mac linux 安装包, 历史版本">
+  <meta name="description" content="MPE Flow 官方发布历史、更新说明以及 Windows、macOS 与 Linux 各平台桌面端及 CLI 二进制安装包下载。">
+  <meta name="keywords" content="MPE下载, MPE发布日志, 更新日志, windows mac linux 安装包, 历史版本, Tauri安装包, Rust二进制下载">
   <meta name="author" content="MPE Flow 团队">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mpe.run/zh/changelog.html">
@@ -20,7 +20,9 @@
   <meta property="og:site_name" content="MPE Flow">
   <meta property="og:url" content="https://mpe.run/zh/changelog.html">
   <meta property="og:title" content="更新日志与版本下载 — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta property="og:description" content="MPE Flow 官方发布历史、更新日志以及适用于 Windows、macOS、Linux 各平台的二进制安装包与便携版下载。">
+  <meta property="og:description" content="MPE Flow 官方发布历史、更新说明以及各平台安装包与 CLI 下载。">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:locale:alternate" content="en_US">
   <meta property="og:image" content="https://mpe.run/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -29,7 +31,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="更新日志与版本下载 — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta name="twitter:description" content="MPE Flow 官方发布历史、更新日志以及适用于 Windows、macOS、Linux 各平台的二进制安装包与便携版下载。">
+  <meta name="twitter:description" content="MPE Flow 官方发布历史、更新说明以及各平台安装包与 CLI 下载。">
   <meta name="twitter:image" content="https://mpe.run/og-image.png">
 
   <!-- Manifest & Theme -->
@@ -43,25 +45,46 @@
     "@graph": [
       {
         "@type": "CollectionPage",
+        "@id": "https://mpe.run/zh/changelog.html#page",
         "name": "MPE Flow 官方更新日志与版本发布历史",
         "description": "Multi-Protocol Flow Executor 跨平台各版本发布说明与安装包下载。",
         "url": "https://mpe.run/zh/changelog.html",
-        "image": "https://mpe.run/og-image.png"
+        "image": "https://mpe.run/og-image.png",
+        "mainEntity": {
+          "@id": "https://mpe.run/zh/changelog.html#releases"
+        }
+      },
+      {
+        "@type": "ItemList",
+        "@id": "https://mpe.run/zh/changelog.html#releases",
+        "name": "MPE Flow 发布历史",
+        "itemListElement": [
+          {
+            "@type": "SoftwareApplication",
+            "position": 1,
+            "name": "MPE Flow 桌面端与 CLI",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Windows, macOS, Linux",
+            "softwareVersion": "1.0.0",
+            "downloadUrl": "https://download.mpe.run"
+          }
+        ]
       },
       {
         "@type": "BreadcrumbList",
+        "@id": "https://mpe.run/zh/changelog.html#breadcrumbs",
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "Home",
-            "item": "https://mpe.run/"
+            "name": "首页",
+            "item": "https://mpe.run/zh/"
           },
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "Changelog",
-            "item": "https://mpe.run/changelog.html"
+            "name": "更新日志",
+            "item": "https://mpe.run/zh/changelog.html"
           }
         ]
       }

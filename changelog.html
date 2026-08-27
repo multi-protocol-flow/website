@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Changelog &amp; Releases — Multi-Protocol Flow Executor (MPE Flow)</title>
-  <meta name="description" content="Release notes, download links for Windows, macOS, Linux, and version history for Multi-Protocol Flow Executor.">
-  <meta name="keywords" content="mpe download, mpe releases, changelog, windows mac linux installer, mpe versions">
+  <meta name="description" content="Release history, changelog notes, and direct binary download links for MPE Flow on Windows, macOS, and Linux.">
+  <meta name="keywords" content="mpe download, mpe releases, changelog, windows mac linux installer, mpe versions, tauri release, rust binary">
   <meta name="author" content="MPE Flow Team">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mpe.run/changelog.html">
@@ -20,7 +20,9 @@
   <meta property="og:site_name" content="MPE Flow">
   <meta property="og:url" content="https://mpe.run/changelog.html">
   <meta property="og:title" content="Changelog &amp; Releases — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta property="og:description" content="Release notes, download links for Windows, macOS, Linux, and version history for Multi-Protocol Flow Executor.">
+  <meta property="og:description" content="Release history and binary download links for MPE Flow across Windows, macOS, and Linux.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="zh_CN">
   <meta property="og:image" content="https://mpe.run/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -29,7 +31,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Changelog &amp; Releases — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta name="twitter:description" content="Release notes, download links for Windows, macOS, Linux, and version history for Multi-Protocol Flow Executor.">
+  <meta name="twitter:description" content="Release history and binary download links for MPE Flow across Windows, macOS, and Linux.">
   <meta name="twitter:image" content="https://mpe.run/og-image.png">
 
   <!-- Manifest & Theme -->
@@ -43,13 +45,34 @@
     "@graph": [
       {
         "@type": "CollectionPage",
+        "@id": "https://mpe.run/changelog.html#page",
         "name": "MPE Flow Changelog and Release History",
         "description": "Release history and binary download links for Multi-Protocol Flow Executor across Windows, macOS, and Linux.",
         "url": "https://mpe.run/changelog.html",
-        "image": "https://mpe.run/og-image.png"
+        "image": "https://mpe.run/og-image.png",
+        "mainEntity": {
+          "@id": "https://mpe.run/changelog.html#releases"
+        }
+      },
+      {
+        "@type": "ItemList",
+        "@id": "https://mpe.run/changelog.html#releases",
+        "name": "MPE Flow Releases",
+        "itemListElement": [
+          {
+            "@type": "SoftwareApplication",
+            "position": 1,
+            "name": "MPE Flow Desktop & CLI",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Windows, macOS, Linux",
+            "softwareVersion": "1.0.0",
+            "downloadUrl": "https://download.mpe.run"
+          }
+        ]
       },
       {
         "@type": "BreadcrumbList",
+        "@id": "https://mpe.run/changelog.html#breadcrumbs",
         "itemListElement": [
           {
             "@type": "ListItem",

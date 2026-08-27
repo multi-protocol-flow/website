@@ -1,0 +1,294 @@
+# MPE Flow (Multi-Protocol Flow Executor) — Complete Technical Knowledge Base
+
+> Comprehensive technical documentation, architecture reference, protocol specification, CLI manual, and integration guide for LLM crawlers, AI search engines, and technical developers.
+
+---
+
+## 1. Overview & Core Philosophy
+
+**MPE Flow** is a high-performance, local-first, multi-protocol visual orchestration and workflow execution engine. Written in **Rust** with a **Tauri 2** desktop interface and a dedicated headless CLI binary (`mpe` / `mpe-cli`), MPE Flow solves the protocol fragmentation problem in modern distributed systems, API testing, and IoT/microservice automation.
+
+Traditional tools (Postman, Insomnia, JMeter, Bruno) focus predominantly on HTTP/REST, treating WebSockets, raw TCP/UDP, Kafka, gRPC, or MCP as second-class citizen plugins or separate isolated tools. MPE Flow provides **native cross-protocol data pipelining**, allowing developers to authenticate via OAuth2/HTTP, pipe the session token into a WebSocket handshake, stream telemetry over raw TCP, verify results in Redis/MongoDB, and push verification events to Kafka or MCP within a single declarative DAG (Directed Acyclic Graph).
+
+### Key Architectural Pillars
+
+- **Rust Workspace Engine:** 18 decoupled crates ensuring sub-millisecond step execution, zero garbage collection pauses, and minimal memory usage (<30MB baseline).
+- **Single Dual-Mode Binary:** Launching without CLI arguments starts the visual Tauri 2 desktop canvas; supplying CLI arguments switches instantly to headless high-throughput CLI mode with zero GUI overhead.
+- **Offline-First & Sovereign Privacy:** 100% local `.mpf` workflow files and `.env` environment variables. No mandatory accounts, telemetry lock-in, or third-party cloud synchronization.
+- **Unified Schema & Typing:** Strict JSON Schema validation across all protocol nodes and variable interpolations.
+- **Pluggable Sidecar Architecture:** Third-party and enterprise protocols (MCP, Kafka, Redis, MongoDB, gRPC, Mail) operate via the standalone `mpe-plugin-sdk` wire protocol over standard IPC, guaranteeing process isolation and safety.
+
+---
+
+## 2. Supported Protocols & Node Types
+
+MPE Flow categorizes nodes into Built-in Protocol Nodes, Logic/Control Nodes, and Extensible Plugin Nodes.
+
+### 2.1 Built-in Protocol Nodes
+
+| Protocol Node | Variant Identifier | Description & Key Parameters |
+|---|---|---|
+| **HTTP Request** | `http` | Full HTTP/1.1 & HTTP/2 client. Supports URL, Method (`GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `HEAD`, `OPTIONS`), Headers, Query Params, Auth (Bearer, Basic, API Key, OAuth2), Multipart/Form-data, JSON/Raw body, Proxy settings, Timeout, and JSONPath output extraction. |
+| **WebSocket Connect** | `ws_connect` | Establishes persistent WebSocket connection. Parameters: `url`, `headers`, `protocols`, `tls`, `heartbeat_interval_sec`. |
+| **WebSocket Send & Collect** | `ws_send_collect` | Sends payload and captures response matching criteria (timeout, regex pattern, JSON path condition). |
+| **WebSocket Close** | `ws_close` | Gracefully terminates active WebSocket session with status code and reason. |
+| **TCP Connect** | `tcp_connect` | Connects raw TCP/TLS socket. Parameters: `host`, `port`, `tls` (enabled, ca_cert, client_cert, client_key), `connect_timeout_ms`. |
+| **TCP Send** | `tcp_send` | Transmits raw bytes, hex, UTF-8 strings, or structured delimiters over established TCP stream. |
+| **TCP Receive** | `tcp_receive` | Receives TCP data with framing strategies: Fixed Length, Delimiter (e.g. `\r\n`), or Inactivity Timeout. |
+| **TCP Close** | `tcp_close` | Closes active TCP socket stream. |
+| **UDP Bind** | `udp_bind` | Binds local UDP socket to `host:port`. |
+| **UDP SendTo** | `udp_send_to` | Sends datagram to target `host:port`. |
+| **UDP RecvFrom** | `udp_recv_from` | Awaits datagram with configurable buffer size and timeout. |
+| **UDP Close** | `udp_close` | Releases bound UDP socket. |
+| **SSE Connect** | `sse_connect` | Establishes Server-Sent Events HTTP stream. |
+| **SSE Listen** | `sse_listen` | Listens for specific event types (`event: <name>`) or extracts data payload matching filters. |
+| **SSE Disconnect** | `sse_disconnect` | Terminates active SSE stream. |
+| **GraphQL Query** | `graphql_query` | Executes GraphQL Query or Mutation with endpoint, variables, and header authentication. |
+| **GraphQL Introspect** | `graphql_introspect` | Queries remote GraphQL schema (`__schema`) for type discovery. |
+| **GraphQL Subscribe** | `graphql_subscribe` | Subscribes to GraphQL subscription over WebSocket transport. |
+
+### 2.2 Logic & Flow Control Nodes
+
+- **Entry Node (`entry`):** Workflow entry point defining input parameters and schema validation.
+- **End Node (`end`):** Workflow termination point aggregating final outputs, status codes, and latency metrics.
+- **Conditional Branching (`conditional`):** Evaluates Boolean logic using JS expressions or CEL (Common Expression Language). Routes flow execution to `true` or `false` outbound ports.
+- **Script Node (`script`):** Executes sandboxed JavaScript (via Boa Engine) or Rhai scripts for dynamic transformations, crypto hashes (SHA256, HMAC, MD5), base64 encoding, and custom math.
+- **Assertion Node (`assertion`):** Validates execution state against expectations (e.g., status code equals 200, response time < 500ms, JSON schema compliance, regex body match).
+- **Variable Extractor (`variable_extractor`):** Extracts values from upstream node outputs via JSONPath, Regex, or XPath and assigns them to workflow context variables.
+- **Proxy Node (`proxy`):** Intercepts or routes requests through forward or SOCKS5 proxies.
+
+### 2.3 Plugin Protocols (via `mpe-plugin-sdk`)
+
+- **MCP (Model Context Protocol):** `mcp:connect`, `mcp:call_tool`, `mcp:read_resource`, `mcp:list_tools`. Enables automated testing of Anthropic/OpenAI MCP servers and agentic workflows.
+- **Apache Kafka:** `kafka:produce`, `kafka:consume`, `kafka:admin`. Supports SASL/SCRAM, SSL/TLS, schema registry (Avro/Protobuf), and topic creation.
+- **Redis:** `redis:command`, `redis:get`, `redis:set`, `redis:pub`, `redis:sub`, `redis:eval`. Supports Redis Cluster, Sentinel, and TLS.
+- **MongoDB:** `mongo:find`, `mongo:insert`, `mongo:update`, `mongo:delete`, `mongo:aggregate`.
+- **gRPC:** `grpc:unary`, `grpc:client_stream`, `grpc:server_stream`, `grpc:bidi_stream` with Protobuf reflection.
+- **Mail (SMTP / IMAP):** `smtp:send`, `imap:fetch`, `imap:search`.
+
+---
+
+## 3. Flow File Format Specification (.mpf)
+
+MPE Flow workflows are stored in clean, human-readable JSON files with the `.mpf` extension.
+
+```json
+{
+  "id": "flow_auth_and_stream_v1",
+  "name": "Auth, WebSocket & TCP Ingestion Pipeline",
+  "version": "1.0.0",
+  "description": "Authenticates against OAuth2 API, connects to WebSocket stream, and pushes processed events to TCP server.",
+  "variables": {
+    "BASE_URL": "https://api.example.com",
+    "WS_URL": "wss://stream.example.com/events",
+    "TCP_HOST": "127.0.0.1",
+    "TCP_PORT": 9000
+  },
+  "settings": {
+    "timeout_ms": 30000,
+    "on_error": "RouteToFalse",
+    "max_concurrency": 10
+  },
+  "nodes": [
+    {
+      "id": "node_entry",
+      "type": "entry",
+      "name": "Start",
+      "position": { "x": 100, "y": 200 },
+      "data": {}
+    },
+    {
+      "id": "node_auth",
+      "type": "http",
+      "name": "Authenticate User",
+      "position": { "x": 300, "y": 200 },
+      "data": {
+        "method": "POST",
+        "url": "{{BASE_URL}}/v1/auth/login",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "type": "json",
+          "content": "{\"username\": \"admin\", \"password\": \"secret\"}"
+        }
+      }
+    },
+    {
+      "id": "node_extract_token",
+      "type": "variable_extractor",
+      "name": "Extract Token",
+      "position": { "x": 500, "y": 200 },
+      "data": {
+        "source": "{{$nodes.node_auth.output.body}}",
+        "extractors": [
+          { "target": "AUTH_TOKEN", "path": "$.access_token", "type": "jsonpath" }
+        ]
+      }
+    },
+    {
+      "id": "node_ws_connect",
+      "type": "ws_connect",
+      "name": "Connect Live Stream",
+      "position": { "x": 700, "y": 200 },
+      "data": {
+        "url": "{{WS_URL}}",
+        "headers": {
+          "Authorization": "Bearer {{AUTH_TOKEN}}"
+        }
+      }
+    },
+    {
+      "id": "node_ws_listen",
+      "type": "ws_send_collect",
+      "name": "Collect Stream Event",
+      "position": { "x": 900, "y": 200 },
+      "data": {
+        "connection_id": "{{$nodes.node_ws_connect.output.connection_id}}",
+        "send_message": "{\"action\": \"subscribe\", \"topic\": \"telemetry\"}",
+        "timeout_ms": 5000
+      }
+    },
+    {
+      "id": "node_tcp_push",
+      "type": "tcp_send",
+      "name": "Push to TCP Ingest",
+      "position": { "x": 1100, "y": 200 },
+      "data": {
+        "host": "{{TCP_HOST}}",
+        "port": "{{TCP_PORT}}",
+        "payload": "{{$nodes.node_ws_listen.output.message}}\n"
+      }
+    },
+    {
+      "id": "node_end",
+      "type": "end",
+      "name": "Completed",
+      "position": { "x": 1300, "y": 200 },
+      "data": {}
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "node_entry", "target": "node_auth" },
+    { "id": "e2", "source": "node_auth", "target": "node_extract_token" },
+    { "id": "e3", "source": "node_extract_token", "target": "node_ws_connect" },
+    { "id": "e4", "source": "node_ws_connect", "target": "node_ws_listen" },
+    { "id": "e5", "source": "node_ws_listen", "target": "node_tcp_push" },
+    { "id": "e6", "source": "node_tcp_push", "target": "node_end" }
+  ]
+}
+```
+
+---
+
+## 4. CLI Command Reference & CI/CD Integration
+
+The MPE CLI offers comprehensive command-line operations designed for developer ergonomics and CI/CD pipelines.
+
+### 4.1 Running Workflows (`mpe run`)
+
+Executes a workflow file headlessly.
+
+```bash
+# Basic run
+mpe run ./tests/flows/e2e_checkout.mpf
+
+# Inject environment file and override variables
+mpe run ./tests/flows/e2e_checkout.mpf --env staging.env --var TIMEOUT=5000 --var RETRIES=3
+
+# Output structured JUnit XML for GitHub Actions / GitLab CI
+mpe run ./tests/flows/e2e_checkout.mpf --report junit --output ./test-results/junit.xml
+
+# Output detailed JSON report
+mpe run ./tests/flows/e2e_checkout.mpf --report json --output ./test-results/report.json
+
+# Fail fast on first error
+mpe run ./tests/flows/e2e_checkout.mpf --fail-fast
+```
+
+### 4.2 Validating Workflows (`mpe validate`)
+
+Performs static analysis to detect syntax errors, dangling node references, schema mismatches, or infinite loops before execution.
+
+```bash
+mpe validate ./flows/*.mpf
+```
+
+### 4.3 High-Throughput Stress Testing (`mpe stress`)
+
+Executes multi-protocol load testing directly against the DAG workflow.
+
+```bash
+# Run 100 concurrent virtual users for 60 seconds with 10s ramp-up
+mpe stress ./flows/api_benchmark.mpf --concurrency 100 --duration 60s --ramp-up 10s
+
+# Set RPS target limit and generate HTML latency percentile chart
+mpe stress ./flows/api_benchmark.mpf --rps 500 --report html --output stress_report.html
+```
+
+### 4.4 Flow Management (`mpe flow`)
+
+```bash
+# List all nodes in a flow
+mpe flow list ./flows/checkout.mpf
+
+# Inspect detailed configuration of a specific node
+mpe flow show ./flows/checkout.mpf --node node_auth
+
+# Export flow graph as Mermaid diagram or ASCII graph
+mpe flow export ./flows/checkout.mpf --format mermaid
+```
+
+### 4.5 Interactive Debugging (`mpe debug`)
+
+```bash
+# Start interactive CLI step debugger
+mpe debug ./flows/complex_pipeline.mpf --breakpoint node_ws_listen
+```
+
+---
+
+## 5. Comparison Matrix
+
+| Feature / Dimension | MPE Flow | Postman | JMeter | Bruno |
+|---|---|---|---|---|
+| **Core Language / Engine** | **Rust (Zero GC, <30MB RAM)** | Node.js / Electron (Heavy) | Java JVM (Heavy, GC pauses) | Node.js / Electron |
+| **HTTP / REST Support** | Native (Full HTTP/1.1 & HTTP/2) | Native | Native | Native |
+| **WebSocket Chaining** | Native (Connect/Send/Collect/Close) | Isolated tab only | Plugin required | Basic |
+| **TCP / UDP Socket Ops** | Native (Raw framing, Delimiter, TLS) | Not Supported | Raw Sampler (Complex) | Not Supported |
+| **SSE (Server-Sent Events)** | Native streaming node | Limited viewer | Plugin required | Basic |
+| **GraphQL Operations** | Native (Query/Mutation/Sub/Schema) | Native | Sampler | Native |
+| **MCP (Model Context Protocol)** | Native Plugin (`mcp:*` nodes) | Not Supported | Not Supported | Not Supported |
+| **Kafka / Redis / MongoDB / gRPC**| First-Class Plugin Ecosystem | Third-party / Limited | Plugins (JMeter GUI) | Not Supported |
+| **Execution Engine** | Visual GUI + Pure Headless CLI | GUI + Newman CLI | GUI + Non-GUI Mode | GUI + CLI |
+| **Stress / Load Testing** | Built-in Multi-Protocol Engine | Paid Cloud Monitor | Built-in (Java Threads) | Not Supported |
+| **Data Storage / Privacy** | 100% Local Git-friendly `.mpf` | Cloud Sync (Account required) | Local XML/JMX | Local Files |
+| **CI/CD Integration** | Direct binary, JUnit XML, JSON | Newman npm wrapper | Non-GUI shell script | Bru CLI |
+
+---
+
+## 6. Frequently Asked Questions (FAQ)
+
+### Q: How is MPE Flow different from Postman?
+**A:** Postman is primarily designed for standalone HTTP/REST API request-response cycles. MPE Flow is designed for complex **multi-protocol event-driven workflows**. In MPE Flow, you can seamlessly pass data across HTTP, WebSocket, TCP sockets, Server-Sent Events, Kafka, Redis, and AI Model Context Protocol (MCP) servers within a single visual graph. Furthermore, MPE Flow is 100% local-first with no mandatory cloud account or telemetry lock-in.
+
+### Q: Can MPE Flow replace JMeter for stress testing?
+**A:** Yes. MPE Flow includes a native Rust multi-protocol stress engine (`mpe stress`). Unlike JMeter which runs on the Java JVM and requires significant CPU/memory overhead per thread, MPE Flow utilizes asynchronous Rust tasks (Tokio), allowing thousands of concurrent virtual users with negligible resource consumption and accurate p50/p90/p99 latency reporting.
+
+### Q: What is the Model Context Protocol (MCP) node used for?
+**A:** MCP is the standard protocol for connecting AI models (Claude, ChatGPT, IDE agents) to tools and datasets. MPE Flow's `mcp:*` plugin nodes allow developers and QA engineers to connect to MCP servers, test tool definitions, inspect resources, and simulate agentic tool calls in automated test suites.
+
+### Q: Does MPE Flow work in air-gapped or offline enterprise environments?
+**A:** Yes. MPE Flow is distributed as standalone binaries (or Docker container / CLI) with zero external cloud dependencies. Workflows are saved in open `.mpf` JSON files on local disk and can be checked directly into Git repositories.
+
+---
+
+## 7. Official Resources & Community
+
+- **Official Website:** https://mpe.run/
+- **Documentation:** https://mpe.run/docs.html
+- **Plugin Directory:** https://mpe.run/plugins.html
+- **Online Interactive Playground:** https://mpe.run/playground/
+- **Changelog & Releases:** https://mpe.run/changelog.html
+- **GitHub Repository:** https://github.com/multi-protocol-flow
+- **Issue Tracker:** https://github.com/multi-protocol-flow/mpe/issues

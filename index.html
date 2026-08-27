@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MPE Flow — Multi-Protocol Workflow Executor &amp; Visual API Testing (GUI + CLI)</title>
-  <meta name="description" content="Design, test, and automate multi-protocol workflows across HTTP, WebSocket, SSE, TCP, UDP, GraphQL, and Kafka in a single Rust binary. Cross-platform desktop app &amp; CLI.">
-  <meta name="keywords" content="multi-protocol, api testing, workflow automation, websocket testing, tcp workflow, sse debug, graphql client, tauri, rust, postman alternative, jmeter alternative">
+  <meta name="description" content="Open-source multi-protocol workflow executor and visual API testing platform in Rust. Orchestrate and automate HTTP, WebSocket, TCP, UDP, SSE, GraphQL, MCP, and Kafka with GUI &amp; CLI.">
+  <meta name="keywords" content="multi-protocol api testing, websocket testing tool, tcp socket debugger, sse stream test, graphql client, mcp server debug, postman alternative, jmeter alternative, rust api automation, tauri cli">
   <meta name="author" content="MPE Flow Team">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mpe.run/">
@@ -20,7 +20,9 @@
   <meta property="og:site_name" content="MPE Flow">
   <meta property="og:url" content="https://mpe.run/">
   <meta property="og:title" content="MPE Flow — Multi-Protocol Workflow Executor &amp; Visual API Testing (GUI + CLI)">
-  <meta property="og:description" content="Design, test, and automate multi-protocol workflows across HTTP, WebSocket, SSE, TCP, UDP, GraphQL, and Kafka in a single Rust binary.">
+  <meta property="og:description" content="Open-source multi-protocol workflow executor and visual API testing platform in Rust. Orchestrate HTTP, WebSocket, TCP, UDP, SSE, GraphQL, and MCP in one binary.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="zh_CN">
   <meta property="og:image" content="https://mpe.run/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -29,13 +31,12 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="MPE Flow — Multi-Protocol Workflow Executor &amp; Visual API Testing (GUI + CLI)">
-  <meta name="twitter:description" content="Design, test, and automate multi-protocol workflows across HTTP, WebSocket, SSE, TCP, UDP, GraphQL, and Kafka in a single Rust binary.">
+  <meta name="twitter:description" content="Open-source multi-protocol workflow executor and visual API testing platform in Rust. Orchestrate HTTP, WebSocket, TCP, UDP, SSE, GraphQL, and MCP in one binary.">
   <meta name="twitter:image" content="https://mpe.run/og-image.png">
 
   <!-- Manifest & Theme -->
   <link rel="manifest" href="/site.webmanifest">
   <meta name="theme-color" content="#0f172a">
-
   <!-- Structured Data (JSON-LD) -->
   <script type="application/ld+json">
   {
@@ -46,22 +47,65 @@
         "@id": "https://mpe.run/#software",
         "name": "MPE Flow",
         "alternateName": "Multi-Protocol Flow Executor",
-        "operatingSystem": "Windows, macOS, Linux",
         "applicationCategory": "DeveloperApplication",
-        "description": "Cross-platform multi-protocol workflow executor and visual API testing engine with 7 core protocols built-in and extensible plugin architecture.",
+        "applicationSubCategory": "API Testing & Multi-Protocol Workflow Automation",
+        "operatingSystem": "Windows, macOS, Linux",
+        "softwareRequirements": "Rust, Tauri 2",
+        "softwareVersion": "1.0.0",
+        "downloadUrl": "https://mpe.run/changelog.html",
+        "license": "https://opensource.org/licenses/MIT",
+        "releaseNotes": "https://mpe.run/changelog.html",
+        "description": "Cross-platform multi-protocol workflow executor and visual API testing engine built in Rust and Tauri 2. Natively chains HTTP, WebSocket, TCP, UDP, SSE, and GraphQL with an extensible plugin architecture for MCP, Kafka, and Redis.",
         "url": "https://mpe.run/",
         "image": "https://mpe.run/og-image.png",
         "screenshot": "https://mpe.run/og-image.png",
+        "featureList": [
+          "Native cross-protocol chaining across HTTP, WebSocket, TCP, UDP, SSE, and GraphQL",
+          "Model Context Protocol (MCP) server visual debugging and agentic tool evaluation",
+          "Single dual-mode binary: Visual desktop GUI and headless CLI execution engine",
+          "High-throughput multi-protocol stress and load testing with p50/p90/p99 latency distribution",
+          "100% Local-first offline execution with Git-friendly .mpf JSON workflow files",
+          "Native JUnit XML, JSON, and HTML test report generation for CI/CD pipelines"
+        ],
         "offers": {
           "@type": "Offer",
           "price": "0",
           "priceCurrency": "USD"
         },
         "author": {
-          "@type": "Organization",
-          "name": "Multi-Protocol Flow Organization",
-          "url": "https://github.com/multi-protocol-flow"
+          "@id": "https://mpe.run/#organization"
         }
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "@id": "https://mpe.run/#sourcecode",
+        "name": "MPE Flow Source Code",
+        "programmingLanguage": ["Rust", "TypeScript", "JavaScript"],
+        "codeRepository": "https://github.com/multi-protocol-flow",
+        "license": "https://opensource.org/licenses/MIT",
+        "targetProduct": {
+          "@id": "https://mpe.run/#software"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://mpe.run/#organization",
+        "name": "Multi-Protocol Flow Organization",
+        "url": "https://mpe.run/",
+        "logo": "https://mpe.run/mpe-logo.svg",
+        "sameAs": [
+          "https://github.com/multi-protocol-flow"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://mpe.run/#website",
+        "name": "MPE Flow",
+        "url": "https://mpe.run/",
+        "publisher": {
+          "@id": "https://mpe.run/#organization"
+        },
+        "inLanguage": ["en", "zh-CN"]
       },
       {
         "@type": "FAQPage",
@@ -85,10 +129,10 @@
           },
           {
             "@type": "Question",
-            "name": "How does MPE Flow differ from Postman or JMeter?",
+            "name": "How does MPE Flow differ from Postman, JMeter, or Bruno?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Unlike HTTP-centric tools like Postman, MPE Flow provides native first-class support for stateful protocols (TCP, WebSocket, SSE streams, Kafka pub/sub, MCP) with visual graph-based flow design, branching, variable extraction, assertion chains, and high-concurrency stress testing in a lightweight Rust binary."
+              "text": "Unlike HTTP-centric tools like Postman or Bruno, MPE Flow provides native first-class chaining for stateful protocols (TCP, WebSocket, SSE streams, Kafka, MCP) with visual graph-based flow design, branching, variable extraction, assertion chains, and high-concurrency stress testing in a lightweight Rust binary."
             }
           },
           {
@@ -197,10 +241,10 @@
 
         <div class="feature-card">
           <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
           </div>
+          <h3>Automated CI/CD Integration</h3>
           <p>Native JUnit XML reports (<code>--report-format junit --report-file results.xml</code>) plug straight into Jenkins, GitHub Actions, and GitLab CI — every node maps to a test case, so PRs surface flow results without custom tooling.</p>
-        </div>
       </div>
     </div>
   </section>
@@ -280,69 +324,69 @@
   <!-- Comparison -->
   <section class="comparison">
     <div class="container">
-      <h2>Why Choose MPE Flow?</h2>
-      <p class="section-subtitle">Compare with popular alternatives</p>
+      <h2>How MPE Flow Compares</h2>
+      <p class="section-subtitle">Why modern engineering and QA teams choose MPE Flow over single-protocol tools</p>
       
       <div class="comparison-table-wrapper">
         <table class="comparison-table">
           <thead>
             <tr>
-              <th>Feature</th>
-              <th>MPE Flow</th>
+              <th>Core Dimension</th>
+              <th class="highlight">MPE Flow</th>
               <th>Postman</th>
-              <th>n8n/Zapier</th>
-              <th>Custom Scripts</th>
+              <th>Apache JMeter</th>
+              <th>Bruno</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Multi-protocol support</td>
-              <td class="highlight">&#10003; 7 built-in + plugins</td>
-              <td>HTTP only</td>
-              <td>Limited</td>
-              <td>Manual</td>
+              <td>Multi-Protocol Chaining</td>
+              <td class="highlight">&#10003; Native HTTP, WS, TCP, UDP, SSE, GQL, Kafka, MCP</td>
+              <td>HTTP only (isolated WS tab)</td>
+              <td>Supported via complex sampler plugins</td>
+              <td>HTTP &amp; basic GraphQL only</td>
             </tr>
             <tr>
-              <td>Visual editor</td>
-              <td class="highlight">&#10003; Built-in</td>
-              <td>&#10003; Yes</td>
-              <td>&#10003; Yes</td>
-              <td>&#10007; No</td>
+              <td>Engine &amp; Resource Footprint</td>
+              <td class="highlight">&#9889; Native Rust (Zero GC, &lt;30MB RAM)</td>
+              <td>Electron (Heavy memory usage)</td>
+              <td>Java JVM (High RAM &amp; GC pauses)</td>
+              <td>Electron / Node.js</td>
             </tr>
             <tr>
-              <td>Local execution</td>
-              <td class="highlight">&#10003; 100% local</td>
-              <td>Cloud optional</td>
-              <td>Cloud only</td>
-              <td>&#10003; Yes</td>
+              <td>Delivery &amp; Mode</td>
+              <td class="highlight">&#10003; Single Binary (Desktop GUI + CLI)</td>
+              <td>Desktop App + Newman wrapper</td>
+              <td>Java GUI + Shell script</td>
+              <td>Desktop App + Bru CLI</td>
             </tr>
             <tr>
-              <td>CLI mode</td>
-              <td class="highlight">&#10003; Full CLI</td>
-              <td>&#10007; No</td>
-              <td>&#10007; No</td>
-              <td>&#10003; Yes</td>
+              <td>MCP (Model Context Protocol) Eval</td>
+              <td class="highlight">&#10003; Native Visual Inspector &amp; Assertions</td>
+              <td>&#10007; Not Supported</td>
+              <td>&#10007; Not Supported</td>
+              <td>&#10007; Not Supported</td>
             </tr>
             <tr>
-              <td>Price</td>
-              <td class="highlight">&#10003; Free & OSS</td>
-              <td>Freemium</td>
-              <td>Subscription</td>
-              <td>Free</td>
+              <td>Built-in Stress Testing</td>
+              <td class="highlight">&#10003; Native Tokio Async (p50/p90/p99 latency)</td>
+              <td>&#10007; Paid cloud monitor only</td>
+              <td>&#10003; Built-in (Thread-heavy)</td>
+              <td>&#10007; Not Supported</td>
             </tr>
             <tr>
-              <td>Performance</td>
-              <td class="highlight">&#10003; Rust engine</td>
-              <td>Good</td>
-              <td>Variable</td>
-              <td>Variable</td>
+              <td>Local-First &amp; Data Sovereign</td>
+              <td class="highlight">&#10003; 100% Local Git-friendly .mpf files</td>
+              <td>&#10007; Mandatory Cloud Account</td>
+              <td>&#10003; Local XML/JMX</td>
+              <td>&#10003; Local plain files</td>
             </tr>
             <tr>
-              <td>Offline capable</td>
-              <td class="highlight">&#10003; Yes</td>
-              <td>&#10007; No</td>
-              <td>&#10007; No</td>
-              <td>&#10003; Yes</td>
+              <td>CI/CD Native Reporting</td>
+              <td class="highlight">&#10003; JUnit XML, JSON, HTML, Markdown</td>
+              <td>Newman CLI / JSON</td>
+              <td>JTL / HTML report</td>
+              <td>CLI text output</td>
             </tr>
           </tbody>
         </table>

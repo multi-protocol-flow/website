@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Documentation — Multi-Protocol Flow Executor (MPE Flow)</title>
-  <meta name="description" content="Comprehensive documentation for MPE Flow: CLI commands, node types, variables, flow file schema, protocol execution, and automation.">
-  <meta name="keywords" content="mpe docs, multi-protocol documentation, flow executor guide, cli reference, rust api testing">
+  <meta name="description" content="Comprehensive documentation and CLI reference for MPE Flow: architecture, node schemas, cross-protocol execution, stress testing, and CI/CD integration.">
+  <meta name="keywords" content="mpe docs, multi-protocol documentation, flow executor guide, cli reference, rust api testing, websocket automation, tcp testing, mcp debugging, junit xml">
   <meta name="author" content="MPE Flow Team">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mpe.run/docs.html">
@@ -19,8 +19,10 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="MPE Flow">
   <meta property="og:url" content="https://mpe.run/docs.html">
-  <meta property="og:title" content="Documentation — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta property="og:description" content="Comprehensive documentation for MPE Flow: CLI commands, node types, variables, flow file schema, protocol execution, and automation.">
+  <meta property="og:title" content="Documentation &amp; CLI Manual — Multi-Protocol Flow Executor (MPE Flow)">
+  <meta property="og:description" content="Comprehensive technical documentation and CLI manual for MPE Flow. Orchestrate HTTP, WebSocket, TCP, UDP, SSE, GraphQL, MCP, and Kafka.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="zh_CN">
   <meta property="og:image" content="https://mpe.run/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -28,8 +30,8 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Documentation — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta name="twitter:description" content="Comprehensive documentation for MPE Flow: CLI commands, node types, variables, flow file schema, protocol execution, and automation.">
+  <meta name="twitter:title" content="Documentation &amp; CLI Manual — Multi-Protocol Flow Executor (MPE Flow)">
+  <meta name="twitter:description" content="Comprehensive technical documentation and CLI manual for MPE Flow. Orchestrate HTTP, WebSocket, TCP, UDP, SSE, GraphQL, MCP, and Kafka.">
   <meta name="twitter:image" content="https://mpe.run/og-image.png">
 
   <!-- Manifest & Theme -->
@@ -43,17 +45,59 @@
     "@graph": [
       {
         "@type": "TechArticle",
-        "headline": "MPE Flow Documentation & Reference Manual",
-        "description": "Comprehensive technical guide to Multi-Protocol Flow Executor CLI, architecture, node types, and flow file schema.",
+        "@id": "https://mpe.run/docs.html#article",
+        "headline": "MPE Flow Documentation & Technical Reference Manual",
+        "description": "Comprehensive technical guide to Multi-Protocol Flow Executor CLI, architecture, protocol nodes, and flow file schema.",
         "url": "https://mpe.run/docs.html",
+        "inLanguage": "en",
         "image": "https://mpe.run/og-image.png",
+        "audience": {
+          "@type": "Audience",
+          "audienceType": "Developers, QA Engineers, DevOps Engineers"
+        },
+        "articleSection": [
+          "Architecture & Engine Design",
+          "CLI Command Reference",
+          "Built-in Protocol Nodes",
+          "Plugin Ecosystem",
+          "Flow File Specification (.mpf)",
+          "CI/CD Integration & Automation"
+        ],
         "author": {
           "@type": "Organization",
-          "name": "Multi-Protocol Flow Organization"
+          "name": "Multi-Protocol Flow Organization",
+          "url": "https://mpe.run/"
         }
       },
       {
+        "@type": "HowTo",
+        "@id": "https://mpe.run/docs.html#howto",
+        "name": "How to Orchestrate and Execute Multi-Protocol Workflows with MPE Flow CLI",
+        "description": "Step-by-step tutorial on creating, validating, and executing multi-protocol test workflows using MPE Flow CLI.",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "position": 1,
+            "name": "Design Workflow",
+            "text": "Design your cross-protocol workflow visually in the MPE Flow GUI or export a declarative .mpf JSON file."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 2,
+            "name": "Validate Flow Schema",
+            "text": "Execute 'mpe validate flow.mpf' to verify node schemas, variables, and DAG connections."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 3,
+            "name": "Execute in CI/CD",
+            "text": "Run 'mpe run flow.mpf --report junit --output results.xml' headlessly in your CI pipeline."
+          }
+        ]
+      },
+      {
         "@type": "BreadcrumbList",
+        "@id": "https://mpe.run/docs.html#breadcrumbs",
         "itemListElement": [
           {
             "@type": "ListItem",

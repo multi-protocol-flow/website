@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>插件市场 — Multi-Protocol Flow Executor (MPE Flow)</title>
-  <meta name="description" content="浏览并安装 MPE Flow 官方与社区协议插件：Redis、MongoDB、gRPC、MCP、Kafka、LLM、SMTP、IMAP 等丰富生态。">
-  <meta name="keywords" content="MPE插件市场, 协议插件, MCP调试, gRPC测试, Redis工作流, MongoDB插件, Kafka测试">
+  <meta name="description" content="浏览并安装 MPE Flow 官方与社区协议插件：Model Context Protocol (MCP)、Apache Kafka、Redis、MongoDB、gRPC、SMTP、IMAP 与 LLM 自动化评测插件。">
+  <meta name="keywords" content="MPE插件市场, 协议插件, MCP调试, gRPC测试, Redis工作流, MongoDB插件, Kafka测试, 邮件自动化, LLM测试">
   <meta name="author" content="MPE Flow 团队">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mpe.run/zh/plugins.html">
@@ -20,7 +20,9 @@
   <meta property="og:site_name" content="MPE Flow">
   <meta property="og:url" content="https://mpe.run/zh/plugins.html">
   <meta property="og:title" content="插件市场 — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta property="og:description" content="浏览并安装 MPE Flow 官方与社区协议插件：Redis、MongoDB、gRPC、MCP、Kafka、LLM、SMTP、IMAP 等丰富生态。">
+  <meta property="og:description" content="浏览并安装 MPE Flow 官方与社区协议插件：MCP、Kafka、Redis、MongoDB、gRPC、SMTP、IMAP 与 LLM 评测生态。">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:locale:alternate" content="en_US">
   <meta property="og:image" content="https://mpe.run/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -29,7 +31,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="插件市场 — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta name="twitter:description" content="浏览并安装 MPE Flow 官方与社区协议插件：Redis、MongoDB、gRPC、MCP、Kafka、LLM、SMTP、IMAP 等丰富生态。">
+  <meta name="twitter:description" content="浏览并安装 MPE Flow 官方与社区协议插件：MCP、Kafka、Redis、MongoDB、gRPC、SMTP、IMAP 与 LLM 评测生态。">
   <meta name="twitter:image" content="https://mpe.run/og-image.png">
 
   <!-- Manifest & Theme -->
@@ -43,25 +45,94 @@
     "@graph": [
       {
         "@type": "CollectionPage",
+        "@id": "https://mpe.run/zh/plugins.html#page",
         "name": "MPE Flow 官方插件市场",
-        "description": "Multi-Protocol Flow Executor 跨协议工作流执行引擎官方与社区协议插件目录。",
+        "description": "Multi-Protocol Flow Executor 跨协议工作流执行引擎官方与社区协议插件目录：MCP、Kafka、Redis、MongoDB、gRPC、SMTP 与 IMAP 等。",
         "url": "https://mpe.run/zh/plugins.html",
-        "image": "https://mpe.run/og-image.png"
+        "image": "https://mpe.run/og-image.png",
+        "mainEntity": {
+          "@id": "https://mpe.run/zh/plugins.html#itemlist"
+        }
+      },
+      {
+        "@type": "ItemList",
+        "@id": "https://mpe.run/zh/plugins.html#itemlist",
+        "name": "MPE Flow 协议插件列表",
+        "numberOfItems": 8,
+        "itemListElement": [
+          {
+            "@type": "SoftwareApplication",
+            "position": 1,
+            "name": "mpe-plugin-mcp",
+            "applicationCategory": "DeveloperApplication",
+            "description": "Model Context Protocol (MCP) 智能体工具调用、资源读取与服务调试插件。"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 2,
+            "name": "mpe-plugin-kafka",
+            "applicationCategory": "DeveloperApplication",
+            "description": "Apache Kafka 消息生产与消费、Topic 管理及 Schema Registry 集成插件。"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 3,
+            "name": "mpe-plugin-redis",
+            "applicationCategory": "DeveloperApplication",
+            "description": "Redis 内存键值存储、缓存操作与发布/订阅消息队列插件。"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 4,
+            "name": "mpe-plugin-mongo",
+            "applicationCategory": "DeveloperApplication",
+            "description": "MongoDB 文档数据库 CRUD 基础操作与聚合管道分析插件。"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 5,
+            "name": "mpe-plugin-grpc",
+            "applicationCategory": "DeveloperApplication",
+            "description": "gRPC 远程过程调用插件，支持 Protobuf 反射与客户端/服务端流式通信。"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 6,
+            "name": "mpe-plugin-smtp",
+            "applicationCategory": "DeveloperApplication",
+            "description": "SMTP 邮件发送与自动化通知触发插件。"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 7,
+            "name": "mpe-plugin-imap",
+            "applicationCategory": "DeveloperApplication",
+            "description": "IMAP 邮箱轮询、邮件搜索与收件箱自动化校验插件。"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "position": 8,
+            "name": "mpe-plugin-llm",
+            "applicationCategory": "DeveloperApplication",
+            "description": "大语言模型 Prompt 执行、AI 智能体评估与工作流验证插件。"
+          }
+        ]
       },
       {
         "@type": "BreadcrumbList",
+        "@id": "https://mpe.run/zh/plugins.html#breadcrumbs",
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "Home",
-            "item": "https://mpe.run/"
+            "name": "首页",
+            "item": "https://mpe.run/zh/"
           },
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "Plugins",
-            "item": "https://mpe.run/plugins.html"
+            "name": "插件",
+            "item": "https://mpe.run/zh/plugins.html"
           }
         ]
       }

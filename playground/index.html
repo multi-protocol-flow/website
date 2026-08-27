@@ -24,7 +24,7 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:type" content="image/png">
-
+    <meta property="og:locale" content="en_US">
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Web Playground — Multi-Protocol Flow Executor (MPE Flow)">
@@ -42,12 +42,18 @@
       "@graph": [
         {
           "@type": "WebApplication",
+          "@id": "https://mpe.run/playground/#app",
           "name": "MPE Flow Web Playground",
-          "description": "Interactive web-based flow designer for Multi-Protocol Flow Executor.",
+          "description": "Interactive web-based flow designer and visual workflow builder for Multi-Protocol Flow Executor.",
           "url": "https://mpe.run/playground/",
           "applicationCategory": "DeveloperApplication",
-          "operatingSystem": "All modern browsers",
-          "image": "https://mpe.run/og-image.png"
+          "operatingSystem": "All modern web browsers",
+          "image": "https://mpe.run/og-image.png",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
         },
         {
           "@type": "BreadcrumbList",
