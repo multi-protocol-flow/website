@@ -202,6 +202,27 @@ code {
   color: var(--color-text);
 }
 
+.nav-links .lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: 4px 10px;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all var(--transition);
+}
+
+.nav-links .lang-switch:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+  color: var(--color-text);
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.2);
+}
 /* --- Buttons --- */
 .btn {
   display: inline-flex;
@@ -1465,4 +1486,73 @@ a.protocol-item:hover .protocol-name {
   .docs-content {
     padding: var(--spacing-6) var(--spacing-4);
   }
+}
+
+/* --- FAQ Section --- */
+.faq-section {
+  padding: var(--spacing-20) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.faq-section h2 {
+  text-align: center;
+}
+
+.faq-section .section-subtitle {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto var(--spacing-12);
+}
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacing-6);
+  margin-top: var(--spacing-8);
+}
+
+.faq-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.faq-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.faq-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-3);
+  line-height: 1.4;
+}
+
+.faq-card p {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.faq-card p code {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--color-primary-hover);
+}
+
+.faq-card a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.faq-card a:hover {
+  color: var(--color-primary-hover);
 }

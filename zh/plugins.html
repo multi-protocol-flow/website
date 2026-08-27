@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plugin Marketplace — Multi-Protocol Flow Executor (MPE Flow)</title>
-  <meta name="description" content="Browse and install protocol plugins for MPE Flow: Redis, MongoDB, gRPC, MCP, Kafka, LLM, SMTP, IMAP, and more.">
-  <meta name="keywords" content="mpe plugins, protocol plugins, mcp server debug, grpc testing, redis flow, mongodb workflow, kafka testing">
-  <meta name="author" content="MPE Flow Team">
+  <title>插件市场 — Multi-Protocol Flow Executor (MPE Flow)</title>
+  <meta name="description" content="浏览并安装 MPE Flow 官方与社区协议插件：Redis、MongoDB、gRPC、MCP、Kafka、LLM、SMTP、IMAP 等丰富生态。">
+  <meta name="keywords" content="MPE插件市场, 协议插件, MCP调试, gRPC测试, Redis工作流, MongoDB插件, Kafka测试">
+  <meta name="author" content="MPE Flow 团队">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://mpe.run/plugins.html">
+  <link rel="canonical" href="https://mpe.run/zh/plugins.html">
 
   <!-- Hreflang alternates -->
   <link rel="alternate" hreflang="en" href="https://mpe.run/plugins.html">
@@ -18,9 +18,9 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MPE Flow">
-  <meta property="og:url" content="https://mpe.run/plugins.html">
-  <meta property="og:title" content="Plugin Marketplace — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta property="og:description" content="Browse and install protocol plugins for MPE Flow: Redis, MongoDB, gRPC, MCP, Kafka, LLM, SMTP, IMAP, and more.">
+  <meta property="og:url" content="https://mpe.run/zh/plugins.html">
+  <meta property="og:title" content="插件市场 — Multi-Protocol Flow Executor (MPE Flow)">
+  <meta property="og:description" content="浏览并安装 MPE Flow 官方与社区协议插件：Redis、MongoDB、gRPC、MCP、Kafka、LLM、SMTP、IMAP 等丰富生态。">
   <meta property="og:image" content="https://mpe.run/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -28,8 +28,8 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Plugin Marketplace — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta name="twitter:description" content="Browse and install protocol plugins for MPE Flow: Redis, MongoDB, gRPC, MCP, Kafka, LLM, SMTP, IMAP, and more.">
+  <meta name="twitter:title" content="插件市场 — Multi-Protocol Flow Executor (MPE Flow)">
+  <meta name="twitter:description" content="浏览并安装 MPE Flow 官方与社区协议插件：Redis、MongoDB、gRPC、MCP、Kafka、LLM、SMTP、IMAP 等丰富生态。">
   <meta name="twitter:image" content="https://mpe.run/og-image.png">
 
   <!-- Manifest & Theme -->
@@ -43,9 +43,9 @@
     "@graph": [
       {
         "@type": "CollectionPage",
-        "name": "MPE Flow Plugin Marketplace",
-        "description": "Directory of protocol and extension plugins for Multi-Protocol Flow Executor.",
-        "url": "https://mpe.run/plugins.html",
+        "name": "MPE Flow 官方插件市场",
+        "description": "Multi-Protocol Flow Executor 跨协议工作流执行引擎官方与社区协议插件目录。",
+        "url": "https://mpe.run/zh/plugins.html",
         "image": "https://mpe.run/og-image.png"
       },
       {
@@ -72,23 +72,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/png" href="../favicon.png">
 <body>
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <a href="/" class="logo">
-        <img src="mpe-logo.svg" alt="MPE Flow" class="logo-img">
+      <a href="/zh/" class="logo">
+        <img src="../mpe-logo.svg" alt="MPE Flow" class="logo-img">
       </a>
       <nav aria-label="Main navigation">
         <ul class="nav-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="/playground/">Playground</a></li>
-          <li><a href="plugins.html" class="active">Plugins</a></li>
-          <li><a href="docs.html">Docs</a></li>
-          <li><a href="changelog.html">Changelog</a></li>
-          <li><a href="/zh/plugins.html" class="lang-switch" title="切换到简体中文">🌐 简体中文</a></li>
+          <li><a href="/zh/">首页</a></li>
+          <li><a href="/playground/">演练场</a></li>
+          <li><a href="plugins.html" class="active">插件市场</a></li>
+          <li><a href="docs.html">文档</a></li>
+          <li><a href="changelog.html">更新日志</a></li>
+          <li><a href="/plugins.html" class="lang-switch" title="Switch to English">🌐 English</a></li>
         </ul>
       </nav>
     </div>
@@ -97,18 +97,18 @@
   <!-- Plugin Marketplace -->
   <section class="page-title">
     <div class="container">
-      <h1>Plugin Marketplace</h1>
-      <p>7 core protocols ship in the MPE binary. Everything else is a plugin &mdash; install with one command.</p>
+      <h1>插件市场</h1>
+      <p>MPE 二进制原生内置 7 种核心协议。其他协议均通过侧边进程插件提供 &mdash; 一行命令即可安装。</p>
     </div>
   </section>
 
   <section class="plugins-page">
     <div class="container">
       <div class="plugin-install-help">
-        <h2>Install a Plugin</h2>
-        <p>From the desktop app, open Settings &rarr; <strong>Plugin Market</strong>. From the CLI:</p>
+        <h2>安装插件</h2>
+        <p>在桌面端应用中，打开 设置 &rarr; <strong>插件市场</strong>。使用 CLI 时：</p>
         <div class="plugin-command">mpe plugin install &lt;name&gt; --registry https://multi-protocol-flow.github.io/mpe-plugin-registry</div>
-        <p class="plugin-help-muted">Or set <code>MPE_PLUGIN_REGISTRY</code> once &mdash; then <code>mpe plugin install &lt;name&gt;</code> works without flags.</p>
+        <p class="plugin-help-muted">或配置一次 <code>MPE_PLUGIN_REGISTRY</code> 环境变量 &mdash; 之后即可直接执行 <code>mpe plugin install &lt;name&gt;</code>。</p>
       </div>
       <div id="plugin-grid" class="plugin-grid"></div>
       <div id="plugin-status" class="plugin-status"></div>
@@ -118,13 +118,13 @@
   <!-- Footer -->
   <footer class="site-footer">
     <div class="container">
-      <p>&copy; <span id="footer-year">2026</span> MPE Flow. MIT License.</p>
+      <p>&copy; <span id="footer-year">2026</span> MPE Flow. MIT 许可证。</p>
       <ul class="footer-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="plugins.html">Plugins</a></li>
-        <li><a href="docs.html">Docs</a></li>
-        <li><a href="changelog.html">Changelog</a></li>
-        <li><a href="/zh/plugins.html">简体中文</a></li>
+        <li><a href="/zh/">首页</a></li>
+        <li><a href="plugins.html">插件市场</a></li>
+        <li><a href="docs.html">文档</a></li>
+        <li><a href="changelog.html">更新日志</a></li>
+        <li><a href="/plugins.html">English</a></li>
       </ul>
   </footer>
 
@@ -219,7 +219,7 @@
 
       function fail() {
         status.className = 'plugin-status error';
-        status.innerHTML = 'Failed to load the plugin registry. ' +
+        status.innerHTML = '加载插件注册表失败。' +
           '<a href="' + REGISTRY_URL + '" target="_blank" rel="noopener">Open it directly</a> ' +
           'or <a href="#" id="retry-btn">retry</a>.';
         var retry = document.getElementById('retry-btn');
@@ -228,7 +228,7 @@
 
       function load() {
         status.className = 'plugin-status';
-        status.textContent = 'Loading plugins\u2026';
+        status.textContent = '正在加载插件列表\u2026';
         grid.innerHTML = '';
         fetch(REGISTRY_URL)
           .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })

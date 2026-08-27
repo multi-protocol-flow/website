@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changelog &amp; Releases — Multi-Protocol Flow Executor (MPE Flow)</title>
-  <meta name="description" content="Release notes, download links for Windows, macOS, Linux, and version history for Multi-Protocol Flow Executor.">
-  <meta name="keywords" content="mpe download, mpe releases, changelog, windows mac linux installer, mpe versions">
-  <meta name="author" content="MPE Flow Team">
+  <title>更新日志与版本下载 — Multi-Protocol Flow Executor (MPE Flow)</title>
+  <meta name="description" content="MPE Flow 官方发布历史、更新日志以及适用于 Windows、macOS、Linux 各平台的二进制安装包与便携版下载。">
+  <meta name="keywords" content="MPE下载, MPE发布日志, 更新日志, windows mac linux 安装包, 历史版本">
+  <meta name="author" content="MPE Flow 团队">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://mpe.run/changelog.html">
+  <link rel="canonical" href="https://mpe.run/zh/changelog.html">
 
   <!-- Hreflang alternates -->
   <link rel="alternate" hreflang="en" href="https://mpe.run/changelog.html">
@@ -18,9 +18,9 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MPE Flow">
-  <meta property="og:url" content="https://mpe.run/changelog.html">
-  <meta property="og:title" content="Changelog &amp; Releases — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta property="og:description" content="Release notes, download links for Windows, macOS, Linux, and version history for Multi-Protocol Flow Executor.">
+  <meta property="og:url" content="https://mpe.run/zh/changelog.html">
+  <meta property="og:title" content="更新日志与版本下载 — Multi-Protocol Flow Executor (MPE Flow)">
+  <meta property="og:description" content="MPE Flow 官方发布历史、更新日志以及适用于 Windows、macOS、Linux 各平台的二进制安装包与便携版下载。">
   <meta property="og:image" content="https://mpe.run/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -28,8 +28,8 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Changelog &amp; Releases — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta name="twitter:description" content="Release notes, download links for Windows, macOS, Linux, and version history for Multi-Protocol Flow Executor.">
+  <meta name="twitter:title" content="更新日志与版本下载 — Multi-Protocol Flow Executor (MPE Flow)">
+  <meta name="twitter:description" content="MPE Flow 官方发布历史、更新日志以及适用于 Windows、macOS、Linux 各平台的二进制安装包与便携版下载。">
   <meta name="twitter:image" content="https://mpe.run/og-image.png">
 
   <!-- Manifest & Theme -->
@@ -43,9 +43,9 @@
     "@graph": [
       {
         "@type": "CollectionPage",
-        "name": "MPE Flow Changelog and Release History",
-        "description": "Release history and binary download links for Multi-Protocol Flow Executor across Windows, macOS, and Linux.",
-        "url": "https://mpe.run/changelog.html",
+        "name": "MPE Flow 官方更新日志与版本发布历史",
+        "description": "Multi-Protocol Flow Executor 跨平台各版本发布说明与安装包下载。",
+        "url": "https://mpe.run/zh/changelog.html",
         "image": "https://mpe.run/og-image.png"
       },
       {
@@ -72,23 +72,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/png" href="../favicon.png">
 <body>
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <a href="/" class="logo">
-        <img src="mpe-logo.svg" alt="MPE Flow" class="logo-img">
+      <a href="/zh/" class="logo">
+        <img src="../mpe-logo.svg" alt="MPE Flow" class="logo-img">
       </a>
       <nav aria-label="Main navigation">
         <ul class="nav-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="/playground/">Playground</a></li>
-          <li><a href="plugins.html">Plugins</a></li>
-          <li><a href="docs.html">Docs</a></li>
-          <li><a href="changelog.html" class="active">Changelog</a></li>
-          <li><a href="/zh/changelog.html" class="lang-switch" title="切换到简体中文">🌐 简体中文</a></li>
+          <li><a href="/zh/">首页</a></li>
+          <li><a href="/playground/">演练场</a></li>
+          <li><a href="plugins.html">插件市场</a></li>
+          <li><a href="docs.html">文档</a></li>
+          <li><a href="changelog.html" class="active">更新日志</a></li>
+          <li><a href="/changelog.html" class="lang-switch" title="Switch to English">🌐 English</a></li>
         </ul>
       </nav>
     </div>
@@ -97,11 +97,11 @@
   <!-- Changelog Content -->
   <section class="changelog-page">
     <div class="container">
-      <h1>Changelog</h1>
+      <h1>更新日志</h1>
 
       <div id="cl-status" class="download-status">
         <div class="spinner"></div>
-        <p>Loading release history...</p>
+        <p>正在加载发布历史...</p>
       </div>
 
       <div id="release-list" class="release-list" style="display:none;">
@@ -113,13 +113,13 @@
   <!-- Footer -->
   <footer class="site-footer">
     <div class="container">
-      <p>&copy; <span id="footer-year">2026</span> MPE Flow. MIT License.</p>
+      <p>&copy; <span id="footer-year">2026</span> MPE Flow. MIT 许可证。</p>
       <ul class="footer-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="plugins.html">Plugins</a></li>
-        <li><a href="docs.html">Docs</a></li>
-        <li><a href="changelog.html">Changelog</a></li>
-        <li><a href="/zh/changelog.html">简体中文</a></li>
+        <li><a href="/zh/">首页</a></li>
+        <li><a href="plugins.html">插件市场</a></li>
+        <li><a href="docs.html">文档</a></li>
+        <li><a href="changelog.html">更新日志</a></li>
+        <li><a href="/changelog.html">English</a></li>
       </ul>
   </footer>
 
@@ -130,7 +130,7 @@
 
     // ---- Render a release card ----
     function renderRelease(release) {
-      var notes = release.notes || 'No release notes available.';
+      var notes = release.notes || '暂无发布说明。';
       var date = release.date || '';
       var version = release.tag || release.version || 'v?.?.?';
       var isPrerelease = release.prerelease;
@@ -145,7 +145,7 @@
       html += '<div class="release-header">';
       html += '<span class="release-version">' + escapeHtml(version) + '</span>';
       if (isPrerelease) {
-        html += '<span class="release-badge prerelease">Pre-release</span>';
+        html += '<span class="release-badge prerelease">预览版</span>';
       }
       if (date) {
         html += '<span class="release-date">' + date + '</span>';

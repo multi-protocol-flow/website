@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Documentation — Multi-Protocol Flow Executor (MPE Flow)</title>
-  <meta name="description" content="Comprehensive documentation for MPE Flow: CLI commands, node types, variables, flow file schema, protocol execution, and automation.">
-  <meta name="keywords" content="mpe docs, multi-protocol documentation, flow executor guide, cli reference, rust api testing">
-  <meta name="author" content="MPE Flow Team">
+  <title>文档中心 — Multi-Protocol Flow Executor (MPE Flow)</title>
+  <meta name="description" content="MPE Flow 官方中文开发与使用文档：CLI 命令参考、节点类型配置、变量提取与引用语法、工作流 .mpf 文件格式及跨协议自动化执行指南。">
+  <meta name="keywords" content="MPE Flow文档, 多协议工作流指南, 接口测试命令, CLI使用手册, 流程编排文档">
+  <meta name="author" content="MPE Flow 团队">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://mpe.run/docs.html">
+  <link rel="canonical" href="https://mpe.run/zh/docs.html">
 
   <!-- Hreflang alternates -->
   <link rel="alternate" hreflang="en" href="https://mpe.run/docs.html">
@@ -18,9 +18,9 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="MPE Flow">
-  <meta property="og:url" content="https://mpe.run/docs.html">
-  <meta property="og:title" content="Documentation — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta property="og:description" content="Comprehensive documentation for MPE Flow: CLI commands, node types, variables, flow file schema, protocol execution, and automation.">
+  <meta property="og:url" content="https://mpe.run/zh/docs.html">
+  <meta property="og:title" content="文档中心 — Multi-Protocol Flow Executor (MPE Flow)">
+  <meta property="og:description" content="MPE Flow 官方中文开发与使用文档：CLI 命令参考、节点类型配置、变量提取与引用语法、工作流 .mpf 文件格式及跨协议自动化执行指南。">
   <meta property="og:image" content="https://mpe.run/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -28,8 +28,8 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Documentation — Multi-Protocol Flow Executor (MPE Flow)">
-  <meta name="twitter:description" content="Comprehensive documentation for MPE Flow: CLI commands, node types, variables, flow file schema, protocol execution, and automation.">
+  <meta name="twitter:title" content="文档中心 — Multi-Protocol Flow Executor (MPE Flow)">
+  <meta name="twitter:description" content="MPE Flow 官方中文开发与使用文档：CLI 命令参考、节点类型配置、变量提取与引用语法、工作流 .mpf 文件格式及跨协议自动化执行指南。">
   <meta name="twitter:image" content="https://mpe.run/og-image.png">
 
   <!-- Manifest & Theme -->
@@ -43,9 +43,9 @@
     "@graph": [
       {
         "@type": "TechArticle",
-        "headline": "MPE Flow Documentation & Reference Manual",
-        "description": "Comprehensive technical guide to Multi-Protocol Flow Executor CLI, architecture, node types, and flow file schema.",
-        "url": "https://mpe.run/docs.html",
+        "headline": "MPE Flow 官方中文文档与参考手册",
+        "description": "Multi-Protocol Flow Executor 跨协议工作流执行引擎与 CLI 详细技术指南、节点类型与文件格式规范。",
+        "url": "https://mpe.run/zh/docs.html",
         "image": "https://mpe.run/og-image.png",
         "author": {
           "@type": "Organization",
@@ -76,23 +76,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/png" href="../favicon.png">
 <body>
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <a href="/" class="logo">
-        <img src="mpe-logo.svg" alt="MPE Flow" class="logo-img">
+      <a href="/zh/" class="logo">
+        <img src="../mpe-logo.svg" alt="MPE Flow" class="logo-img">
       </a>
       <nav aria-label="Main navigation">
         <ul class="nav-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="/playground/">Playground</a></li>
-          <li><a href="plugins.html">Plugins</a></li>
-          <li><a href="docs.html" class="active">Docs</a></li>
-          <li><a href="changelog.html">Changelog</a></li>
-          <li><a href="/zh/docs.html" class="lang-switch" title="切换到简体中文">🌐 简体中文</a></li>
+          <li><a href="/zh/">首页</a></li>
+          <li><a href="/playground/">演练场</a></li>
+          <li><a href="plugins.html">插件市场</a></li>
+          <li><a href="docs.html" class="active">文档</a></li>
+          <li><a href="changelog.html">更新日志</a></li>
+          <li><a href="/docs.html" class="lang-switch" title="Switch to English">🌐 English</a></li>
         </ul>
       </nav>
     </div>
@@ -105,15 +105,15 @@
       <aside class="docs-sidebar">
         <nav class="docs-nav">
           <div class="docs-nav-section">
-            <h4>Getting Started</h4>
+            <h4>快速入门</h4>
             <ul>
-              <li><a href="#overview">Overview</a></li>
-              <li><a href="#installation">Installation</a></li>
+              <li><a href="#overview">概述</a></li>
+              <li><a href="#installation">安装指南</a></li>
               <li><a href="#quick-example">Quick Example</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
-            <h4>CLI Reference</h4>
+            <h4>CLI 命令参考</h4>
             <ul>
               <li><a href="#ci-cd">CI/CD Integration</a></li>
             </ul>
@@ -128,13 +128,13 @@
             </ul>
           </div>
           <div class="docs-nav-section">
-            <h4>Node Types</h4>
+            <h4>节点类型</h4>
             <ul>
               <li><a href="#node-entry">Entry / End</a></li>
-              <li><a href="#node-http">HTTP</a></li>
+              <li><a href="#node-http">HTTP 节点</a></li>
               <li><a href="#node-conditional">Conditional</a></li>
               <li><a href="#node-script">Script</a></li>
-              <li><a href="#node-assertion">Assertion</a></li>
+              <li><a href="#node-assertion">断言节点</a></li>
               <li><a href="#node-websocket">WebSocket</a></li>
               <li><a href="#node-other">Other Protocols</a></li>
             </ul>
@@ -1153,13 +1153,13 @@ mpe plugin install &lt;name&gt; [--version &lt;v&gt;] [--registry &lt;url&gt;] [
   <!-- Footer -->
   <footer class="site-footer">
     <div class="container">
-      <p>&copy; <span id="footer-year">2026</span> MPE Flow. MIT License.</p>
+      <p>&copy; <span id="footer-year">2026</span> MPE Flow. MIT 许可证。</p>
       <ul class="footer-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="plugins.html">Plugins</a></li>
-        <li><a href="docs.html">Docs</a></li>
-        <li><a href="changelog.html">Changelog</a></li>
-        <li><a href="/zh/docs.html">简体中文</a></li>
+        <li><a href="/zh/">首页</a></li>
+        <li><a href="plugins.html">插件市场</a></li>
+        <li><a href="docs.html">文档</a></li>
+        <li><a href="changelog.html">更新日志</a></li>
+        <li><a href="/docs.html">English</a></li>
       </ul>
   </footer>
 

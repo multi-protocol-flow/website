@@ -1,0 +1,130 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background Gradients -->
+    <radialGradient id="bgGlow1" cx="20%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#0b0f19" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgGlow2" cx="80%" cy="80%" r="60%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#0b0f19" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#14b8a6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base background -->
+  <rect width="1200" height="630" fill="#0b0f19"/>
+  <rect width="1200" height="630" fill="url(#bgGlow1)"/>
+  <rect width="1200" height="630" fill="url(#bgGlow2)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.08" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105"/>
+    <line x1="0" y1="210" x2="1200" y2="210"/>
+    <line x1="0" y1="315" x2="1200" y2="315"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/>
+    <line x1="0" y1="525" x2="1200" y2="525"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
+  </g>
+
+  <!-- Container Box -->
+  <rect x="60" y="50" width="1080" height="530" rx="24" fill="url(#cardGrad)" stroke="#334155" stroke-width="2"/>
+
+  <!-- Brand / Header Section -->
+  <g transform="translate(100, 95)">
+    <!-- Logo Icon -->
+    <rect x="0" y="0" width="56" height="56" rx="14" fill="#0ea5e9" fill-opacity="0.15" stroke="#38bdf8" stroke-width="2"/>
+    <path d="M16 38L28 18L40 38M20 32H36" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Logo Text -->
+    <text x="72" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="30" font-weight="800" fill="#f8fafc" letter-spacing="-0.5">MPE Flow</text>
+    
+    <!-- Release Badge -->
+    <rect x="236" y="14" width="130" height="28" rx="14" fill="#0ea5e9" fill-opacity="0.15" stroke="#0ea5e9" stroke-width="1.5"/>
+    <text x="301" y="33" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#38bdf8">RUST + TAURI</text>
+
+    <!-- GUI + CLI Badge -->
+    <rect x="376" y="14" width="110" height="28" rx="14" fill="#14b8a6" fill-opacity="0.15" stroke="#14b8a6" stroke-width="1.5"/>
+    <text x="431" y="33" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#2dd4bf">GUI + CLI</text>
+  </g>
+
+  <!-- Main Title -->
+  <text x="100" y="245" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="52" font-weight="900" fill="url(#brandGrad)" letter-spacing="-1.5">
+    Multi-Protocol Flow Executor
+  </text>
+
+  <!-- Description / Pitch -->
+  <text x="100" y="305" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="23" font-weight="500" fill="#e2e8f0" letter-spacing="-0.2">
+    Visual Workflow Orchestration &amp; Multi-Protocol API Testing Engine
+  </text>
+  <text x="100" y="342" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="400" fill="#94a3b8">
+    Build, execute, debug and stress-test complex workflows with assertions, branching, and plugins.
+  </text>
+
+  <!-- Protocol Pills List -->
+  <g transform="translate(100, 395)">
+    <!-- HTTP -->
+    <rect x="0" y="0" width="76" height="38" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="38" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#38bdf8">HTTP</text>
+
+    <!-- WebSocket -->
+    <rect x="88" y="0" width="118" height="38" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="147" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#38bdf8">WebSocket</text>
+
+    <!-- TCP / UDP -->
+    <rect x="218" y="0" width="102" height="38" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="269" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#38bdf8">TCP/UDP</text>
+
+    <!-- SSE -->
+    <rect x="332" y="0" width="66" height="38" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="365" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#38bdf8">SSE</text>
+
+    <!-- GraphQL -->
+    <rect x="410" y="0" width="96" height="38" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="458" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#38bdf8">GraphQL</text>
+
+    <!-- Kafka -->
+    <rect x="518" y="0" width="80" height="38" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="558" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#a78bfa">Kafka</text>
+
+    <!-- MCP -->
+    <rect x="610" y="0" width="68" height="38" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="644" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#a78bfa">MCP</text>
+
+    <!-- gRPC -->
+    <rect x="690" y="0" width="76" height="38" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="728" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#a78bfa">gRPC</text>
+
+    <!-- Redis -->
+    <rect x="778" y="0" width="78" height="38" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="817" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#a78bfa">Redis</text>
+
+    <!-- MongoDB -->
+    <rect x="868" y="0" width="102" height="38" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="919" y="24" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#a78bfa">MongoDB</text>
+  </g>
+
+  <!-- Footer link / metadata bar -->
+  <g transform="translate(100, 480)">
+    <text x="0" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#38bdf8">mpe.run</text>
+    <text x="110" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#64748b">|</text>
+    <text x="130" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#94a3b8">github.com/multi-protocol-flow</text>
+    <text x="900" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#64748b">MIT License</text>
+  </g>
+</svg>

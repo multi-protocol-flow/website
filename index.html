@@ -3,14 +3,121 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-Protocol Flow Executor</title>
-  <meta name="description" content="Visually design and execute multi-protocol workflows with the Multi-Protocol Flow Executor. Cross-platform desktop app and CLI tool.">
+  <title>MPE Flow — Multi-Protocol Workflow Executor &amp; Visual API Testing (GUI + CLI)</title>
+  <meta name="description" content="Design, test, and automate multi-protocol workflows across HTTP, WebSocket, SSE, TCP, UDP, GraphQL, and Kafka in a single Rust binary. Cross-platform desktop app &amp; CLI.">
+  <meta name="keywords" content="multi-protocol, api testing, workflow automation, websocket testing, tcp workflow, sse debug, graphql client, tauri, rust, postman alternative, jmeter alternative">
+  <meta name="author" content="MPE Flow Team">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://mpe.run/">
+
+  <!-- Hreflang alternates -->
+  <link rel="alternate" hreflang="en" href="https://mpe.run/">
+  <link rel="alternate" hreflang="zh-CN" href="https://mpe.run/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://mpe.run/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MPE Flow">
+  <meta property="og:url" content="https://mpe.run/">
+  <meta property="og:title" content="MPE Flow — Multi-Protocol Workflow Executor &amp; Visual API Testing (GUI + CLI)">
+  <meta property="og:description" content="Design, test, and automate multi-protocol workflows across HTTP, WebSocket, SSE, TCP, UDP, GraphQL, and Kafka in a single Rust binary.">
+  <meta property="og:image" content="https://mpe.run/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MPE Flow — Multi-Protocol Workflow Executor &amp; Visual API Testing (GUI + CLI)">
+  <meta name="twitter:description" content="Design, test, and automate multi-protocol workflows across HTTP, WebSocket, SSE, TCP, UDP, GraphQL, and Kafka in a single Rust binary.">
+  <meta name="twitter:image" content="https://mpe.run/og-image.png">
+
+  <!-- Manifest & Theme -->
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#0f172a">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://mpe.run/#software",
+        "name": "MPE Flow",
+        "alternateName": "Multi-Protocol Flow Executor",
+        "operatingSystem": "Windows, macOS, Linux",
+        "applicationCategory": "DeveloperApplication",
+        "description": "Cross-platform multi-protocol workflow executor and visual API testing engine with 7 core protocols built-in and extensible plugin architecture.",
+        "url": "https://mpe.run/",
+        "image": "https://mpe.run/og-image.png",
+        "screenshot": "https://mpe.run/og-image.png",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "Multi-Protocol Flow Organization",
+          "url": "https://github.com/multi-protocol-flow"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://mpe.run/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is MPE Flow?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "MPE Flow (Multi-Protocol Flow Executor) is a high-performance visual workflow orchestration and integration testing engine built with Rust and Tauri. It enables engineers to chain and automate complex scenarios across HTTP, WebSocket, TCP, UDP, SSE, GraphQL, Kafka, and MCP in a single desktop application and standalone CLI."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which protocols are natively supported versus via plugins?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "MPE Flow includes 7 native core protocols inside the single binary: HTTP/HTTPS, WebSocket, TCP, UDP, SSE (Server-Sent Events), GraphQL, and Script/Assertion nodes. Additional protocols such as Kafka, MCP, gRPC, Redis, MongoDB, SMTP, and IMAP are available through one-click sidecar plugins."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does MPE Flow differ from Postman or JMeter?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Unlike HTTP-centric tools like Postman, MPE Flow provides native first-class support for stateful protocols (TCP, WebSocket, SSE streams, Kafka pub/sub, MCP) with visual graph-based flow design, branching, variable extraction, assertion chains, and high-concurrency stress testing in a lightweight Rust binary."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can MPE Flow run in CI/CD pipelines?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. MPE Flow ships as a dual-mode single binary containing both the GUI and the standalone mpe CLI. You can run 'mpe run flow.mpf --report json' directly in GitHub Actions, GitLab CI, Jenkins, or Docker without GUI dependencies."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is MPE Flow open source?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, MPE Flow is open source under the MIT License, hosted on GitHub at https://github.com/multi-protocol-flow."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/png" href="favicon.png">
-</head>
 <body>
   <!-- Header -->
   <header class="site-header">
@@ -25,6 +132,7 @@
           <li><a href="plugins.html">Plugins</a></li>
           <li><a href="docs.html">Docs</a></li>
           <li><a href="changelog.html">Changelog</a></li>
+          <li><a href="/zh/" class="lang-switch" title="切换到简体中文">🌐 简体中文</a></li>
         </ul>
       </nav>
     </div>
@@ -241,8 +349,35 @@
       </div>
     </div>
   </section>
-
-
+  <!-- FAQ Section -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+      <h2>Frequently Asked Questions</h2>
+      <p class="section-subtitle">Everything you need to know about MPE Flow architecture, protocols, and deployment.</p>
+      <div class="faq-grid">
+        <div class="faq-card">
+          <h3>What is MPE Flow?</h3>
+          <p>MPE Flow (Multi-Protocol Flow Executor) is a high-performance visual workflow orchestration and integration testing engine built with Rust and Tauri. It enables engineers to chain and automate complex scenarios across HTTP, WebSocket, TCP, UDP, SSE, GraphQL, Kafka, and MCP in a single desktop application and standalone CLI.</p>
+        </div>
+        <div class="faq-card">
+          <h3>Which protocols are natively supported vs via plugins?</h3>
+          <p>MPE Flow includes 7 native core protocols inside the single binary: HTTP/HTTPS, WebSocket, TCP, UDP, SSE (Server-Sent Events), GraphQL, and Script/Assertion nodes. Additional protocols such as Kafka, MCP, gRPC, Redis, MongoDB, SMTP, and IMAP are available through one-click sidecar plugins.</p>
+        </div>
+        <div class="faq-card">
+          <h3>How does MPE Flow differ from Postman or JMeter?</h3>
+          <p>Unlike HTTP-centric tools like Postman, MPE Flow provides native first-class support for stateful protocols (TCP, WebSocket, SSE streams, Kafka pub/sub, MCP) with visual graph-based flow design, branching, variable extraction, assertion chains, and high-concurrency stress testing in a lightweight Rust binary.</p>
+        </div>
+        <div class="faq-card">
+          <h3>Can MPE Flow run in CI/CD pipelines?</h3>
+          <p>Yes. MPE Flow ships as a dual-mode single binary containing both the GUI and the standalone <code>mpe</code> CLI. You can run <code>mpe run flow.mpf --report json</code> directly in GitHub Actions, GitLab CI, Jenkins, or Docker without GUI dependencies.</p>
+        </div>
+        <div class="faq-card">
+          <h3>Is MPE Flow open source and free to use?</h3>
+          <p>Yes, MPE Flow is open source under the MIT License, hosted on GitHub at <a href="https://github.com/multi-protocol-flow" target="_blank" rel="noopener">github.com/multi-protocol-flow</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- CTA -->
   <section class="cta">
@@ -276,9 +411,10 @@
       <p>&copy; <span id="footer-year">2026</span> MPE Flow. MIT License.</p>
       <ul class="footer-links">
         <li><a href="docs.html">Docs</a></li>
+        <li><a href="plugins.html">Plugins</a></li>
         <li><a href="changelog.html">Changelog</a></li>
+        <li><a href="/zh/">简体中文</a></li>
       </ul>
-    </div>
   </footer>
 
   <script>

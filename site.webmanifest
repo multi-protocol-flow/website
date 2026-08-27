@@ -1,0 +1,16 @@
+{
+  "name": "Multi-Protocol Flow Executor",
+  "short_name": "MPE Flow",
+  "description": "Multi-protocol workflow executor & visual API testing across HTTP, WebSocket, TCP, SSE, GraphQL, Kafka",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    }
+  ]
+}
