@@ -109,47 +109,49 @@
             <ul>
               <li><a href="#overview">概述</a></li>
               <li><a href="#installation">安装指南</a></li>
-              <li><a href="#quick-example">Quick Example</a></li>
+              <li><a href="#quick-example">快速示例</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
             <h4>CLI 命令参考</h4>
             <ul>
-              <li><a href="#ci-cd">CI/CD Integration</a></li>
+              <li><a href="#commands">常用命令</a></li>
+              <li><a href="#ci-cd">CI/CD 集成</a></li>
+              <li><a href="#output-format">输出格式</a></li>
+              <li><a href="#exit-codes">退出状态码</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
-            <h4>Flow Files</h4>
+            <h4>工作流文件</h4>
             <ul>
-              <li><a href="#flow-structure">File Structure</a></li>
-              <li><a href="#node-structure">Node Structure</a></li>
-              <li><a href="#connections">Connections</a></li>
-              <li><a href="#variables">Variables</a></li>
+              <li><a href="#flow-structure">文件结构</a></li>
+              <li><a href="#node-structure">节点结构</a></li>
+              <li><a href="#connections">连线关系</a></li>
+              <li><a href="#variables">变量系统</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
             <h4>节点类型</h4>
             <ul>
-              <li><a href="#node-entry">Entry / End</a></li>
+              <li><a href="#node-entry">Entry / End 节点</a></li>
               <li><a href="#node-http">HTTP 节点</a></li>
-              <li><a href="#node-conditional">Conditional</a></li>
-              <li><a href="#node-script">Script</a></li>
+              <li><a href="#node-conditional">条件分支节点</a></li>
+              <li><a href="#node-script">脚本节点</a></li>
               <li><a href="#node-assertion">断言节点</a></li>
-              <li><a href="#node-websocket">WebSocket</a></li>
-              <li><a href="#node-other">Other Protocols</a></li>
+              <li><a href="#node-websocket">WebSocket 节点</a></li>
+              <li><a href="#node-other">其他协议节点</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
-            <h4>Plugin Development</h4>
+            <h4>插件开发</h4>
             <ul>
-              <li><a href="#plugin-overview">Plugin Overview</a></li>
-              <li><a href="#plugin-sdk">SDK &amp; Development</a></li>
-              <li><a href="#plugin-marketplace">Marketplace</a></li>
+              <li><a href="#plugin-overview">插件概述</a></li>
+              <li><a href="#plugin-sdk">SDK 与开发</a></li>
+              <li><a href="#plugin-marketplace">插件市场</a></li>
             </ul>
           </div>
         </nav>
       </aside>
-
       <!-- Main Content -->
       <main class="docs-content">
         <!-- Overview -->
@@ -255,84 +257,83 @@ mpe --help</code></pre>
 
         <!-- Commands -->
         <article id="commands" class="docs-section">
-          <h2>CLI Commands</h2>
+          <h2>CLI 命令参考</h2>
           
           <table class="docs-table">
             <thead>
               <tr>
-                <th>Command</th>
-                <th>Description</th>
-                <th>Example</th>
+                <th>命令</th>
+                <th>说明</th>
+                <th>示例</th>
               </tr>
             </thead>
             <tbody>
-                <td><code>--report-format</code></td>
-                <td>Report export format for <code>mpe run</code>: <code>json</code> (default) or <code>junit</code></td>
-                <td><code>mpe run -f flow.mpf --report-format junit</code></td>
+              <tr>
+                <td><code>mpe run</code></td>
+                <td>执行工作流文件 (.mpf)</td>
+                <td><code>mpe run -f flow.mpf</code></td>
               </tr>
               <tr>
-                <td><code>--report-file</code></td>
-                <td>Export the execution report (JUnit XML or JSON) to this file path</td>
-                <td><code>mpe run -f flow.mpf --report-format junit --report-file results.xml</code></td>
-              </tr>
                 <td><code>mpe validate</code></td>
-                <td>Validate flow structure without executing</td>
+                <td>校验工作流结构（不执行）</td>
                 <td><code>mpe validate -f flow.mpf</code></td>
               </tr>
               <tr>
                 <td><code>mpe debug</code></td>
-                <td>Run with debug output (NDJSON protocol)</td>
+                <td>单步调试输出（NDJSON 协议）</td>
                 <td><code>mpe debug -f flow.mpf</code></td>
               </tr>
               <tr>
                 <td><code>mpe stress</code></td>
-                <td>Run stress test</td>
+                <td>运行压力测试</td>
                 <td><code>mpe stress run -f flow.mpf</code></td>
               </tr>
               <tr>
                 <td><code>mpe flow</code></td>
-                <td>Manage flows (list, show, create, delete)</td>
+                <td>工作流管理（list, show, create, delete）</td>
                 <td><code>mpe flow list</code></td>
               </tr>
               <tr>
                 <td><code>mpe report</code></td>
-                <td>Manage reports (list, show, delete)</td>
+                <td>报告管理（list, show, delete）</td>
                 <td><code>mpe report list</code></td>
               </tr>
               <tr>
                 <td><code>mpe run-node</code></td>
-                <td>Execute a single protocol node for connectivity verification</td>
+                <td>单节点协议连通性验证</td>
                 <td><code>mpe run-node '{"type":"redis:connect","host":"127.0.0.1","port":6379}'</code></td>
               </tr>
               <tr>
                 <td><code>mpe plugin</code></td>
-                <td>Manage plugins (dir, list, install)</td>
+                <td>插件管理（dir, list, install）</td>
                 <td><code>mpe plugin list</code></td>
               </tr>
             </tbody>
           </table>
 
           <div class="docs-code">
-            <pre><code># View all commands
+            <pre><code># 查看所有命令
 mpe --help
 
-# View command-specific help
-mpe run --help
+# 查看特定命令帮助
+mpe run --help</code></pre>
+          </div>
+        </article>
 
         <!-- CI/CD Integration -->
         <article id="ci-cd" class="docs-section">
-          <h2>CI/CD Integration (GitHub Actions)</h2>
-          <p><code>mpe run</code> can export execution results as standard JUnit XML, which is natively understood by Jenkins, GitHub Actions, and GitLab CI. Each node in the flow becomes a <code>&lt;testcase&gt;</code>; failed and skipped nodes map to <code>&lt;failure&gt;</code> and <code>&lt;skipped&gt;</code> elements.</p>
+          <h2>CI/CD 集成 (GitHub Actions)</h2>
+          <p><code>mpe run</code> 支持将执行结果导出为标准 JUnit XML 格式，可直接被 Jenkins、GitHub Actions 和 GitLab CI 等持续集成平台识别与解析。工作流中的每个节点对应一个 <code>&lt;testcase&gt;</code>；执行失败和跳过的节点分别映射为 <code>&lt;failure&gt;</code> 和 <code>&lt;skipped&gt;</code> 元素。</p>
 
           <div class="docs-code">
-            <pre><code># Export a JUnit XML report for CI consumers
+            <pre><code># 导出 JUnit XML 报告供 CI 使用
 mpe run -f flow.mpf --report-format junit --report-file results.xml
 
-# Or print the JUnit XML directly to stdout (no --report-file)
+# 或者直接将 JUnit XML 输出到 stdout（不带 --report-file）
 mpe run -f flow.mpf --report-format junit</code></pre>
           </div>
 
-          <p>Add a workflow step in your repository to run flows and publish the report on pull requests with <a href="https://github.com/dorny/test-reporter">dorny/test-reporter</a>:</p>
+          <p>在仓库中添加工作流步骤，通过 <a href="https://github.com/dorny/test-reporter" target="_blank" rel="noopener">dorny/test-reporter</a> 在 Pull Request 中自动执行工作流并展示测试报告：</p>
 
           <div class="docs-code">
             <pre><code>name: Flow Tests
@@ -361,12 +362,10 @@ jobs:
           </div>
 
           <div class="docs-info">
-            <h4>Note</h4>
-            <p>The JUnit report reflects node-level results: assertion, HTTP, WebSocket, and other protocol nodes map to individual test cases. A failed node produces a non-zero exit code, so plain <code>mpe run --report-format junit --report-file results.xml</code> also fails the job by default.</p>
+            <h4>提示</h4>
+            <p>JUnit 报告如实反映节点级别的测试结果：断言、HTTP、WebSocket 等协议节点映射为独立的测试用例。任何节点执行失败都会导致非零退出码，因此 <code>mpe run --report-format junit --report-file results.xml</code> 默认会在失败时使 CI Job 报错中断。</p>
           </div>
         </article>
-
-        <!-- Output Format -->
 
         <!-- Output Format -->
         <article id="output-format" class="docs-section">
@@ -1161,6 +1160,7 @@ mpe plugin install &lt;name&gt; [--version &lt;v&gt;] [--registry &lt;url&gt;] [
         <li><a href="changelog.html">更新日志</a></li>
         <li><a href="/docs.html">English</a></li>
       </ul>
+    </div>
   </footer>
 
   <script>

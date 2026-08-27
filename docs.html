@@ -115,7 +115,10 @@
           <div class="docs-nav-section">
             <h4>CLI Reference</h4>
             <ul>
+              <li><a href="#commands">Commands</a></li>
               <li><a href="#ci-cd">CI/CD Integration</a></li>
+              <li><a href="#output-format">Output Format</a></li>
+              <li><a href="#exit-codes">Exit Codes</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
@@ -266,15 +269,12 @@ mpe --help</code></pre>
               </tr>
             </thead>
             <tbody>
-                <td><code>--report-format</code></td>
-                <td>Report export format for <code>mpe run</code>: <code>json</code> (default) or <code>junit</code></td>
-                <td><code>mpe run -f flow.mpf --report-format junit</code></td>
+              <tr>
+                <td><code>mpe run</code></td>
+                <td>Execute a flow file (.mpf)</td>
+                <td><code>mpe run -f flow.mpf</code></td>
               </tr>
               <tr>
-                <td><code>--report-file</code></td>
-                <td>Export the execution report (JUnit XML or JSON) to this file path</td>
-                <td><code>mpe run -f flow.mpf --report-format junit --report-file results.xml</code></td>
-              </tr>
                 <td><code>mpe validate</code></td>
                 <td>Validate flow structure without executing</td>
                 <td><code>mpe validate -f flow.mpf</code></td>
@@ -317,7 +317,9 @@ mpe --help</code></pre>
 mpe --help
 
 # View command-specific help
-mpe run --help
+mpe run --help</code></pre>
+          </div>
+        </article>
 
         <!-- CI/CD Integration -->
         <article id="ci-cd" class="docs-section">
@@ -365,8 +367,6 @@ jobs:
             <p>The JUnit report reflects node-level results: assertion, HTTP, WebSocket, and other protocol nodes map to individual test cases. A failed node produces a non-zero exit code, so plain <code>mpe run --report-format junit --report-file results.xml</code> also fails the job by default.</p>
           </div>
         </article>
-
-        <!-- Output Format -->
 
         <!-- Output Format -->
         <article id="output-format" class="docs-section">
@@ -1161,6 +1161,7 @@ mpe plugin install &lt;name&gt; [--version &lt;v&gt;] [--registry &lt;url&gt;] [
         <li><a href="changelog.html">Changelog</a></li>
         <li><a href="/zh/docs.html">简体中文</a></li>
       </ul>
+    </div>
   </footer>
 
   <script>
