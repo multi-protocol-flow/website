@@ -157,6 +157,17 @@
             </ul>
           </div>
           <div class="docs-nav-section">
+            <h4>AI Copilot</h4>
+            <ul>
+              <li><a href="#ai-copilot">Overview &amp; Providers</a></li>
+              <li><a href="#ai-interaction">Interaction Modes</a></li>
+              <li><a href="#ai-tools">Canvas Generation &amp; Layout</a></li>
+              <li><a href="#ai-autonomous">Autonomous Run &amp; Steering</a></li>
+              <li><a href="#ai-diagnostics">Error Diagnosis &amp; Self-Healing</a></li>
+              <li><a href="#ai-workspace">Local Workspace Awareness</a></li>
+            </ul>
+          </div>
+          <div class="docs-nav-section">
             <h4>CLI Reference</h4>
             <ul>
               <li><a href="#commands">Commands</a></li>
@@ -300,6 +311,95 @@ mpe --help</code></pre>
           </div>
         </article>
 
+        <!-- AI Copilot -->
+        <article id="ai-copilot" class="docs-section">
+          <h2>AI Copilot &amp; Smart Orchestration</h2>
+          <p>MPE Flow features a native, deep-integrated Agentic AI Copilot designed for natural language workflow generation, autonomous execution, canvas layout optimization, and one-click error self-healing.</p>
+
+          <div class="docs-tip">
+            <h4>Privacy &amp; Data Sovereignty</h4>
+            <p>The AI Copilot connects to any OpenAI-compatible provider (OpenAI, DeepSeek, Claude, or local Ollama/vLLM instances). All workflow files, tokens, and payloads stay on your machine. No mandatory accounts or cloud telemetry.</p>
+          </div>
+
+          <h3>Configuring an AI Provider</h3>
+          <p>Open <strong>Settings &rarr; AI Copilot</strong> to configure one or more model providers:</p>
+          <ul>
+            <li><strong>Preset Quick-Fill:</strong> 1-click configuration for popular providers like DeepSeek, OpenAI, Claude, Kimi, and Ollama.</li>
+            <li><strong>Base URL &amp; API Key:</strong> Connect to public cloud endpoints or private self-hosted models (e.g., <code>http://localhost:11434/v1</code> for Ollama).</li>
+            <li><strong>Model Selection:</strong> Fetch model lists automatically or specify custom model identifiers (e.g., <code>deepseek-chat</code>, <code>deepseek-reasoner</code>, <code>gpt-4o</code>, <code>claude-3-5-sonnet</code>).</li>
+            <li><strong>Custom System Prompt:</strong> Inject domain rules, naming conventions, or company-specific API guidelines applied to every request.</li>
+          </ul>
+
+          <h3 id="ai-interaction">Interaction Modes &amp; Shortcuts</h3>
+          <p>Access the AI Copilot across three integrated surfaces:</p>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Surface</th>
+                <th>Shortcut</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sidebar Copilot</strong></td>
+                <td><span class="kbd-shortcut">Ctrl+I</span> / <span class="kbd-shortcut">Cmd+I</span></td>
+                <td>Collapsible right-side chat panel with conversation history, multi-session management, and model switcher.</td>
+              </tr>
+              <tr>
+                <td><strong>Detachable Floating Window</strong></td>
+                <td>Drag header or Undock button</td>
+                <td>Undock the Copilot panel into a free-floating, draggable modal across multi-monitor setups. Drag back to the right to re-dock.</td>
+              </tr>
+              <tr>
+                <td><strong>Spotlight Quick Commands</strong></td>
+                <td><span class="kbd-shortcut">Ctrl+K</span> / <span class="kbd-shortcut">Cmd+K</span></td>
+                <td>Center command palette to run natural language instructions, batch pipeline commands, or layout operations without opening the sidebar.</td>
+              </tr>
+              <tr>
+                <td><strong>CLI AI Bridge</strong></td>
+                <td><code>mpe ai "&lt;prompt&gt;"</code></td>
+                <td>Execute AI commands directly from your terminal, seamlessly bridging with the running GUI or executing in headless mode.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 id="ai-tools">Canvas Tools &amp; Natural Language Generation</h3>
+          <p>The Copilot does not just generate static text &mdash; it operates the visual canvas directly through strict typed tool calls:</p>
+          <ul>
+            <li><strong>Natural Language to DAG:</strong> <em>"Create an authentication flow that sends a POST to /api/login, extracts the bearer token, and pipes it to a WebSocket connection."</em></li>
+            <li><strong>Batch Pipeline Creation:</strong> Constructs complete multi-node flows with typed schemas and default connections in a single atomic operation.</li>
+            <li><strong>Automatic Layout &amp; Adaptive Wrapping:</strong> Cleanly arranges complex branching DAGs. Supports standard horizontal/vertical layouts as well as the new <strong>Adaptive Wrap Auto-Layout</strong> for expansive multi-branch flows.</li>
+            <li><strong>Script Generation:</strong> Automatically writes JavaScript or Rhai snippets for data transformations, crypto signing, or custom assertions.</li>
+            <li><strong>Datasource Exploration:</strong> Searches connected API specifications and automatically imports target endpoints onto the canvas.</li>
+          </ul>
+
+          <h3 id="ai-autonomous">Autonomous Execution ("Run to Goal") &amp; Midway Steering</h3>
+          <p>When solving complex workflows, the AI Copilot can autonomously iterate through execution cycles:</p>
+          <ul>
+            <li><strong>Auto-Execute to Goal:</strong> Enable the <em>Auto-Execute</em> toggle to let the Copilot run the workflow, observe execution outputs, and self-correct until the desired assertion or business goal passes.</li>
+            <li><strong>Midway Steering &amp; Interruption:</strong> While the AI is actively running tools, you can type additional instructions in the input box (e.g., <em>"Use port 8080 instead"</em>) without cancelling the task. The Copilot absorbs your correction in real-time.</li>
+            <li><strong>Thinking Chain Visibility:</strong> Full support for reasoning models (e.g. DeepSeek-R1). The stream parser extracts <code>&lt;think&gt;</code> tags and provides an interactive collapsible thinking block.</li>
+            <li><strong>High-Risk Safety Confirmations:</strong> Destructive operations like clearing the canvas, deleting multiple nodes, or installing third-party marketplace plugins require explicit user approval before execution.</li>
+          </ul>
+
+          <h3 id="ai-diagnostics">One-Click Error Diagnosis &amp; Self-Healing</h3>
+          <p>When a protocol node fails (HTTP 500, WebSocket handshake timeout, assertion mismatch):</p>
+          <ul>
+            <li>Click <strong>AI Diagnosis &amp; Fix</strong> directly on the failed node's error banner or in the Execution History panel.</li>
+            <li>The Copilot analyzes upstream inputs, output payload schemas, and underlying error chains.</li>
+            <li>It identifies root causes (e.g., missing Authorization header, expired token, JSONPath extraction error) and suggests a 1-click automated fix on the canvas.</li>
+          </ul>
+
+          <h3 id="ai-workspace">Local Project Workspace Awareness</h3>
+          <p>Connect your local codebase repository (via <strong>Link Workspace</strong>) to empower the AI Copilot with repository context:</p>
+          <ul>
+            <li><strong>Project Structure Scanning:</strong> Detects frameworks, OpenAPI / Swagger specs, and config files.</li>
+            <li><strong>Code Search &amp; Snippet Reading:</strong> Discovers backend route signatures, payload DTOs, and environment contracts to accurately configure node URLs and request bodies.</li>
+            <li><strong>Multimodal Screenshot Upload:</strong> Paste or drag-and-drop screenshots of API documentation, Swagger UIs, or terminal error traces directly into the chat for instant visual comprehension.</li>
+          </ul>
+        </article>
+
         <!-- Commands -->
         <article id="commands" class="docs-section">
           <h2>CLI Commands</h2>
@@ -352,6 +452,16 @@ mpe --help</code></pre>
                 <td><code>mpe plugin</code></td>
                 <td>Manage plugins (dir, list, install)</td>
                 <td><code>mpe plugin list</code></td>
+              </tr>
+              <tr>
+                <td><code>mpe ai</code></td>
+                <td>Drive or query the AI Copilot from terminal (bridges with GUI or runs headless)</td>
+                <td><code>mpe ai "Create a login flow that extracts JWT"</code></td>
+              </tr>
+              <tr>
+                <td><code>mpe open</code></td>
+                <td>Open a workflow file in the running GUI desktop app</td>
+                <td><code>mpe open flow.mpf</code></td>
               </tr>
             </tbody>
           </table>
@@ -765,6 +875,45 @@ jobs:
 
 // Later use: {{user_id}}, {{http_status}}</code></pre>
           </div>
+
+          <h3>Built-in Dynamic Variables</h3>
+          <p>MPE Flow includes dynamic template variables evaluated at runtime on each step execution:</p>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Variable</th>
+                <th>Description</th>
+                <th>Example Output</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>{{$timestamp}}</code></td>
+                <td>Current Unix timestamp in milliseconds</td>
+                <td><code>1772867200123</code></td>
+              </tr>
+              <tr>
+                <td><code>{{$isoTimestamp}}</code></td>
+                <td>Current UTC timestamp in ISO 8601 format</td>
+                <td><code>2026-09-07T12:00:00.000Z</code></td>
+              </tr>
+              <tr>
+                <td><code>{{$guid}}</code> / <code>{{$uuid}}</code></td>
+                <td>Random UUID v4</td>
+                <td><code>a3f89021-4b12-42fe-b58f-287517c2f829</code></td>
+              </tr>
+              <tr>
+                <td><code>{{$randomInt}}</code></td>
+                <td>Random 6-digit integer (0-999999)</td>
+                <td><code>482103</code></td>
+              </tr>
+              <tr>
+                <td><code>{{$randomAlphaNumeric}}</code></td>
+                <td>Random 8-character alphanumeric string</td>
+                <td><code>k9X2mQ8L</code></td>
+              </tr>
+            </tbody>
+          </table>
 
           <h3>Conditional / Assertion Paths</h3>
           <p><code>conditional</code> and <code>assertion</code> nodes read directly from <code>last_node_output</code>:</p>

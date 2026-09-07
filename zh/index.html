@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MPE Flow — 多协议工作流执行引擎与可视化接口测试工具 (桌面端 + CLI)</title>
-  <meta name="description" content="基于 Rust 构建的开源多协议工作流编排与可视化接口测试平台。单一可执行文件原生支持 HTTP、WebSocket、TCP、UDP、SSE、GraphQL 与 MCP 智能体调试，GUI 与 CLI 一体化。">
-  <meta name="keywords" content="多协议接口测试, WebSocket测试工具, TCP套接字调试, SSE流式测试, GraphQL客户端, MCP服务调试, Postman替代品, JMeter压测替代, Rust自动化测试, 跨协议编排">
+  <title>MPE Flow — 多协议工作流执行引擎、全域 AI 助手与可视化接口测试工具 (桌面端 + CLI)</title>
+  <meta name="description" content="基于 Rust 构建的开源多协议工作流编排、内置全域 AI 助手与可视化接口测试平台。单一二进制原生支持 HTTP、WebSocket、TCP、UDP、SSE、GraphQL 与 MCP 智能体调试，支持自然语言生成与一键错误自愈。">
+  <meta name="keywords" content="多协议接口测试, AI工作流助手, 自然语言生成流程, 接口错误智能自愈, 本地工程感知, WebSocket测试工具, TCP套接字调试, SSE流式测试, GraphQL客户端, MCP服务调试, Postman替代品, JMeter压测替代, Rust自动化测试, 跨协议编排">
   <meta name="author" content="MPE Flow 团队">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://mpe.run/zh/">
@@ -19,8 +19,8 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MPE Flow">
   <meta property="og:url" content="https://mpe.run/zh/">
-  <meta property="og:title" content="MPE Flow — 多协议工作流执行引擎与可视化接口测试工具 (桌面端 + CLI)">
-  <meta property="og:description" content="基于 Rust 构建的开源多协议工作流编排与可视化接口测试平台。原生支持 HTTP、WebSocket、TCP、UDP、SSE、GraphQL 与 MCP 智能体调试。">
+  <meta property="og:title" content="MPE Flow — 多协议工作流执行引擎、全域 AI 助手与可视化接口测试工具 (桌面端 + CLI)">
+  <meta property="og:description" content="基于 Rust 构建的开源多协议工作流编排、内置全域 AI 助手与可视化接口测试平台。单一二进制原生支持 HTTP、WebSocket、TCP、UDP、SSE、GraphQL 与 MCP 智能体调试。">
   <meta property="og:locale" content="zh_CN">
   <meta property="og:locale:alternate" content="en_US">
   <meta property="og:image" content="https://mpe.run/og-image.png">
@@ -30,8 +30,8 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="MPE Flow — 多协议工作流执行引擎与可视化接口测试工具 (桌面端 + CLI)">
-  <meta name="twitter:description" content="基于 Rust 构建的开源多协议工作流编排与可视化接口测试平台。原生支持 HTTP、WebSocket、TCP、UDP、SSE、GraphQL 与 MCP 智能体调试。">
+  <meta name="twitter:title" content="MPE Flow — 多协议工作流执行引擎、全域 AI 助手与可视化接口测试工具 (桌面端 + CLI)">
+  <meta name="twitter:description" content="基于 Rust 构建的开源多协议工作流编排、内置全域 AI 助手与可视化接口测试平台。单一二进制原生支持 HTTP、WebSocket、TCP、UDP、SSE、GraphQL 与 MCP 智能体调试。">
   <meta name="twitter:image" content="https://mpe.run/og-image.png">
 
   <!-- Manifest & Theme -->
@@ -55,11 +55,12 @@
         "downloadUrl": "https://mpe.run/zh/changelog.html",
         "license": "https://opensource.org/licenses/MIT",
         "releaseNotes": "https://mpe.run/zh/changelog.html",
-        "description": "基于 Rust + Tauri 构建的跨平台多协议工作流执行引擎与可视化接口测试工具，原生内置 7 种核心协议，支持丰富的 MCP、Kafka、Redis 等侧边进程插件生态。",
+        "description": "基于 Rust + Tauri 构建的跨平台多协议工作流执行引擎、内置全域 AI 助手与可视化接口测试工具，原生内置 7 种核心协议，支持丰富的 MCP、Kafka、Redis 等侧边进程插件生态。",
         "url": "https://mpe.run/zh/",
         "image": "https://mpe.run/og-image.png",
         "screenshot": "https://mpe.run/og-image.png",
         "featureList": [
+          "内置全域 AI 助手：支持自然语言多协议工作流生成、自主执行到底与一键错误智能自愈",
           "原生支持 HTTP、WebSocket、TCP、UDP、SSE 与 GraphQL 跨协议链路串联",
           "Model Context Protocol (MCP) 智能体服务可视化调试与自动化评测",
           "单二进制双模式：桌面端可视化 GUI 与无头高并发 CLI 执行引擎",
@@ -192,7 +193,7 @@
         工作流执行引擎
       </h1>
       <p>
-        可视化编排与执行跨协议复杂工作流。
+        可视化编排、自动化测试与内置 AI 智能自愈多协议复杂工作流。<br>
         内置 7 种核心协议，支持一键安装插件扩展。
         跨平台桌面端应用与强大 CLI &mdash; 单一二进制搞定一切。
       </p>
@@ -225,6 +226,13 @@
       <p class="section-subtitle">在一个统一工作区内完成可视化调试、AI 智能体工具评估与全自动跨协议端到端测试。</p>
       
       <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+          </div>
+          <h3>内置全域 AI 助手与智能诊断修复</h3>
+          <p>输入自然语言自动批量编排多协议流水线、自适应折行排版与编写脚本。支持自主推进「执行到底」、中途插话纠偏、一键报错深度诊断与本地代码工程感知。</p>
+        </div>
         <div class="feature-card">
           <div class="feature-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
@@ -336,6 +344,13 @@
               <td>&#10003; 是</td>
               <td>需自行部署</td>
             </tr>
+            <tr>
+              <td>内置 AI 助手与智能自愈</td>
+              <td class="highlight">&#10003; 全域画布 Copilot (自然语言编排、自适应排版、自主执行、一键修复、工程感知)</td>
+              <td>Postbot (仅 HTTP，需云端账号/付费)</td>
+              <td>&#10007; 无</td>
+              <td>仅用于 Prompt 调试</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -348,6 +363,10 @@
       <h2>常见问题解答</h2>
       <p class="section-subtitle">了解关于 MPE Flow 架构、协议支持与自动化部署的一切信息。</p>
       <div class="faq-grid">
+        <div class="faq-card">
+          <h3>MPE Flow 的内置 AI 助手如何工作？支持本地私有大模型吗？</h3>
+          <p>MPE Flow 内置全域 AI 助手，兼容任意 OpenAI 协议的大模型服务（包括 DeepSeek、OpenAI、Claude、Kimi、通义千问等，或通过 Ollama、vLLM 本地离线部署的私有开源模型）。AI 助手通过 Tool Calling 原生接入画布与执行系统，能够批量生成节点、自适应折行排版、编写动态脚本、自动关联本地项目代码感知契约，并在执行报错时一键诊断与智能自愈，全程 100% 隐私安全，不强制依赖云端账号。</p>
+        </div>
         <div class="faq-card">
           <h3>什么是 MPE Flow？</h3>
           <p>MPE Flow (Multi-Protocol Flow Executor) 是一款基于 Rust 和 Tauri 构建的高性能跨协议工作流编排与集成测试引擎。它允许开发者通过可视化画布轻松编排跨 HTTP、WebSocket、TCP、UDP、SSE、GraphQL、Kafka 与 MCP 的复杂场景，提供桌面端 GUI 与独立无头 CLI。</p>

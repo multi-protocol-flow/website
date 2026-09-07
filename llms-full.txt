@@ -17,6 +17,7 @@ Traditional tools (Postman, Insomnia, JMeter, Bruno) focus predominantly on HTTP
 - **Offline-First & Sovereign Privacy:** 100% local `.mpf` workflow files and `.env` environment variables. No mandatory accounts, telemetry lock-in, or third-party cloud synchronization.
 - **Unified Schema & Typing:** Strict JSON Schema validation across all protocol nodes and variable interpolations.
 - **Pluggable Sidecar Architecture:** Third-party and enterprise protocols (MCP, Kafka, Redis, MongoDB, gRPC, Mail) operate via the standalone `mpe-plugin-sdk` wire protocol over standard IPC, guaranteeing process isolation and safety.
+- **Built-in Agentic AI Copilot:** Native full-canvas AI assistant supporting OpenAI-compatible providers, natural language to DAG workflow generation, autonomous execution to goal, midway steering, 1-click execution error self-healing, and local codebase awareness.
 
 ---
 
@@ -179,9 +180,49 @@ MPE Flow workflows are stored in clean, human-readable JSON files with the `.mpf
 }
 ```
 
+### 3.1 Built-in Dynamic Variables
+
+In addition to user-defined variables (`{{variable_name}}`) and node output mappings (`{{$nodes.node_id.output.field}}`), MPE Flow provides zero-declaration dynamic runtime variables evaluated fresh on each step:
+
+- `{{$timestamp}}`: Current Unix epoch timestamp in milliseconds (e.g. `1772867200123`).
+- `{{$isoTimestamp}}`: Current UTC date and time in ISO 8601 standard format (e.g. `2026-09-07T12:00:00.000Z`).
+- `{{$guid}}` / `{{$uuid}}`: Cryptographically random UUID v4 identifier.
+- `{{$randomInt}}`: Random 6-digit integer (`0` to `999999`).
+- `{{$randomAlphaNumeric}}`: Random 8-character alphanumeric string.
+
 ---
 
-## 4. CLI Command Reference & CI/CD Integration
+## 4. Built-in Agentic AI Copilot & Smart Orchestration
+
+MPE Flow integrates a full-canvas AI Copilot acting as an intelligent workflow architect:
+
+### 4.1 Architecture & Model Providers
+- **OpenAI-Compatible Client:** Compatible with any standard provider (DeepSeek, OpenAI, Claude, Kimi, Zhipu) or local private models hosted via Ollama, vLLM, or LM Studio.
+- **Privacy-First:** Operates directly from the local client with custom API Base URLs and keys; no mandatory cloud telemetry or accounts.
+- **Global System Prompt:** Supports injecting project-wide architectural guidelines, naming rules, or team conventions.
+
+### 4.2 Canvas Tool Calling
+The Copilot manipulates the workflow canvas using typed tool calls:
+- `batch_create_pipeline`: Atoms-level generation of complete multi-protocol DAGs from a single prompt.
+- `auto_layout`: Optimizes node positions. Includes both standard directional DAG layout and the new **Adaptive Wrap Auto-Layout** algorithm for compact multi-branch visualization.
+- `generate_or_update_script`: Generates JavaScript or Rhai code for transformation, hash signing, or assertion nodes.
+- `run_flow`: Triggers flow execution and streams real-time status and logs back to the Copilot.
+
+### 4.3 Autonomous Execution ("Run to Goal") & Midway Steering
+- **Auto-Execute Mode:** Copilot can iterate through execution, observe output failures, adjust configurations, and re-run until assertions pass.
+- **Midway Steering:** Allows injecting real-time corrections or additional instructions during active tool execution without cancelling the task.
+- **Reasoning Transparency:** Full support for reasoning models (e.g. DeepSeek-R1) with stream parsing of `<think>` tags.
+- **Safety Confirmations:** High-risk actions (clearing canvas, bulk node deletion, marketplace plugin installation) trigger explicit user approval dialogs.
+
+### 4.4 Local Workspace Perception & One-Click Self-Healing
+- **Link Local Workspace:** Allows the Copilot to inspect local Git repositories, scan folder layouts, read source code, and parse OpenAPI/Swagger schemas.
+- **One-Click Error Diagnosis & Fix:** On node execution failure, 1-click AI diagnosis inspects upstream outputs and root causes, proposing an automated fix on the canvas.
+- **Multimodal Support:** Paste or drag-and-drop error screenshots and API documentation images directly into the chat.
+- **Interaction Surfaces:** Right sidebar panel (`Ctrl+I` / `Cmd+I`), detachable floating draggable window, center Spotlight command palette (`Ctrl+K` / `Cmd+K`), and terminal CLI bridge (`mpe ai`).
+
+---
+
+## 5. CLI Command Reference & CI/CD Integration
 
 The MPE CLI offers comprehensive command-line operations designed for developer ergonomics and CI/CD pipelines.
 
@@ -246,9 +287,23 @@ mpe flow export ./flows/checkout.mpf --format mermaid
 mpe debug ./flows/complex_pipeline.mpf --breakpoint node_ws_listen
 ```
 
+### 5.6 CLI AI Copilot Bridge (`mpe ai`)
+
+```bash
+# Query or drive the AI Copilot directly from the terminal
+mpe ai "Create an HTTP authentication flow and pipe bearer token to WebSocket"
+```
+
+### 5.7 Open Flow in Desktop GUI (`mpe open`)
+
+```bash
+# Open a workflow file in the running desktop GUI instance
+mpe open ./flows/checkout.mpf
+```
+
 ---
 
-## 5. Comparison Matrix
+## 6. Comparison Matrix
 
 | Feature / Dimension | MPE Flow | Postman | JMeter | Bruno |
 |---|---|---|---|---|
@@ -264,10 +319,11 @@ mpe debug ./flows/complex_pipeline.mpf --breakpoint node_ws_listen
 | **Stress / Load Testing** | Built-in Multi-Protocol Engine | Paid Cloud Monitor | Built-in (Java Threads) | Not Supported |
 | **Data Storage / Privacy** | 100% Local Git-friendly `.mpf` | Cloud Sync (Account required) | Local XML/JMX | Local Files |
 | **CI/CD Integration** | Direct binary, JUnit XML, JSON | Newman npm wrapper | Non-GUI shell script | Bru CLI |
+| **AI Copilot & Auto-Fix** | **Native Full-Canvas Copilot (NL-to-DAG, auto-layout, autonomous run, 1-click error fix, code perception)** | Postbot (HTTP-only, cloud account required, paid tier) | Not Supported | Not Supported |
 
 ---
 
-## 6. Frequently Asked Questions (FAQ)
+## 7. Frequently Asked Questions (FAQ)
 
 ### Q: How is MPE Flow different from Postman?
 **A:** Postman is primarily designed for standalone HTTP/REST API request-response cycles. MPE Flow is designed for complex **multi-protocol event-driven workflows**. In MPE Flow, you can seamlessly pass data across HTTP, WebSocket, TCP sockets, Server-Sent Events, Kafka, Redis, and AI Model Context Protocol (MCP) servers within a single visual graph. Furthermore, MPE Flow is 100% local-first with no mandatory cloud account or telemetry lock-in.
@@ -281,9 +337,12 @@ mpe debug ./flows/complex_pipeline.mpf --breakpoint node_ws_listen
 ### Q: Does MPE Flow work in air-gapped or offline enterprise environments?
 **A:** Yes. MPE Flow is distributed as standalone binaries (or Docker container / CLI) with zero external cloud dependencies. Workflows are saved in open `.mpf` JSON files on local disk and can be checked directly into Git repositories.
 
+
+### Q: How does the built-in AI Copilot work?
+**A:** The AI Copilot connects to any OpenAI-compatible provider (DeepSeek, OpenAI, Claude, or local Ollama instances) and interacts directly with the MPE Flow canvas via strict tool calling. It can create and connect nodes, compute adaptive layouts, write JavaScript/Rhai scripts, inspect local codebases, execute workflows autonomously to reach a goal, and diagnose/repair execution errors in a single click &mdash; with zero data lock-in and offline model support.
 ---
 
-## 7. Official Resources & Community
+## 8. Official Resources & Community
 
 - **Official Website:** https://mpe.run/
 - **Documentation:** https://mpe.run/docs.html

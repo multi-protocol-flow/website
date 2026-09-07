@@ -157,6 +157,17 @@
             </ul>
           </div>
           <div class="docs-nav-section">
+            <h4>全域 AI 助手</h4>
+            <ul>
+              <li><a href="#ai-copilot">架构与服务商</a></li>
+              <li><a href="#ai-interaction">交互形态与快捷键</a></li>
+              <li><a href="#ai-tools">画布操作与智能排版</a></li>
+              <li><a href="#ai-autonomous">自主执行与中途纠偏</a></li>
+              <li><a href="#ai-diagnostics">错误诊断与智能自愈</a></li>
+              <li><a href="#ai-workspace">本地工程代码感知</a></li>
+            </ul>
+          </div>
+          <div class="docs-nav-section">
             <h4>CLI 命令参考</h4>
             <ul>
               <li><a href="#commands">常用命令</a></li>
@@ -200,50 +211,50 @@
       <main class="docs-content">
         <!-- Overview -->
         <article id="overview" class="docs-section">
-          <h2>Overview</h2>
-          <p>MPE Flow is a multi-protocol workflow orchestration engine. It runs as either a desktop GUI or a CLI tool &mdash; from the same binary.</p>
+          <h2>概述</h2>
+          <p>MPE Flow 是一款高性能跨协议工作流编排与执行引擎。通过单一可执行文件，即可无缝运行桌面端图形界面 (GUI) 或独立无头命令行工具 (CLI)。</p>
           
           <div class="docs-info">
-            <h4>Two Modes, One Binary</h4>
+            <h4>单二进制，双运行模式</h4>
             <ul>
-              <li><strong>No arguments</strong> &rarr; Opens the Tauri desktop GUI</li>
-              <li><strong>With arguments</strong> &rarr; Runs in CLI mode</li>
+              <li><strong>无启动参数</strong> &rarr; 启动 Tauri 桌面端图形化界面</li>
+              <li><strong>携带命令行参数</strong> &rarr; 进入无头高并发 CLI 执行模式</li>
             </ul>
-            <p><em>On Linux, only the CLI binary is available &mdash; no GUI dependencies required.</em></p>
+            <p><em>在 Linux 平台上，提供轻量纯 CLI 二进制，无需任何 GTK/WebKit 等图形库依赖。</em></p>
           </div>
         </article>
 
         <!-- Installation -->
         <article id="installation" class="docs-section">
-          <h2>Installation</h2>
+          <h2>安装指南</h2>
 
-          <h3>Windows &amp; macOS</h3>
-          <p>Download the installer from the <a href="changelog.html">Changelog</a> page. The same binary supports both GUI and CLI modes.</p>
+          <h3>Windows 与 macOS</h3>
+          <p>可直接前往 <a href="changelog.html">更新日志</a> 页面下载安装包。同一二进制支持 GUI 与 CLI 两种模式。</p>
 
-          <h3>Linux (CLI)</h3>
-          <p>Download the pre-built binary and add it to your <code>PATH</code>:</p>
+          <h3>Linux (纯 CLI)</h3>
+          <p>下载预编译二进制并加入系统 <code>PATH</code>：</p>
           <div class="docs-code">
-            <pre><code># Download and extract
+            <pre><code># 下载并解压
 curl -LO https://download.mpe.run/releases/latest/mpe-vX.Y.Z-linux-x86_64.tar.gz
 tar xzf mpe-vX.Y.Z-linux-x86_64.tar.gz
 
-# Make executable and move to PATH
+# 赋予执行权限并移入 PATH
 chmod +x mpe
 sudo mv mpe /usr/local/bin/
 
-# Verify
+# 验证安装
 mpe --help</code></pre>
           </div>
           <div class="docs-info">
-            <h4>Note</h4>
-            <p>The Linux build is CLI-only &mdash; no GUI, no GTK/WebKit dependencies required.</p>
+            <h4>说明</h4>
+            <p>Linux 版本为纯 CLI 模式，轻量零 GUI 依赖，非常适合 Docker 容器与 CI/CD 宿主机环境。</p>
           </div>
         </article>
 
         <!-- Quick Example -->
         <article id="quick-example" class="docs-section">
-          <h2>Quick Example</h2>
-          <p>Create a file <code>hello.mpf</code>:</p>
+          <h2>快速示例</h2>
+          <p>创建一个工作流文件 <code>hello.mpf</code>：</p>
           <div class="docs-code">
             <pre><code>{
   "_version": 1,
@@ -293,10 +304,99 @@ mpe --help</code></pre>
   }
 }</code></pre>
           </div>
-          <p>Run it:</p>
+          <p>运行工作流：</p>
           <div class="docs-code">
             <pre><code>mpe run -f hello.mpf</code></pre>
           </div>
+        </article>
+
+        <!-- AI Copilot -->
+        <article id="ai-copilot" class="docs-section">
+          <h2>全域 AI 助手与智能编排</h2>
+          <p>MPE Flow 原生内置了深度集成的全域 AI 流程编排架构师（Agentic AI Copilot），具备自然语言工作流生成、自主推进「执行到底」、自适应折行排版优化与一键报错智能自愈等全套智能体能力。</p>
+
+          <div class="docs-tip">
+            <h4>隐私优先与数据主权</h4>
+            <p>内置 AI 助手支持连接任意兼容 OpenAI 协议的大模型服务（包括 DeepSeek、OpenAI、Claude、Kimi、通义千问等，或通过 Ollama / vLLM 本地离线私有化部署的模型）。所有工作流、Token 和测试数据完全留存在本地设备，无强制云端同步或账户锁定。</p>
+          </div>
+
+          <h3>配置 AI Provider</h3>
+          <p>前往系统设置 <strong>全局设置 &rarr; AI 助手</strong> 即可添加与管理模型服务商：</p>
+          <ul>
+            <li><strong>常用服务预设：</strong> 提供 DeepSeek、OpenAI、Claude、Kimi、Ollama 等主流厂商的常用预设，一键填入 Base URL 与推荐模型。</li>
+            <li><strong>Base URL 与 API Key：</strong> 自由接入公有云 API 或本地自建大模型端点（例如本地 Ollama 服务 <code>http://localhost:11434/v1</code>）。</li>
+            <li><strong>模型自省与选择：</strong> 支持一键拉取服务商模型列表，或手动指定任意模型标识（如 <code>deepseek-chat</code>、<code>deepseek-reasoner</code>、<code>gpt-4o</code>、<code>claude-3-5-sonnet</code>）。</li>
+            <li><strong>自定义全局 System Prompt：</strong> 注入您团队的特定业务规范、接口命名偏好或统一脚本风格，每次对话时自动附加生效。</li>
+          </ul>
+
+          <h3 id="ai-interaction">交互形态与全局快捷键</h3>
+          <p>MPE Flow 提供了四种无缝衔接的 AI 助手交互入口：</p>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>交互形态</th>
+                <th>快捷键 / 触发方式</th>
+                <th>功能说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>右侧 Copilot 侧边栏</strong></td>
+                <td><span class="kbd-shortcut">Ctrl+I</span> / <span class="kbd-shortcut">Cmd+I</span></td>
+                <td>内置多会话管理、历史记录持久化、模型实时切换与上下文感知对话。</td>
+              </tr>
+              <tr>
+                <td><strong>脱离吸附 (浮动窗口)</strong></td>
+                <td>按住顶部拖拽 / 点击脱离按钮</td>
+                <td>将 Copilot 变为独立可拖拽移动的浮动窗口，适合多显示器编程。拖回右侧边缘即可一键重新吸附。</td>
+              </tr>
+              <tr>
+                <td><strong>Spotlight 快捷指令</strong></td>
+                <td><span class="kbd-shortcut">Ctrl+K</span> / <span class="kbd-shortcut">Cmd+K</span></td>
+                <td>居中唤起全局指令弹窗，无需展开侧边栏即可通过自然语言一键生成流程、排版或调试。</td>
+              </tr>
+              <tr>
+                <td><strong>CLI AI 双向桥接</strong></td>
+                <td><code>mpe ai "&lt;指令&gt;"</code></td>
+                <td>在终端直接向 AI 助手下发指令，自动联动正在运行的 GUI 界面或在无头模式下执行。</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 id="ai-tools">画布操作与自然语言流程生成</h3>
+          <p>AI Copilot 不仅能回答文本，更通过强类型 Tool Calling 直接操控图形化画布：</p>
+          <ul>
+            <li><strong>自然语言生成 DAG：</strong> 例如：<em>“创建一个登录认证并提取 Token 传递给下游 WebSocket 长连接的完整工作流”</em>。</li>
+            <li><strong>批量编排流水线：</strong> 具备 <code>batch_create_pipeline</code> 能力，一条指令即可原子化创建多节点复合流转拓扑并自动建立端口连线。</li>
+            <li><strong>自动排版与自适应折行：</strong> 支持传统水平/垂直 DAG 排版，并全新引入 <strong>自适应折行布局算法 (Adaptive Wrap)</strong>，自动根据视口与多分支层级优化排版，杜绝连线重叠与无限横向拉伸。</li>
+            <li><strong>脚本生成与修复：</strong> 自动编写满足 QuickJS / Rhai 运行时规范的 JavaScript 脚本，完成复杂加解密、动态计算与数据清洗。</li>
+            <li><strong>数据源检索与导入：</strong> 感知已接入的 OpenAPI / Swagger 规范，按需自动导入接口并转为工作流节点。</li>
+          </ul>
+
+          <h3 id="ai-autonomous">自主推进模式（执行到底）与中途纠偏插话</h3>
+          <p>面向复杂的多步验证与探索性编排场景：</p>
+          <ul>
+            <li><strong>执行到底模式 (Auto-Execute)：</strong> 开启后 AI 将自主连续调用工具、执行节点并观察产物，直到达到既定业务目标或通过全部断言。</li>
+            <li><strong>中途纠偏插话 (Midway Steering)：</strong> 当 AI 正在批量执行或持续推理时，无需中止任务，可直接在输入框发送补充指令（例如：<em>“端口改用 8080”</em>），AI 将实时吸收新指令动态微调后续步骤。</li>
+            <li><strong>思考链透明化 (Thinking Chain)：</strong> 原生适配 DeepSeek-R1 等推理模型，流式解析 <code>&lt;think&gt;</code> 标签，提供可折叠展开的推理思考过程展示。</li>
+            <li><strong>高风险操作安全确认：</strong> 清空画布、批量删除节点、安装外部插件等破坏性操作前，弹出用户确认卡片，需人工授权后方可执行。</li>
+          </ul>
+
+          <h3 id="ai-diagnostics">节点报错一键 AI 深度诊断与自愈</h3>
+          <p>当协议节点执行遇到异常（HTTP 500、WebSocket 握手超时、断言失败等）：</p>
+          <ul>
+            <li>在错误提示条或执行历史面板中点击 <strong>AI 诊断与修复</strong>。</li>
+            <li>Copilot 自动采集上游节点上下文、出入参快照与底层错误链进行归因分析。</li>
+            <li>清晰呈现根因（如认证头缺失、Token 失效、JSONPath 语法错误），并在画布中一键应用推荐修复方案。</li>
+          </ul>
+
+          <h3 id="ai-workspace">本地工作区代码感知与多模态</h3>
+          <p>点击 <strong>关联本地项目</strong>，将工作流与本地源码工程建立连接：</p>
+          <ul>
+            <li><strong>项目结构扫描：</strong> 自动感知工程技术栈、路由文件、OpenAPI 文档与配置文件。</li>
+            <li><strong>切片阅读与代码检索：</strong> 检索后端 Controller、DTO 定义与环境变量规范，精准填充接口路径与请求体格式。</li>
+            <li><strong>截图多模态输入：</strong> 支持直接粘贴或拖拽接口文档截图、错误弹窗截图，AI 自动结合图像信息完成配置。</li>
+          </ul>
         </article>
 
         <!-- Commands -->
@@ -351,6 +451,16 @@ mpe --help</code></pre>
                 <td><code>mpe plugin</code></td>
                 <td>插件管理（dir, list, install）</td>
                 <td><code>mpe plugin list</code></td>
+              </tr>
+              <tr>
+                <td><code>mpe ai</code></td>
+                <td>终端驱动或对话 AI Copilot（与 GUI 双向联动或无头运行）</td>
+                <td><code>mpe ai "创建一个登录并提取 Token 的工作流"</code></td>
+              </tr>
+              <tr>
+                <td><code>mpe open</code></td>
+                <td>在运行中的桌面 GUI 应用中打开指定工作流文件</td>
+                <td><code>mpe open flow.mpf</code></td>
               </tr>
             </tbody>
           </table>
@@ -714,41 +824,40 @@ jobs:
 
         <!-- Variables -->
         <article id="variables" class="docs-section">
-          <h2>Variables</h2>
+          <h2>变量系统</h2>
           
           <div class="docs-warning">
-            <h4>Variable Pool vs Node Output</h4>
-            <p><code>{{var}}</code> syntax can <strong>only</strong> access the Variable Pool. Protocol node outputs are stored separately in <code>last_node_output</code> and do NOT automatically become variables.</p>
-            <p>To use node output data with <code>{{var}}</code>, you must first extract it using a <code>variable_extractor</code> or <code>script</code> node.</p>
+            <h4>变量池 (Variable Pool) 与节点输出的关系</h4>
+            <p><code>{{var}}</code> 插值语法<strong>只能</strong>读取工作流变量池中的变量。协议节点的直接输出独立缓存在 <code>last_node_output</code> 中，默认不会自动写入变量池。</p>
+            <p>如需在后续节点中通过 <code>{{var}}</code> 引用上一步的输出数据，请先通过 <code>variable_extractor</code> 变量提取节点或 <code>script</code> 脚本节点提取到变量池。</p>
           </div>
 
-          <h3>Syntax</h3>
+          <h3>语法规范</h3>
           <table class="docs-table">
             <thead>
               <tr>
-                <th>Syntax</th>
-                <th>Description</th>
+                <th>插值语法</th>
+                <th>说明</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td><code>{{variable_name}}</code></td>
-                <td>Reference a variable from the pool</td>
+                <td>引用变量池中的指定变量</td>
               </tr>
               <tr>
                 <td><code>{{obj.field}}</code></td>
-                <td>Access nested field with dot notation</td>
+                <td>通过点号语法访问嵌套 JSON 对象的内部字段</td>
               </tr>
             </tbody>
           </table>
 
-          <h3>Adding Variables to the Pool</h3>
+          <h3>向变量池注入变量</h3>
           <ol>
-            <li><strong>Initial variables</strong>: Define in <code>flow.initial_variables</code></li>
-            <li><strong>variable_extractor</strong>: Extract from <code>last_node_output</code> using JSONPath</li>
-            <li><strong>script</strong>: Use <code>fn.variables.set(name, value)</code></li>
+            <li><strong>初始化变量</strong>：在工作流全局设置 <code>flow.initial_variables</code> 中定义</li>
+            <li><strong>变量提取节点</strong>：使用 <code>variable_extractor</code> 配合 JSONPath 从 <code>last_node_output</code> 提取</li>
+            <li><strong>脚本注入</strong>：在 <code>script</code> 节点中使用 <code>fn.variables.set(name, value)</code></li>
           </ol>
-
           <div class="docs-code">
             <pre><code>// variable_extractor example
 {
@@ -764,6 +873,45 @@ jobs:
 
 // Later use: {{user_id}}, {{http_status}}</code></pre>
           </div>
+
+          <h3>内置动态变量 (Dynamic Variables)</h3>
+          <p>MPE Flow 深度内置了一系列免声明的动态变量，在每个步骤执行时实时计算取值：</p>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>动态变量</th>
+                <th>说明</th>
+                <th>取值示例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>{{$timestamp}}</code></td>
+                <td>当前 Unix 毫秒时间戳</td>
+                <td><code>1772867200123</code></td>
+              </tr>
+              <tr>
+                <td><code>{{$isoTimestamp}}</code></td>
+                <td>ISO 8601 UTC 格式当前标准时间</td>
+                <td><code>2026-09-07T12:00:00.000Z</code></td>
+              </tr>
+              <tr>
+                <td><code>{{$guid}}</code> / <code>{{$uuid}}</code></td>
+                <td>随机生成的 UUID v4 唯一标识</td>
+                <td><code>a3f89021-4b12-42fe-b58f-287517c2f829</code></td>
+              </tr>
+              <tr>
+                <td><code>{{$randomInt}}</code></td>
+                <td>随机 6 位正整数 (0-999999)</td>
+                <td><code>482103</code></td>
+              </tr>
+              <tr>
+                <td><code>{{$randomAlphaNumeric}}</code></td>
+                <td>随机 8 位大小写字母与数字组合字符串</td>
+                <td><code>k9X2mQ8L</code></td>
+              </tr>
+            </tbody>
+          </table>
 
           <h3>Conditional / Assertion Paths</h3>
           <p><code>conditional</code> and <code>assertion</code> nodes read directly from <code>last_node_output</code>:</p>

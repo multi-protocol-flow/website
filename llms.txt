@@ -1,6 +1,6 @@
 # MPE Flow (Multi-Protocol Flow Executor)
 
-> MPE Flow is an ultra-fast, offline-first, multi-protocol flow execution engine and visual orchestration platform built in Rust and Tauri 2. It bridges HTTP/REST, WebSocket, TCP, UDP, SSE, and GraphQL natively in a single unified workflow, with an extensible plugin architecture supporting MCP, Kafka, Redis, MongoDB, gRPC, SMTP, and IMAP.
+> MPE Flow is an ultra-fast, offline-first, multi-protocol flow execution engine, visual orchestration platform, and built-in Agentic AI Copilot built in Rust and Tauri 2. It bridges HTTP/REST, WebSocket, TCP, UDP, SSE, and GraphQL natively in a single unified workflow, with an extensible plugin architecture supporting MCP, Kafka, Redis, MongoDB, gRPC, SMTP, and IMAP.
 
 ## Project Information
 
@@ -22,6 +22,18 @@
 - **Server-Sent Events (SSE):** Streaming event streams (Connect, Event listener with filter/type matching, Disconnect).
 - **GraphQL:** Full GraphQL operations (Query, Mutation, Schema Introspection, WebSocket-based Subscriptions).
 - **Flow Control & Data Ops:** Entry, End, Conditional Branching (JS / CEL expressions), Script Execution (JavaScript via Boa / Rhai), Assertions (JSON schema, status code, response time, headers), and Variable Extractors.
+
+## Built-in Agentic AI Copilot & Automation
+
+MPE Flow integrates a native AI Copilot designed for natural language orchestration and self-healing:
+- **OpenAI-Compatible Architecture:** Connects to any OpenAI-compatible provider (DeepSeek, OpenAI, Claude, Kimi, or local offline models via Ollama / vLLM). No cloud lock-in.
+- **Natural Language to DAG:** Generates complete workflows and pipelines from prompt descriptions (`batch_create_pipeline`).
+- **Adaptive Wrap Auto-Layout:** Intelligently optimizes canvas node placement with adaptive row-wrapping to keep complex multi-branch graphs compact and readable.
+- **Autonomous Execution ("Run to Goal"):** Autonomously executes workflows, observes node outputs, and self-corrects until targets/assertions pass.
+- **Midway Steering:** Allows injecting real-time corrections or additional instructions during active tool execution without cancelling the task.
+- **One-Click Error Diagnosis & Smart Fix:** Diagnoses failed nodes (HTTP 500, socket timeouts, assertion failures) with full error-chain analysis and provides 1-click canvas repair.
+- **Local Project Workspace Awareness:** Links to local repository code, discovers backend routes and DTOs, and parses OpenAPI / Swagger schemas.
+- **Interaction Surfaces:** Right sidebar panel (`Ctrl+I` / `Cmd+I`), detachable floating draggable window, center Spotlight command palette (`Ctrl+K` / `Cmd+K`), and terminal CLI bridge (`mpe ai`).
 
 ## Extensible Plugin Ecosystem
 
@@ -45,14 +57,15 @@ MPE delivers a dual-mode single binary (`mpe` for GUI + CLI, or pure headless `m
 - `mpe stress <file.mpf>`: Run multi-protocol load and stress tests (concurrency, ramp-up, RPS targets, latency percentiles p50/p90/p99).
 - `mpe flow <list|show|export>`: Inspect and manage workflow structures.
 - `mpe debug <file.mpf>`: Interactive CLI step debugger with breakpoint support.
-
+- `mpe ai "<prompt>"`: Query or drive the AI Copilot from terminal (bridges with GUI or runs headless).
+- `mpe open <file.mpf>`: Open a workflow file in the active desktop GUI instance.
 ## Workflow File Format (.mpf)
 
 `.mpf` (Multi-Protocol Flow) is a declarative, human-readable JSON format:
 - `id`, `name`, `version`, `description`
 - `nodes`: Array of protocol and logic nodes with typed configurations.
 - `edges`: Directed edges with source/target handles (`default`, `true`, `false`, `error`).
-- `variables`: Global and workflow-scoped variables with templating syntax `{{variable_name}}` or `{{$nodes.node_id.output.field}}`.
+- `variables`: Global and workflow-scoped variables (`{{var_name}}`) plus built-in runtime dynamic variables (`{{$timestamp}}`, `{{$isoTimestamp}}`, `{{$guid}}` / `{{$uuid}}`, `{{$randomInt}}`, `{{$randomAlphaNumeric}}`).
 - `settings`: Execution error policies (`RouteToFalse`, `Ignore`, `AbortFlow`), timeout configs, and concurrency limits.
 
 ## Key Advantages over Postman, JMeter, and Bruno
@@ -61,3 +74,4 @@ MPE delivers a dual-mode single binary (`mpe` for GUI + CLI, or pure headless `m
 2. **Local-First & Zero Cloud Lock-In:** All workflows, secrets, and test data stay on local disk; no mandatory account or cloud sync.
 3. **Rust-Powered High Performance:** Sub-millisecond execution overhead, low memory footprint, and high-throughput stress testing.
 4. **CI/CD Native:** Direct exit codes, JUnit XML output, GitHub Actions / GitLab CI ready without wrapper node scripts.
+5. **Native Full-Canvas AI Copilot:** From prompt to executable multi-protocol graph with autonomous self-healing, adaptive layout, and local code awareness.
