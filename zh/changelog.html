@@ -176,13 +176,19 @@
       }
       html += '</div>';
       html += '<div class="release-notes">' + escapeHtml(notes) + '</div>';
-      if (downloads.windows || downloads.macos || downloads.linux) {
+      if (downloads.windows || downloads.macos || downloads.linux || downloads.linux_appimage || downloads.linux_deb) {
         html += '<div class="release-downloads">';
         if (downloads.windows) {
           html += '<a href="' + downloads.windows + '" class="btn btn-sm" download>Windows</a>';
         }
         if (downloads.macos) {
           html += '<a href="' + downloads.macos + '" class="btn btn-sm" download>macOS</a>';
+        }
+        if (downloads.linux_appimage) {
+          html += '<a href="' + downloads.linux_appimage + '" class="btn btn-sm" download>Linux AppImage</a>';
+        }
+        if (downloads.linux_deb) {
+          html += '<a href="' + downloads.linux_deb + '" class="btn btn-sm" download>Linux DEB</a>';
         }
         if (downloads.linux) {
           html += '<a href="' + downloads.linux + '" class="btn btn-sm" download>Linux CLI</a>';
