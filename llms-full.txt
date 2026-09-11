@@ -52,8 +52,9 @@ MPE Flow categorizes nodes into Built-in Protocol Nodes, Logic/Control Nodes, an
 
 - **Entry Node (`entry`):** Workflow entry point defining input parameters and schema validation.
 - **End Node (`end`):** Workflow termination point aggregating final outputs, status codes, and latency metrics.
+- **Subflow Node (`sub_flow`):** Embeds and reuses independent workflows. Referenced via `target_flow_id` (workspace UUID) or `target_flow_path` (relative/absolute file path). Supports variable inheritance (`inherit_all_variables`), input parameter mappings (`variable_mappings`), output exports (`export_all_variables`), and output return mappings (`output_mappings`). Includes cycle detection and canvas drag-and-drop creation from the flow list.
 - **Conditional Branching (`conditional`):** Evaluates Boolean logic using JS expressions or CEL (Common Expression Language). Routes flow execution to `true` or `false` outbound ports.
-- **Script Node (`script`):** Executes sandboxed JavaScript (via Boa Engine) or Rhai scripts for dynamic transformations, crypto hashes (SHA256, HMAC, MD5), base64 encoding, and custom math.
+- **Script Node (`script`):** Executes sandboxed JavaScript (via QuickJS) for dynamic transformations, crypto hashes (SHA256, HMAC, MD5), base64 encoding, and custom math.
 - **Assertion Node (`assertion`):** Validates execution state against expectations (e.g., status code equals 200, response time < 500ms, JSON schema compliance, regex body match).
 - **Variable Extractor (`variable_extractor`):** Extracts values from upstream node outputs via JSONPath, Regex, or XPath and assigns them to workflow context variables.
 - **Proxy Node (`proxy`):** Intercepts or routes requests through forward or SOCKS5 proxies.
@@ -287,6 +288,11 @@ mpe flow export ./flows/checkout.mpf --format mermaid
 mpe debug ./flows/complex_pipeline.mpf --breakpoint node_ws_listen
 ```
 
+MPE Flow's debugging engine supports:
+- **Breakpoints:** Visual node breakpoints and CLI `--breakpoint <node_id>` flags.
+- **Stepping Controls:** Step Over (`F10`), Step Into (`F11`, enters `sub_flow` nodes to debug child flows), Step Out (`Shift + F11`, completes remaining subflow steps and returns to caller), and Skip Node.
+- **Multi-Level Call Frames (`DebugCallFrame`):** Hierarchical stack trace (`#0 Root Flow -> #1 Subflow`) with visual frame switching and per-frame variable inspection.
+- **In-Flight Mutation:** Live variable pool editing and temporary node configuration updates during active pause.
 ### 5.6 CLI AI Copilot Bridge (`mpe ai`)
 
 ```bash

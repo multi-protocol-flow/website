@@ -21,7 +21,7 @@
 - **UDP:** Connectionless datagram networking (Bind, SendTo, RecvFrom, Close, Broadcast).
 - **Server-Sent Events (SSE):** Streaming event streams (Connect, Event listener with filter/type matching, Disconnect).
 - **GraphQL:** Full GraphQL operations (Query, Mutation, Schema Introspection, WebSocket-based Subscriptions).
-- **Flow Control & Data Ops:** Entry, End, Conditional Branching (JS / CEL expressions), Script Execution (JavaScript via Boa / Rhai), Assertions (JSON schema, status code, response time, headers), and Variable Extractors.
+- **Flow Control & Data Ops:** Entry, End, Subflow (nested modular workflows with input/output variable mappings, cycle detection, and canvas drag-and-drop), Conditional Branching (JS / CEL expressions), Script Execution (JavaScript via QuickJS), Assertions (JSON schema, status code, response time, headers), and Variable Extractors.
 
 ## Built-in Agentic AI Copilot & Automation
 
@@ -56,7 +56,7 @@ MPE delivers a dual-mode single binary (`mpe` for GUI + CLI, or pure headless `m
 - `mpe validate <file.mpf>`: Statically validate node schemas, circular dependencies, and variable references.
 - `mpe stress <file.mpf>`: Run multi-protocol load and stress tests (concurrency, ramp-up, RPS targets, latency percentiles p50/p90/p99).
 - `mpe flow <list|show|export>`: Inspect and manage workflow structures.
-- `mpe debug <file.mpf>`: Interactive CLI step debugger with breakpoint support.
+- `mpe debug <file.mpf>`: Interactive step debugger with breakpoint support, subflow Step-Into (F11) / Step-Out (Shift+F11), and multi-level call frame stack tracking.
 - `mpe ai "<prompt>"`: Query or drive the AI Copilot from terminal (bridges with GUI or runs headless).
 - `mpe open <file.mpf>`: Open a workflow file in the active desktop GUI instance.
 ## Workflow File Format (.mpf)

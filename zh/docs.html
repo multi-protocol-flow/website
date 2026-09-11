@@ -189,12 +189,20 @@
             <h4>节点类型</h4>
             <ul>
               <li><a href="#node-entry">Entry / End 节点</a></li>
+              <li><a href="#node-subflow">子流程节点 (Subflow)</a></li>
               <li><a href="#node-http">HTTP 节点</a></li>
               <li><a href="#node-conditional">条件分支节点</a></li>
               <li><a href="#node-script">脚本节点</a></li>
               <li><a href="#node-assertion">断言节点</a></li>
               <li><a href="#node-websocket">WebSocket 节点</a></li>
               <li><a href="#node-other">其他协议节点</a></li>
+            </ul>
+          </div>
+          <div class="docs-nav-section">
+            <h4>可视化调试</h4>
+            <ul>
+              <li><a href="#debugging-overview">断点与控制工具栏</a></li>
+              <li><a href="#debugging-subflow">子流程步入步出与调用栈</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
@@ -974,6 +982,65 @@ jobs:
           </div>
         </article>
 
+        <!-- Node Types: Subflow -->
+        <article id="node-subflow" class="docs-section">
+          <h2>子流程节点 (Subflow)</h2>
+          <p>子流程节点支持将其他独立工作流（<code>.mpf</code> 文件或工作区已存流程）作为模块化子节点嵌入到当前流程中，实现高内聚、可复用的复杂业务流编排。</p>
+
+          <h3>画布拖拽生成与标签联动</h3>
+          <p>支持直接从<strong>左侧侧边栏流程列表</strong>拖拽任意流程文件到画布中央，系统将自动创建并绑定该流程的子流程节点。双击子流程节点或在配置面板中点击“打开流程”，将在顶部多标签栏 (<strong>FlowTabBar</strong>) 中以独立标签打开目标子流程，便于即时查看与编辑，同时保留当前父流程的草稿与调试状态。</p>
+
+          <div class="docs-code">
+            <pre><code>{
+  "uuid": "subflow-1",
+  "type": "sub_flow",
+  "name": "用户登录与鉴权子流程",
+  "data": {
+    "type": "sub_flow",
+    "target_flow_id": "7b6c3d9a-1234-5678-abcd-ef0123456789",
+    "target_flow_path": "./subflows/auth.mpf",
+    "inherit_all_variables": true,
+    "variable_mappings": [
+      { "source": "parent_username", "target": "login_user" },
+      { "source": "parent_password", "target": "login_pass" }
+    ],
+    "export_all_variables": true,
+    "output_mappings": [
+      { "source": "access_token", "target": "auth_token" }
+    ]
+  }
+}</code></pre>
+          </div>
+
+          <h3>配置参数详解</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>参数字段</th>
+                <th>类型</th>
+                <th>默认值</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>target_flow_id</code></td><td>string (可选)</td><td><code>null</code></td><td>工作区中已保存流程的 UUID（桌面端 GUI 模式下引用）。</td></tr>
+              <tr><td><code>target_flow_path</code></td><td>string (可选)</td><td><code>null</code></td><td>目标 <code>.mpf</code> 或 <code>.json</code> 流程文件的相对或绝对路径（跨环境迁移与 CLI 模式引用）。</td></tr>
+              <tr><td><code>inherit_all_variables</code></td><td>boolean</td><td><code>true</code></td><td>是否自动将父流程上下文中的所有变量继承给子流程。</td></tr>
+              <tr><td><code>variable_mappings</code></td><td>array</td><td><code>[]</code></td><td>显式入参映射规则（<code>source</code> 父变量名/表达式 &rarr; <code>target</code> 子流程变量名），优先级高于自动继承。</td></tr>
+              <tr><td><code>export_all_variables</code></td><td>boolean</td><td><code>true</code></td><td>子流程执行完毕后，是否将子流程产生的所有变量自动回传合并至父流程变量池。</td></tr>
+              <tr><td><code>output_mappings</code></td><td>array</td><td><code>[]</code></td><td>显式出参回传规则（<code>source</code> 子流程变量名 &rarr; <code>target</code> 父流程变量名），用于精准控制回传命名。</td></tr>
+            </tbody>
+          </table>
+
+          <h3>环路依赖检测与防死锁</h3>
+          <p>MPE Flow 的 DAG 编译器在预检阶段即对子流程依赖图执行拓扑排序与环路检测。若存在直接自引用（A &rarr; A）或相互间接循环调用（A &rarr; B &rarr; A），校验器将立即拦截并给出明确的环路路径报错，彻底防止无限递归死锁。</p>
+
+          <div class="docs-info">
+            <h4>树状嵌套执行报告</h4>
+            <p>子流程执行完毕后，其内部所有节点的执行耗时、状态、输入输出及断言指标均完整保存在层级化的执行报告树中，可在执行历史面板中层层展开深入溯源。</p>
+          </div>
+        </article>
+
         <!-- Node Types: HTTP -->
         <article id="node-http" class="docs-section">
           <h2>HTTP Node</h2>
@@ -1263,6 +1330,58 @@ jobs:
             <h4>Plugin Protocols</h4>
             <p>More protocols (Redis, MySQL/PostgreSQL, MongoDB, SMTP, gRPC, MCP) are available as installable plugins &mdash; see Plugin Development below.</p>
           </div>
+        </article>
+
+        <!-- 可视化调试: 概述与控制 -->
+        <article id="debugging-overview" class="docs-section">
+          <h2>可视化调试与断点控制</h2>
+          <p>MPE Flow 内置全功能图形化交互调试器（同时支持 CLI 交互式单步调试）。可在任意节点挂起执行、实时查看/修改上下文变量、跳过不稳定节点或注入模拟产物。</p>
+
+          <h3>断点标记</h3>
+          <p>鼠标悬停在画布任意节点上，点击节点顶部的断点红点即可切换断点状态。开启调试运行后，执行器将在遇到断点节点前自动暂停并聚焦画布视口。</p>
+
+          <h3>调试动作与全局快捷键</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>动作</th>
+                <th>快捷键</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>继续执行 (Continue)</strong></td><td><code>F5</code> / 继续</td><td>恢复流程执行，直至遇到下一个断点或整个流程执行完毕。</td></tr>
+              <tr><td><strong>单步跳过 (Step Over)</strong></td><td><code>F10</code></td><td>执行当前暂停节点并立即在下一个相连节点暂停。遇到子流程节点时，将在后台完整运行整个子流程并在父流程下一节点暂停。</td></tr>
+              <tr><td><strong>单步步入 (Step Into)</strong></td><td><code>F11</code></td><td>在子流程 (<code>sub_flow</code>) 节点暂停时按 <code>F11</code> 步入其内部，并在子流程的首个有效节点暂停。对常规协议节点行为同单步跳过。</td></tr>
+              <tr><td><strong>单步步出 (Step Out)</strong></td><td><code>Shift + F11</code></td><td>当在子流程内部暂停时，快速执行完当前子流程剩余全部节点，并暂停在父流程中该子流程节点的下一个后继节点。</td></tr>
+              <tr><td><strong>跳过节点 (Skip Node)</strong></td><td>&mdash;</td><td>忽略当前节点的实际网络/系统执行，指定下游输出端口分支（如 <code>true</code> / <code>false</code>）并可自定义注入模拟 output 数据。</td></tr>
+              <tr><td><strong>执行到底 (Run to End)</strong></td><td>&mdash;</td><td>临时忽略后续所有断点，直接以正常模式运行完毕。</td></tr>
+              <tr><td><strong>终止调试 (Stop)</strong></td><td>&mdash;</td><td>强制中止当前调试会话，生成截至当前暂停节点的阶段性调试报告。</td></tr>
+            </tbody>
+          </table>
+        </article>
+
+        <!-- 可视化调试: 子流程单步与调用栈追踪 -->
+        <article id="debugging-subflow" class="docs-section">
+          <h2>子流程步入步出与调用栈追踪</h2>
+          <p>面对多层嵌套子流程的复杂业务场景，MPE Flow 调试引擎原生支持嵌套调用栈帧 (<code>DebugCallFrame</code>) 与分层级单步穿透。</p>
+
+          <h3>子流程精细化单步控制</h3>
+          <p>当执行推进至子流程节点时：</p>
+          <ul>
+            <li><strong>步入 (Step Into / F11)：</strong> 画布无缝下钻至子流程拓扑视图，顶部面包屑动态显示当前嵌套层级（如 <code>主流程 &gt; 鉴权子流程</code>），并在子流程首个执行节点高亮闪烁暂停。</li>
+            <li><strong>步过 (Step Over / F10)：</strong> 将子流程作为黑盒原子步骤执行，直接在父流程后续节点恢复暂停，适合快速跳过已验证成熟的公共模块。</li>
+            <li><strong>步出 (Step Out / Shift+F11)：</strong> 当深入排查完子流程中的关键步骤后，一键执行完毕子流程剩余节点并返回父级上下文，无需逐节点敲击单步。</li>
+          </ul>
+
+          <h3>多层调试调用栈帧 (Call Stack)</h3>
+          <p>右侧<strong>执行面板 - 堆栈</strong>中将动态呈现清晰的嵌套调用链路：</p>
+          <div class="docs-code">
+            <pre><code>#0 根工作流 (订单主链路) &rarr; 子流程节点: 支付结算
+  #1 支付结算 (Payment Pipeline) &rarr; 子流程节点: Token 刷新
+    #2 Token 刷新 (OAuth2 Refresh) &rarr; HTTP 节点: /oauth/token [PAUSED 已暂停]</code></pre>
+          </div>
+          <p>点击调用栈中的任意父级栈帧，画布视口与变量面板将即刻回溯切换至该层级的工作流视图与变量快照，支持在父子流程之间随时横向对照调试数据。</p>
         </article>
 
         <!-- Plugin Development: Overview -->

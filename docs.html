@@ -189,12 +189,20 @@
             <h4>Node Types</h4>
             <ul>
               <li><a href="#node-entry">Entry / End</a></li>
+              <li><a href="#node-subflow">Subflow</a></li>
               <li><a href="#node-http">HTTP</a></li>
               <li><a href="#node-conditional">Conditional</a></li>
               <li><a href="#node-script">Script</a></li>
               <li><a href="#node-assertion">Assertion</a></li>
               <li><a href="#node-websocket">WebSocket</a></li>
               <li><a href="#node-other">Other Protocols</a></li>
+            </ul>
+          </div>
+          <div class="docs-nav-section">
+            <h4>Visual Debugging</h4>
+            <ul>
+              <li><a href="#debugging-overview">Debug Controls &amp; Breakpoints</a></li>
+              <li><a href="#debugging-subflow">Subflow Stepping &amp; Call Stack</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
@@ -976,6 +984,65 @@ jobs:
           </div>
         </article>
 
+        <!-- Node Types: Subflow -->
+        <article id="node-subflow" class="docs-section">
+          <h2>Subflow Node</h2>
+          <p>Subflow nodes enable modular workflow reuse by embedding another workflow into the current flow. Child flows can be referenced by workspace flow ID or relative file path.</p>
+
+          <h3>Canvas Drag &amp; Drop</h3>
+          <p>You can drag any workflow file directly from the <strong>Sidebar Flow List</strong> onto the canvas to instantly create a Subflow node pre-configured to target that flow. Double-clicking a Subflow node opens the target workflow in a new tab within the <strong>FlowTabBar</strong> without losing your active drafting or debugging context.</p>
+
+          <div class="docs-code">
+            <pre><code>{
+  "uuid": "subflow-1",
+  "type": "sub_flow",
+  "name": "User Authentication Subflow",
+  "data": {
+    "type": "sub_flow",
+    "target_flow_id": "7b6c3d9a-1234-5678-abcd-ef0123456789",
+    "target_flow_path": "./subflows/auth.mpf",
+    "inherit_all_variables": true,
+    "variable_mappings": [
+      { "source": "parent_username", "target": "login_user" },
+      { "source": "parent_password", "target": "login_pass" }
+    ],
+    "export_all_variables": true,
+    "output_mappings": [
+      { "source": "access_token", "target": "auth_token" }
+    ]
+  }
+}</code></pre>
+          </div>
+
+          <h3>Configuration Fields</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Default</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>target_flow_id</code></td><td>string (optional)</td><td><code>null</code></td><td>UUID of a saved workflow in the workspace (used in GUI mode).</td></tr>
+              <tr><td><code>target_flow_path</code></td><td>string (optional)</td><td><code>null</code></td><td>Relative or absolute file path to a <code>.mpf</code> or <code>.json</code> workflow file (portable &amp; CLI mode).</td></tr>
+              <tr><td><code>inherit_all_variables</code></td><td>boolean</td><td><code>true</code></td><td>Whether the child subflow automatically inherits all parent scope variables.</td></tr>
+              <tr><td><code>variable_mappings</code></td><td>array</td><td><code>[]</code></td><td>Explicit input parameter mappings (<code>source</code> expression/variable &rarr; <code>target</code> child variable). Overrides inherited variables.</td></tr>
+              <tr><td><code>export_all_variables</code></td><td>boolean</td><td><code>true</code></td><td>Whether child workflow output variables are exported back into parent workflow scope after execution completes.</td></tr>
+              <tr><td><code>output_mappings</code></td><td>array</td><td><code>[]</code></td><td>Explicit return variable mappings (<code>source</code> child variable &rarr; <code>target</code> parent variable). Used when selective export is desired.</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Cycle Detection &amp; Safety</h3>
+          <p>MPE Flow's DAG compiler validates subflow references before execution. Self-references and circular dependencies (A &rarr; B &rarr; A) are detected during pre-flight validation and rejected with descriptive error reports, preventing infinite recursion.</p>
+
+          <div class="docs-info">
+            <h4>Nested Execution Reports</h4>
+            <p>When a subflow executes, its child node execution metrics, step statuses, and duration are preserved in a hierarchical execution report tree viewable in the Execution History panel.</p>
+          </div>
+        </article>
+
         <!-- Node Types: HTTP -->
         <article id="node-http" class="docs-section">
           <h2>HTTP Node</h2>
@@ -1265,6 +1332,58 @@ jobs:
             <h4>Plugin Protocols</h4>
             <p>More protocols (Redis, MySQL/PostgreSQL, MongoDB, SMTP, gRPC, MCP) are available as installable plugins &mdash; see Plugin Development below.</p>
           </div>
+        </article>
+
+        <!-- Visual Debugging: Overview -->
+        <article id="debugging-overview" class="docs-section">
+          <h2>Visual Debugging &amp; Controls</h2>
+          <p>MPE Flow provides an interactive visual step debugger built into both the desktop canvas and CLI. You can pause workflow execution, inspect node inputs/outputs, modify variable pools in flight, and bypass flaky endpoints.</p>
+
+          <h3>Breakpoints</h3>
+          <p>Click the red breakpoint dot on any canvas node to toggle a breakpoint. When debugging starts, execution proceeds until a breakpoint node is reached, pausing execution before the node runs.</p>
+
+          <h3>Debug Actions &amp; Global Shortcuts</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>Shortcut</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Continue</strong></td><td><code>F5</code> / Resume</td><td>Resume execution until the next breakpoint or workflow completion.</td></tr>
+              <tr><td><strong>Step Over</strong></td><td><code>F10</code></td><td>Execute the current node and pause at the immediate next node. For Subflow nodes, runs the child flow completely.</td></tr>
+              <tr><td><strong>Step Into</strong></td><td><code>F11</code></td><td>Step inside a <code>sub_flow</code> node to pause at its first internal node. On regular nodes, behaves as Step Over.</td></tr>
+              <tr><td><strong>Step Out</strong></td><td><code>Shift + F11</code></td><td>Execute the remainder of the current subflow and pause at the successor node in the parent flow.</td></tr>
+              <tr><td><strong>Skip Node</strong></td><td>&mdash;</td><td>Bypass current node execution. Choose an active output branch (e.g. <code>true</code> / <code>false</code>) and supply mock output data.</td></tr>
+              <tr><td><strong>Run to End</strong></td><td>&mdash;</td><td>Ignore all remaining breakpoints and finish the workflow execution.</td></tr>
+              <tr><td><strong>Stop Debugging</strong></td><td>&mdash;</td><td>Terminate the debug session and generate a partial execution report.</td></tr>
+            </tbody>
+          </table>
+        </article>
+
+        <!-- Visual Debugging: Subflow Stepping & Call Stack -->
+        <article id="debugging-subflow" class="docs-section">
+          <h2>Subflow Stepping &amp; Call Stack Tracking</h2>
+          <p>When orchestrating complex nested workflows, MPE Flow's debugger supports multi-level call frame tracking (<code>DebugCallFrame</code>) with hierarchical stepping.</p>
+
+          <h3>Stepping into Subflows</h3>
+          <p>When execution pauses at a Subflow node:</p>
+          <ul>
+            <li>Press <strong>Step Into (F11)</strong>: The canvas seamlessly switches context to the child workflow, highlighting its entry step with a paused indicator.</li>
+            <li>Press <strong>Step Over (F10)</strong>: If you prefer treating the subflow as an atomic black box, Step Over runs the entire child flow and pauses at the parent flow's next node.</li>
+            <li>Press <strong>Step Out (Shift + F11)</strong>: If you are deep inside a subflow and have inspected the critical logic, Step Out completes the remaining child nodes and returns control to the parent caller.</li>
+          </ul>
+
+          <h3>Hierarchical Call Stack Navigation</h3>
+          <p>The <strong>Execution Stack</strong> panel displays a live call frame hierarchy during nested subflow debugging:</p>
+          <div class="docs-code">
+            <pre><code>#0 Root Flow (Order Ingestion) &rarr; Subflow Node: Process Payment
+  #1 Process Payment (Payment Pipeline) &rarr; Subflow Node: Auth Token
+    #2 Auth Token (OAuth2 Refresh) &rarr; HTTP Request: /oauth/v2/token [PAUSED]</code></pre>
+          </div>
+          <p>Clicking any parent frame in the stack navigates the canvas to that frame's workflow and displays its local variable pool snapshot, allowing you to inspect parent and child state simultaneously.</p>
         </article>
 
         <!-- Plugin Development: Overview -->
