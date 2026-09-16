@@ -153,6 +153,7 @@
             <ul>
               <li><a href="#overview">Overview</a></li>
               <li><a href="#installation">Installation</a></li>
+              <li><a href="#macos-unnotarized">macOS First Run</a></li>
               <li><a href="#quick-example">Quick Example</a></li>
             </ul>
           </div>
@@ -237,8 +238,31 @@
         <article id="installation" class="docs-section">
           <h2>Installation</h2>
 
-          <h3>Windows &amp; macOS</h3>
-          <p>Download the installer from the <a href="changelog.html">Changelog</a> page. The same binary supports both GUI and CLI modes.</p>
+          <h3>Windows</h3>
+          <p>Download the Windows installer (<code>.exe</code> installer or portable build) from the <a href="changelog.html">Changelog</a> page and run it to set up MPE.</p>
+
+          <h3 id="macos-install">macOS</h3>
+          <p>Download the <code>Universal DMG</code> package from the <a href="changelog.html">Changelog</a> page (a single image natively supporting both Apple Silicon M-series and Intel processors). Open the DMG and drag the <strong>MPE</strong> icon to your <strong>Applications</strong> folder.</p>
+
+          <div class="docs-warning" id="macos-unnotarized">
+            <h4>macOS First Run: "Unverified Developer" or "App is damaged" Workaround</h4>
+            <p><strong>Notice:</strong> Current open-source release builds are <strong>not signed or notarized with a paid Apple Developer certificate</strong>. On macOS, Gatekeeper's security mechanism will prevent opening untrusted binaries on first launch, displaying a warning such as <em>"MPE cannot be opened because Apple cannot check it for malicious software"</em> or <em>"MPE is damaged and can't be opened. You should move it to the Trash."</em> This is standard macOS behavior for unsigned software; MPE is fully open source and completely safe to run.</p>
+            <p>To launch MPE, use either of the following solutions:</p>
+
+            <p><strong>Method 1: Clear quarantine attribute via Terminal (Recommended)</strong></p>
+            <p>After moving MPE to your <code>/Applications</code> directory, open Terminal and execute the following command to remove the quarantine flag:</p>
+            <div class="docs-code">
+              <pre><code>xattr -cr /Applications/MPE.app</code></pre>
+            </div>
+            <p>Once cleared, double-click <code>MPE.app</code> from Launchpad or Finder. Gatekeeper will not prompt again.</p>
+
+            <p><strong>Method 2: Right-click Open in Finder</strong></p>
+            <ol>
+              <li>Open <strong>Finder</strong>, navigate to your <strong>Applications</strong> directory, and find <strong>MPE</strong>.</li>
+              <li><strong>Hold down the <code>Control</code> key</strong> on your keyboard, <strong>right-click (or two-finger tap)</strong> the MPE icon, and click <strong>Open</strong> in the menu.</li>
+              <li>In the dialog that appears, click the <strong>Open</strong> button to confirm. (This is only required once).</li>
+            </ol>
+          </div>
 
           <h3>Linux (CLI)</h3>
           <p>Download the pre-built binary and add it to your <code>PATH</code>:</p>

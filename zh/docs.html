@@ -153,6 +153,7 @@
             <ul>
               <li><a href="#overview">概述</a></li>
               <li><a href="#installation">安装指南</a></li>
+              <li><a href="#macos-unnotarized">macOS 首次打开</a></li>
               <li><a href="#quick-example">快速示例</a></li>
             </ul>
           </div>
@@ -236,8 +237,31 @@
         <article id="installation" class="docs-section">
           <h2>安装指南</h2>
 
-          <h3>Windows 与 macOS</h3>
-          <p>可直接前往 <a href="changelog.html">更新日志</a> 页面下载安装包。同一二进制支持 GUI 与 CLI 两种模式。</p>
+          <h3>Windows</h3>
+          <p>前往 <a href="changelog.html">更新日志</a> 页面下载 Windows 平台安装包（<code>.exe</code> 安装程序或免安装版），双击即可完成安装。</p>
+
+          <h3 id="macos-install">macOS</h3>
+          <p>前往 <a href="changelog.html">更新日志</a> 页面下载 macOS 的 <code>Universal DMG</code> 镜像包（单个安装包已同时原生适配 Apple Silicon M 系列芯片与 Intel 芯片机型）。双击打开 DMG 文件后，将 <strong>MPE</strong> 图标拖入 <strong>Applications（应用程序）</strong> 文件夹即可。</p>
+
+          <div class="docs-warning" id="macos-unnotarized">
+            <h4>macOS 首次打开提示“无法验证开发者”或“已损坏”解决办法</h4>
+            <p><strong>原因告知：</strong>由于当前项目为开源阶段，发布版本<strong>尚未购买并配置昂贵的 Apple 商业开发者证书公证（Apple Notarization）</strong>。macOS 系统的 Gatekeeper 安全机制在首次运行未签名应用时，会拦截并弹出安全警示：<em>“无法打开 MPE，因为 Apple 无法检查其是否包含恶意软件”</em> 或 <em>“MPE 已损坏，您应该将它移到废纸篓”</em>。这是 macOS 对未签名软件的默认安全拦截策略，<strong>软件源码完全公开、无毒安全，请放心使用</strong>。</p>
+            <p>遇到拦截提示时，只需通过以下任一方式解除隔离，后续即可正常双击启动：</p>
+            
+            <p><strong>方式一：终端命令一键解除隔离属性（推荐，彻底解决“损坏”提示）</strong></p>
+            <p>将 MPE 拖入“应用程序”文件夹后，打开系统自带的<strong>“终端 (Terminal)”</strong>，粘贴并执行以下命令：</p>
+            <div class="docs-code">
+              <pre><code>xattr -cr /Applications/MPE.app</code></pre>
+            </div>
+            <p>执行完成后，再次在“启动台”或“访达”中直接双击 <code>MPE.app</code> 即可直接运行，此后系统将永久信任并正常打开。</p>
+
+            <p><strong>方式二：通过访达右键强制打开</strong></p>
+            <ol>
+              <li>打开<strong>访达 (Finder)</strong>，进入<strong>应用程序 (Applications)</strong> 目录找到 <strong>MPE</strong> 图标。</li>
+              <li><strong>按住键盘上的 <code>Control</code> 键不放</strong>，同时使用鼠标<strong>右键点击</strong>（或触控板双指轻点）MPE 图标，在弹出的上下文菜单中点击<strong>“打开 (Open)”</strong>。</li>
+              <li>在随后弹出的系统对话框中，系统会提供额外的<strong>“打开”</strong>按钮，点击该按钮即可正常启动。（仅需首次操作一次，之后双击即可直接运行）。</li>
+            </ol>
+          </div>
 
           <h3>Linux (纯 CLI)</h3>
           <p>下载预编译二进制并加入系统 <code>PATH</code>：</p>

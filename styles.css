@@ -1430,7 +1430,8 @@ a.protocol-item:hover .protocol-name {
   margin-bottom: var(--spacing-2);
 }
 
-.docs-info ul {
+.docs-info ul,
+.docs-info ol {
   margin-bottom: 0;
 }
 
@@ -1448,7 +1449,8 @@ a.protocol-item:hover .protocol-name {
   margin-bottom: var(--spacing-2);
 }
 
-.docs-warning ul {
+.docs-warning ul,
+.docs-warning ol {
   margin-bottom: 0;
 }
 
