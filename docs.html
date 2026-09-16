@@ -79,7 +79,7 @@
             "@type": "HowToStep",
             "position": 1,
             "name": "Design Workflow",
-            "text": "Design your cross-protocol workflow visually in the MPE Flow GUI or export a declarative .mpf JSON file."
+            "text": "Design your cross-protocol workflow visually in the MPE Flow GUI or export a declarative .mpf (YAML/JSON) file."
           },
           {
             "@type": "HowToStep",
@@ -263,59 +263,50 @@ mpe --help</code></pre>
         <!-- Quick Example -->
         <article id="quick-example" class="docs-section">
           <h2>Quick Example</h2>
-          <p>Create a file <code>hello.mpf</code>:</p>
+          <p>Create a workflow file <code>hello.mpf</code> (defaults to clean YAML format):</p>
           <div class="docs-code">
-            <pre><code>{
-  "_version": 1,
-  "flow": {
-    "uuid": "example-flow",
-    "name": "Hello World",
-    "nodes": [
-      {
-        "uuid": "entry-1",
-        "type": "entry",
-        "name": "Start",
-        "data": { "type": "entry" }
-      },
-      {
-        "uuid": "http-1",
-        "type": "http",
-        "name": "Fetch Data",
-        "data": {
-          "type": "http",
-          "url": "https://httpbin.org/get",
-          "method": "get"
-        }
-      },
-      {
-        "uuid": "end-1",
-        "type": "end",
-        "name": "End",
-        "data": { "type": "end" }
-      }
-    ],
-    "connections": [
-      {
-        "id": "conn-1",
-        "source_node_uuid": "entry-1",
-        "target_node_uuid": "http-1",
-        "source_port_id": "out",
-        "target_port_id": "in"
-      },
-      {
-        "id": "conn-2",
-        "source_node_uuid": "http-1",
-        "target_node_uuid": "end-1",
-        "source_port_id": "true",
-        "target_port_id": "in"
-      }
-    ]
-  }
-}</code></pre>
+            <pre><code>_version: 1
+flow:
+  uuid: example-flow
+  name: Hello World
+  nodes:
+    - uuid: entry-1
+      type: entry
+      name: Start
+      data:
+        type: entry
+    - uuid: http-1
+      type: http
+      name: Fetch Data
+      data:
+        type: http
+        url: https://httpbin.org/get
+        method: get
+    - uuid: end-1
+      type: end
+      name: End
+      data:
+        type: end
+  connections:
+    - id: conn-1
+      source_node_uuid: entry-1
+      target_node_uuid: http-1
+      source_port_id: out
+      target_port_id: in
+    - id: conn-2
+      source_node_uuid: http-1
+      target_node_uuid: end-1
+      source_port_id: "true"
+      target_port_id: in</code></pre>
           </div>
           <p>Run it:</p>
           <div class="docs-code">
             <pre><code>mpe run -f hello.mpf</code></pre>
+          </div>
+
+          <div class="docs-tip">
+            <h4>YAML by Default with Full JSON Compatibility</h4>
+            <p>Starting in v0.3.0, MPE flow files (<code>.mpf</code>) use YAML by default for optimal readability and Git diff clarity. The engine, CLI, desktop app, and Web Playground automatically detect and support both YAML and JSON formats. Use <code>mpe flow fmt</code> to convert or format files anytime.</p>
           </div>
         </article>
 
@@ -443,8 +434,8 @@ mpe --help</code></pre>
               </tr>
               <tr>
                 <td><code>mpe flow</code></td>
-                <td>Manage flows (list, show, create, delete)</td>
-                <td><code>mpe flow list</code></td>
+                <td>Manage and format flows (list, show, create, delete, fmt)</td>
+                <td><code>mpe flow fmt -f flow.mpf --to yaml</code></td>
               </tr>
               <tr>
                 <td><code>mpe report</code></td>
@@ -477,6 +468,10 @@ mpe --help</code></pre>
           <div class="docs-code">
             <pre><code># View all commands
 mpe --help
+
+# Format flow file or convert between YAML and JSON
+mpe flow fmt ./flows/hello.mpf --to yaml
+mpe flow fmt --all --to yaml
 
 # View command-specific help
 mpe run --help</code></pre>
@@ -604,22 +599,20 @@ jobs:
         <!-- Flow File Structure -->
         <article id="flow-structure" class="docs-section">
           <h2>Flow File Structure</h2>
-          <p>MPE flow files use the <code>.mpf</code> extension and follow the <code>FlowFile</code> wrapper format:</p>
+          <p>MPE flow files use the <code>.mpf</code> extension and follow the <code>FlowFile</code> wrapper format. Flow files default to YAML format (with seamless backwards compatibility for existing JSON files):</p>
           
           <div class="docs-code">
-            <pre><code>{
-  "_version": 1,
-  "flow": {
-    "uuid": "my-flow",
-    "name": "My Flow",
-    "initial_variables": {
-      "api_base": "https://api.example.com",
-      "token": "abc123"
-    },
-    "nodes": [ ... ],
-    "connections": [ ... ]
-  }
-}</code></pre>
+            <pre><code>_version: 1
+flow:
+  uuid: my-flow
+  name: My Flow
+  initial_variables:
+    api_base: https://api.example.com
+    token: abc123
+  nodes:
+    # Array of protocol and logic nodes ...
+  connections:
+    # Array of directed connections ...</code></pre>
           </div>
 
           <h3>Top-level Fields</h3>
@@ -697,16 +690,13 @@ jobs:
         <article id="node-structure" class="docs-section">
           <h2>Node Structure</h2>
           <div class="docs-code">
-            <pre><code>{
-  "uuid": "node-uuid",
-  "type": "http",
-  "name": "My HTTP Request",
-  "data": {
-    "type": "http",
-    "url": "https://api.example.com",
-    "method": "get"
-  }
-}</code></pre>
+            <pre><code>uuid: node-uuid
+type: http
+name: My HTTP Request
+data:
+  type: http
+  url: https://api.example.com
+  method: get</code></pre>
           </div>
 
           <table class="docs-table">
@@ -763,13 +753,11 @@ jobs:
           <h2>Connections</h2>
           <p>Connections define the execution flow between nodes.</p>
           <div class="docs-code">
-            <pre><code>{
-  "id": "conn-1",
-  "source_node_uuid": "entry-1",
-  "target_node_uuid": "http-1",
-  "source_port_id": "out",
-  "target_port_id": "in"
-}</code></pre>
+            <pre><code>id: conn-1
+source_node_uuid: entry-1
+target_node_uuid: http-1
+source_port_id: out
+target_port_id: in</code></pre>
           </div>
 
           <table class="docs-table">
@@ -1026,7 +1014,7 @@ jobs:
             </thead>
             <tbody>
               <tr><td><code>target_flow_id</code></td><td>string (optional)</td><td><code>null</code></td><td>UUID of a saved workflow in the workspace (used in GUI mode).</td></tr>
-              <tr><td><code>target_flow_path</code></td><td>string (optional)</td><td><code>null</code></td><td>Relative or absolute file path to a <code>.mpf</code> or <code>.json</code> workflow file (portable &amp; CLI mode).</td></tr>
+              <tr><td><code>target_flow_path</code></td><td>string (optional)</td><td><code>null</code></td><td>Relative or absolute file path to a <code>.mpf</code>, <code>.yaml</code>, or <code>.json</code> workflow file (portable &amp; CLI mode).</td></tr>
               <tr><td><code>inherit_all_variables</code></td><td>boolean</td><td><code>true</code></td><td>Whether the child subflow automatically inherits all parent scope variables.</td></tr>
               <tr><td><code>variable_mappings</code></td><td>array</td><td><code>[]</code></td><td>Explicit input parameter mappings (<code>source</code> expression/variable &rarr; <code>target</code> child variable). Overrides inherited variables.</td></tr>
               <tr><td><code>export_all_variables</code></td><td>boolean</td><td><code>true</code></td><td>Whether child workflow output variables are exported back into parent workflow scope after execution completes.</td></tr>

@@ -72,113 +72,123 @@ MPE Flow categorizes nodes into Built-in Protocol Nodes, Logic/Control Nodes, an
 
 ## 3. Flow File Format Specification (.mpf)
 
-MPE Flow workflows are stored in clean, human-readable JSON files with the `.mpf` extension.
+MPE Flow workflows are stored in clean, human-readable YAML files with the `.mpf` extension (with transparent backward compatibility for legacy JSON `.mpf` files).
 
-```json
-{
-  "id": "flow_auth_and_stream_v1",
-  "name": "Auth, WebSocket & TCP Ingestion Pipeline",
-  "version": "1.0.0",
-  "description": "Authenticates against OAuth2 API, connects to WebSocket stream, and pushes processed events to TCP server.",
-  "variables": {
-    "BASE_URL": "https://api.example.com",
-    "WS_URL": "wss://stream.example.com/events",
-    "TCP_HOST": "127.0.0.1",
-    "TCP_PORT": 9000
-  },
-  "settings": {
-    "timeout_ms": 30000,
-    "on_error": "RouteToFalse",
-    "max_concurrency": 10
-  },
-  "nodes": [
-    {
-      "id": "node_entry",
-      "type": "entry",
-      "name": "Start",
-      "position": { "x": 100, "y": 200 },
-      "data": {}
-    },
-    {
-      "id": "node_auth",
-      "type": "http",
-      "name": "Authenticate User",
-      "position": { "x": 300, "y": 200 },
-      "data": {
-        "method": "POST",
-        "url": "{{BASE_URL}}/v1/auth/login",
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "body": {
-          "type": "json",
-          "content": "{\"username\": \"admin\", \"password\": \"secret\"}"
-        }
-      }
-    },
-    {
-      "id": "node_extract_token",
-      "type": "variable_extractor",
-      "name": "Extract Token",
-      "position": { "x": 500, "y": 200 },
-      "data": {
-        "source": "{{$nodes.node_auth.output.body}}",
-        "extractors": [
-          { "target": "AUTH_TOKEN", "path": "$.access_token", "type": "jsonpath" }
-        ]
-      }
-    },
-    {
-      "id": "node_ws_connect",
-      "type": "ws_connect",
-      "name": "Connect Live Stream",
-      "position": { "x": 700, "y": 200 },
-      "data": {
-        "url": "{{WS_URL}}",
-        "headers": {
-          "Authorization": "Bearer {{AUTH_TOKEN}}"
-        }
-      }
-    },
-    {
-      "id": "node_ws_listen",
-      "type": "ws_send_collect",
-      "name": "Collect Stream Event",
-      "position": { "x": 900, "y": 200 },
-      "data": {
-        "connection_id": "{{$nodes.node_ws_connect.output.connection_id}}",
-        "send_message": "{\"action\": \"subscribe\", \"topic\": \"telemetry\"}",
-        "timeout_ms": 5000
-      }
-    },
-    {
-      "id": "node_tcp_push",
-      "type": "tcp_send",
-      "name": "Push to TCP Ingest",
-      "position": { "x": 1100, "y": 200 },
-      "data": {
-        "host": "{{TCP_HOST}}",
-        "port": "{{TCP_PORT}}",
-        "payload": "{{$nodes.node_ws_listen.output.message}}\n"
-      }
-    },
-    {
-      "id": "node_end",
-      "type": "end",
-      "name": "Completed",
-      "position": { "x": 1300, "y": 200 },
-      "data": {}
-    }
-  ],
-  "edges": [
-    { "id": "e1", "source": "node_entry", "target": "node_auth" },
-    { "id": "e2", "source": "node_auth", "target": "node_extract_token" },
-    { "id": "e3", "source": "node_extract_token", "target": "node_ws_connect" },
-    { "id": "e4", "source": "node_ws_connect", "target": "node_ws_listen" },
-    { "id": "e5", "source": "node_ws_listen", "target": "node_tcp_push" },
-    { "id": "e6", "source": "node_tcp_push", "target": "node_end" }
-  ]
-}
+```yaml
+_version: 1
+flow:
+  uuid: flow_auth_and_stream_v1
+  name: Auth, WebSocket & TCP Ingestion Pipeline
+  initial_variables:
+    BASE_URL: https://api.example.com
+    WS_URL: wss://stream.example.com/events
+    TCP_HOST: 127.0.0.1
+    TCP_PORT: 9000
+  nodes:
+    - uuid: node_entry
+      type: entry
+      name: Start
+      position:
+        x: 100
+        y: 200
+      data:
+        type: entry
+    - uuid: node_auth
+      type: http
+      name: Authenticate User
+      position:
+        x: 300
+        y: 200
+      data:
+        type: http
+        method: POST
+        url: "{{BASE_URL}}/v1/auth/login"
+        headers:
+          Content-Type: application/json
+        body:
+          type: json
+          content: '{"username": "admin", "password": "secret"}'
+    - uuid: node_extract_token
+      type: variable_extractor
+      name: Extract Token
+      position:
+        x: 500
+        y: 200
+      data:
+        source: "{{$nodes.node_auth.output.body}}"
+        extractors:
+          - target: AUTH_TOKEN
+            path: $.access_token
+            type: jsonpath
+    - uuid: node_ws_connect
+      type: ws_connect
+      name: Connect Live Stream
+      position:
+        x: 700
+        y: 200
+      data:
+        url: "{{WS_URL}}"
+        headers:
+          Authorization: "Bearer {{AUTH_TOKEN}}"
+    - uuid: node_ws_listen
+      type: ws_send_collect
+      name: Collect Stream Event
+      position:
+        x: 900
+        y: 200
+      data:
+        connection_id: "{{$nodes.node_ws_connect.output.connection_id}}"
+        send_message: '{"action": "subscribe", "topic": "telemetry"}'
+        timeout_ms: 5000
+    - uuid: node_tcp_push
+      type: tcp_send
+      name: Push to TCP Ingest
+      position:
+        x: 1100
+        y: 200
+      data:
+        host: "{{TCP_HOST}}"
+        port: "{{TCP_PORT}}"
+        payload: "{{$nodes.node_ws_listen.output.message}}\n"
+    - uuid: node_end
+      type: end
+      name: Completed
+      position:
+        x: 1300
+        y: 200
+      data:
+        type: end
+  connections:
+    - id: conn-1
+      source_node_uuid: node_entry
+      target_node_uuid: node_auth
+      source_port_id: out
+      target_port_id: in
+    - id: conn-2
+      source_node_uuid: node_auth
+      target_node_uuid: node_extract_token
+      source_port_id: "true"
+      target_port_id: in
+    - id: conn-3
+      source_node_uuid: node_extract_token
+      target_node_uuid: node_ws_connect
+      source_port_id: out
+      target_port_id: in
+    - id: conn-4
+      source_node_uuid: node_ws_connect
+      target_node_uuid: node_ws_listen
+      source_port_id: "true"
+      target_port_id: in
+    - id: conn-5
+      source_node_uuid: node_ws_listen
+      target_node_uuid: node_tcp_push
+      source_port_id: "true"
+      target_port_id: in
+    - id: conn-6
+      source_node_uuid: node_tcp_push
+      target_node_uuid: node_end
+      source_port_id: "true"
+      target_port_id: in
 ```
 
 ### 3.1 Built-in Dynamic Variables
@@ -279,6 +289,10 @@ mpe flow show ./flows/checkout.mpf --node node_auth
 
 # Export flow graph as Mermaid diagram or ASCII graph
 mpe flow export ./flows/checkout.mpf --format mermaid
+
+# Format or convert flow files between YAML and JSON
+mpe flow fmt ./flows/checkout.mpf --to yaml
+mpe flow fmt --all --to yaml
 ```
 
 ### 4.5 Interactive Debugging (`mpe debug`)
@@ -341,7 +355,7 @@ mpe open ./flows/checkout.mpf
 **A:** MCP is the standard protocol for connecting AI models (Claude, ChatGPT, IDE agents) to tools and datasets. MPE Flow's `mcp:*` plugin nodes allow developers and QA engineers to connect to MCP servers, test tool definitions, inspect resources, and simulate agentic tool calls in automated test suites.
 
 ### Q: Does MPE Flow work in air-gapped or offline enterprise environments?
-**A:** Yes. MPE Flow is distributed as standalone binaries (or Docker container / CLI) with zero external cloud dependencies. Workflows are saved in open `.mpf` JSON files on local disk and can be checked directly into Git repositories.
+**A:** Yes. MPE Flow is distributed as standalone binaries (or Docker container / CLI) with zero external cloud dependencies. Workflows are saved in open `.mpf` YAML files (with full JSON compatibility) on local disk and can be checked directly into Git repositories.
 
 
 ### Q: How does the built-in AI Copilot work?

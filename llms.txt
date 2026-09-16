@@ -55,16 +55,18 @@ MPE delivers a dual-mode single binary (`mpe` for GUI + CLI, or pure headless `m
   - `--var <key=val>`: Override workflow variables.
 - `mpe validate <file.mpf>`: Statically validate node schemas, circular dependencies, and variable references.
 - `mpe stress <file.mpf>`: Run multi-protocol load and stress tests (concurrency, ramp-up, RPS targets, latency percentiles p50/p90/p99).
-- `mpe flow <list|show|export>`: Inspect and manage workflow structures.
+- `mpe flow <list|show|export|fmt>`: Inspect, manage, and format workflow structures (convert between YAML and JSON).
 - `mpe debug <file.mpf>`: Interactive step debugger with breakpoint support, subflow Step-Into (F11) / Step-Out (Shift+F11), and multi-level call frame stack tracking.
 - `mpe ai "<prompt>"`: Query or drive the AI Copilot from terminal (bridges with GUI or runs headless).
 - `mpe open <file.mpf>`: Open a workflow file in the active desktop GUI instance.
 ## Workflow File Format (.mpf)
 
-`.mpf` (Multi-Protocol Flow) is a declarative, human-readable JSON format:
-- `id`, `name`, `version`, `description`
-- `nodes`: Array of protocol and logic nodes with typed configurations.
-- `edges`: Directed edges with source/target handles (`default`, `true`, `false`, `error`).
+`.mpf` (Multi-Protocol Flow) defaults to a clean, declarative, human-readable YAML format (with seamless backward compatibility for JSON):
+- `_version`: File format version (default: 1)
+- `flow`: Flow container object
+  - `uuid`, `name`, `description`, `initial_variables`
+  - `nodes`: Array of protocol and logic nodes with typed configurations.
+  - `connections`: Directed edges with source/target handles (`out`, `true`, `false`, `error` -> `in`).
 - `variables`: Global and workflow-scoped variables (`{{var_name}}`) plus built-in runtime dynamic variables (`{{$timestamp}}`, `{{$isoTimestamp}}`, `{{$guid}}` / `{{$uuid}}`, `{{$randomInt}}`, `{{$randomAlphaNumeric}}`).
 - `settings`: Execution error policies (`RouteToFalse`, `Ignore`, `AbortFlow`), timeout configs, and concurrency limits.
 
