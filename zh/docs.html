@@ -299,10 +299,10 @@ flow:
       data:
         type: entry
     - uuid: http-1
-      type: http
+      type: http:request
       name: Fetch Data
       data:
-        type: http
+        type: http:request
         url: https://httpbin.org/get
         method: get
     - uuid: end-1
@@ -569,7 +569,7 @@ jobs:
     },
     {
       "node_uuid": "http-001",
-      "node_type": "http",
+      "node_type": "http:request",
       "node_name": "Fetch Data",
       "status": "success",
       "duration_ms": 233,
@@ -714,10 +714,10 @@ flow:
           <h2>节点配置结构 (Node)</h2>
           <div class="docs-code">
             <pre><code>uuid: node-uuid
-type: http
+type: http:request
 name: My HTTP Request
 data:
-  type: http
+  type: http:request
   url: https://api.example.com
   method: get</code></pre>
           </div>
@@ -835,9 +835,9 @@ target_port_id: in</code></pre>
               <tr><td><code>conditional</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
               <tr><td><code>script</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
               <tr><td><code>assertion</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
-              <tr><td><code>variable_extractor</code></td><td><code>in</code></td><td><code>out</code></td></tr>
-              <tr><td><code>ws_*</code>, <code>tcp_*</code>, <code>udp_*</code>, <code>sse_connect</code>/<code>sse_listen</code>, <code>graphql_connect</code>/<code>query</code>/<code>subscribe</code>/<code>introspect</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
-              <tr><td><code>sse_disconnect</code>, <code>graphql_disconnect</code>, <code>proxy</code></td><td><code>in</code></td><td><code>out</code></td></tr>
+              <tr><td><code>variable:extractor</code></td><td><code>in</code></td><td><code>out</code></td></tr>
+              <tr><td><code>ws_*</code>, <code>tcp_*</code>, <code>udp_*</code>, <code>sse:connect</code>/<code>sse:listen</code>, <code>graphql:connect</code>/<code>query</code>/<code>subscribe</code>/<code>introspect</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
+              <tr><td><code>sse:disconnect</code>, <code>graphql:disconnect</code>, <code>proxy</code></td><td><code>in</code></td><td><code>out</code></td></tr>
             </tbody>
           </table>
         </article>
@@ -849,7 +849,7 @@ target_port_id: in</code></pre>
           <div class="docs-warning">
             <h4>变量池 (Variable Pool) 与节点输出的关系</h4>
             <p><code>{{var}}</code> 插值语法<strong>只能</strong>读取工作流变量池中的变量。协议节点的直接输出独立缓存在 <code>last_node_output</code> 中，默认不会自动写入变量池。</p>
-            <p>如需在后续节点中通过 <code>{{var}}</code> 引用上一步的输出数据，请先通过 <code>variable_extractor</code> 变量提取节点或 <code>script</code> 脚本节点提取到变量池。</p>
+            <p>如需在后续节点中通过 <code>{{var}}</code> 引用上一步的输出数据，请先通过 <code>variable:extractor</code> 变量提取节点或 <code>script</code> 脚本节点提取到变量池。</p>
           </div>
 
           <h3>语法规范</h3>
@@ -875,15 +875,15 @@ target_port_id: in</code></pre>
           <h3>向变量池注入变量</h3>
           <ol>
             <li><strong>初始化变量</strong>：在工作流全局设置 <code>flow.initial_variables</code> 中定义</li>
-            <li><strong>变量提取节点</strong>：使用 <code>variable_extractor</code> 配合 JSONPath 从 <code>last_node_output</code> 提取</li>
+            <li><strong>变量提取节点</strong>：使用 <code>variable:extractor</code> 配合 JSONPath 从 <code>last_node_output</code> 提取</li>
             <li><strong>脚本注入</strong>：在 <code>script</code> 节点中使用 <code>fn.variables.set(name, value)</code></li>
           </ol>
           <div class="docs-code">
-            <pre><code>// variable_extractor example
+            <pre><code>// variable:extractor example
 {
-  "type": "variable_extractor",
+  "type": "variable:extractor",
   "data": {
-    "type": "variable_extractor",
+    "type": "variable:extractor",
     "output_mappings": [
       { "source": "$.body.id", "target": "user_id" },
       { "source": "$.status", "target": "http_status" }
@@ -1005,10 +1005,10 @@ target_port_id: in</code></pre>
           <div class="docs-code">
             <pre><code>{
   "uuid": "subflow-1",
-  "type": "sub_flow",
+  "type": "flow:sub",
   "name": "用户登录与鉴权子流程",
   "data": {
-    "type": "sub_flow",
+    "type": "flow:sub",
     "target_flow_id": "7b6c3d9a-1234-5678-abcd-ef0123456789",
     "target_flow_path": "./subflows/auth.mpf",
     "inherit_all_variables": true,
@@ -1060,10 +1060,10 @@ target_port_id: in</code></pre>
           <div class="docs-code">
             <pre><code>{
   "uuid": "http-1",
-  "type": "http",
+  "type": "http:request",
   "name": "API Call",
   "data": {
-    "type": "http",
+    "type": "http:request",
     "url": "{{api_base}}/users",
     "method": "post",
     "headers": {
@@ -1286,11 +1286,11 @@ target_port_id: in</code></pre>
           <p>Three nodes for WebSocket communication: connect, send/collect, close.</p>
           <div class="docs-code">
             <pre><code>// Connect
-{ "type": "ws_connect", "data": { "type": "ws_connect", "url": "wss://echo.example.com/ws" } }
+{ "type": "ws:connect", "data": { "type": "ws:connect", "url": "wss://echo.example.com/ws" } }
 
 // Send and collect response
-{ "type": "ws_send_collect", "data": {
-    "type": "ws_send_collect",
+{ "type": "ws:send_collect", "data": {
+    "type": "ws:send_collect",
     "connection_id": "ws-connect-uuid",
     "message": "{\"type\":\"ping\"}",
     "collect_timeout_ms": 10000
@@ -1298,7 +1298,7 @@ target_port_id: in</code></pre>
 }
 
 // Close
-{ "type": "ws_close", "data": { "type": "ws_close", "connection_id": "ws-connect-uuid" } }</code></pre>
+{ "type": "ws:close", "data": { "type": "ws:close", "connection_id": "ws-connect-uuid" } }</code></pre>
           </div>
         </article>
 
@@ -1308,34 +1308,34 @@ target_port_id: in</code></pre>
           
           <h3>TCP</h3>
           <div class="docs-code">
-            <pre><code>{ "type": "tcp_connect", "data": { "type": "tcp_connect", "host": "localhost", "port": 8080 } }
-{ "type": "tcp_send", "data": { "type": "tcp_send", "connection_id": "uuid", "data": "Hello" } }
-{ "type": "tcp_receive", "data": { "type": "tcp_receive", "connection_id": "uuid" } }
-{ "type": "tcp_close", "data": { "type": "tcp_close", "connection_id": "uuid" } }</code></pre>
+            <pre><code>{ "type": "tcp:connect", "data": { "type": "tcp:connect", "host": "localhost", "port": 8080 } }
+{ "type": "tcp:send", "data": { "type": "tcp:send", "connection_id": "uuid", "data": "Hello" } }
+{ "type": "tcp:receive", "data": { "type": "tcp:receive", "connection_id": "uuid" } }
+{ "type": "tcp:close", "data": { "type": "tcp:close", "connection_id": "uuid" } }</code></pre>
           </div>
 
           <h3>UDP</h3>
           <div class="docs-code">
-            <pre><code>{ "type": "udp_bind", "data": { "type": "udp_bind", "local_addr": "0.0.0.0", "local_port": 8888 } }
-{ "type": "udp_send_to", "data": { "type": "udp_send_to", "connection_id": "uuid", "data": "Hello", "target_addr": "192.168.1.100", "target_port": 9999 } }
-{ "type": "udp_recv_from", "data": { "type": "udp_recv_from", "connection_id": "uuid" } }
-{ "type": "udp_close", "data": { "type": "udp_close", "connection_id": "uuid" } }</code></pre>
+            <pre><code>{ "type": "udp:bind", "data": { "type": "udp:bind", "local_addr": "0.0.0.0", "local_port": 8888 } }
+{ "type": "udp:send_to", "data": { "type": "udp:send_to", "connection_id": "uuid", "data": "Hello", "target_addr": "192.168.1.100", "target_port": 9999 } }
+{ "type": "udp:recv_from", "data": { "type": "udp:recv_from", "connection_id": "uuid" } }
+{ "type": "udp:close", "data": { "type": "udp:close", "connection_id": "uuid" } }</code></pre>
           </div>
 
           <h3>SSE (Server-Sent Events)</h3>
           <div class="docs-code">
-            <pre><code>{ "type": "sse_connect", "data": { "type": "sse_connect", "url": "https://api.example.com/events" } }
-{ "type": "sse_listen", "data": { "type": "sse_listen", "connection_id": "uuid", "max_events": 100 } }
-{ "type": "sse_disconnect", "data": { "type": "sse_disconnect", "connection_id": "uuid" } }</code></pre>
+            <pre><code>{ "type": "sse:connect", "data": { "type": "sse:connect", "url": "https://api.example.com/events" } }
+{ "type": "sse:listen", "data": { "type": "sse:listen", "connection_id": "uuid", "max_events": 100 } }
+{ "type": "sse:disconnect", "data": { "type": "sse:disconnect", "connection_id": "uuid" } }</code></pre>
           </div>
 
           <h3>GraphQL</h3>
           <div class="docs-code">
-            <pre><code>{ "type": "graphql_connect", "data": { "type": "graphql_connect", "endpoint": "https://api.example.com/graphql" } }
-{ "type": "graphql_query", "data": { "type": "graphql_query", "connection_id": "uuid", "query": "query { users { id name } }" } }
-{ "type": "graphql_subscribe", "data": { "type": "graphql_subscribe", "connection_id": "uuid", "query": "subscription { newUser { id } }" } }
-{ "type": "graphql_introspect", "data": { "type": "graphql_introspect", "connection_id": "uuid" } }
-{ "type": "graphql_disconnect", "data": { "type": "graphql_disconnect", "connection_id": "uuid" } }</code></pre>
+            <pre><code>{ "type": "graphql:connect", "data": { "type": "graphql:connect", "endpoint": "https://api.example.com/graphql" } }
+{ "type": "graphql:query", "data": { "type": "graphql:query", "connection_id": "uuid", "query": "query { users { id name } }" } }
+{ "type": "graphql:subscribe", "data": { "type": "graphql:subscribe", "connection_id": "uuid", "query": "subscription { newUser { id } }" } }
+{ "type": "graphql:introspect", "data": { "type": "graphql:introspect", "connection_id": "uuid" } }
+{ "type": "graphql:disconnect", "data": { "type": "graphql:disconnect", "connection_id": "uuid" } }</code></pre>
           </div>
 
           <div class="docs-info">
@@ -1364,7 +1364,7 @@ target_port_id: in</code></pre>
             <tbody>
               <tr><td><strong>继续执行 (Continue)</strong></td><td><code>F5</code> / 继续</td><td>恢复流程执行，直至遇到下一个断点或整个流程执行完毕。</td></tr>
               <tr><td><strong>单步跳过 (Step Over)</strong></td><td><code>F10</code></td><td>执行当前暂停节点并立即在下一个相连节点暂停。遇到子流程节点时，将在后台完整运行整个子流程并在父流程下一节点暂停。</td></tr>
-              <tr><td><strong>单步步入 (Step Into)</strong></td><td><code>F11</code></td><td>在子流程 (<code>sub_flow</code>) 节点暂停时按 <code>F11</code> 步入其内部，并在子流程的首个有效节点暂停。对常规协议节点行为同单步跳过。</td></tr>
+              <tr><td><strong>单步步入 (Step Into)</strong></td><td><code>F11</code></td><td>在子流程 (<code>flow:sub</code>) 节点暂停时按 <code>F11</code> 步入其内部，并在子流程的首个有效节点暂停。对常规协议节点行为同单步跳过。</td></tr>
               <tr><td><strong>单步步出 (Step Out)</strong></td><td><code>Shift + F11</code></td><td>当在子流程内部暂停时，快速执行完当前子流程剩余全部节点，并暂停在父流程中该子流程节点的下一个后继节点。</td></tr>
               <tr><td><strong>跳过节点 (Skip Node)</strong></td><td>&mdash;</td><td>忽略当前节点的实际网络/系统执行，指定下游输出端口分支（如 <code>true</code> / <code>false</code>）并可自定义注入模拟 output 数据。</td></tr>
               <tr><td><strong>执行到底 (Run to End)</strong></td><td>&mdash;</td><td>临时忽略后续所有断点，直接以正常模式运行完毕。</td></tr>

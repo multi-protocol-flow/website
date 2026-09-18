@@ -29,34 +29,34 @@ MPE Flow categorizes nodes into Built-in Protocol Nodes, Logic/Control Nodes, an
 
 | Protocol Node | Variant Identifier | Description & Key Parameters |
 |---|---|---|
-| **HTTP Request** | `http` | Full HTTP/1.1 & HTTP/2 client. Supports URL, Method (`GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `HEAD`, `OPTIONS`), Headers, Query Params, Auth (Bearer, Basic, API Key, OAuth2), Multipart/Form-data, JSON/Raw body, Proxy settings, Timeout, and JSONPath output extraction. |
-| **WebSocket Connect** | `ws_connect` | Establishes persistent WebSocket connection. Parameters: `url`, `headers`, `protocols`, `tls`, `heartbeat_interval_sec`. |
-| **WebSocket Send & Collect** | `ws_send_collect` | Sends payload and captures response matching criteria (timeout, regex pattern, JSON path condition). |
-| **WebSocket Close** | `ws_close` | Gracefully terminates active WebSocket session with status code and reason. |
-| **TCP Connect** | `tcp_connect` | Connects raw TCP/TLS socket. Parameters: `host`, `port`, `tls` (enabled, ca_cert, client_cert, client_key), `connect_timeout_ms`. |
-| **TCP Send** | `tcp_send` | Transmits raw bytes, hex, UTF-8 strings, or structured delimiters over established TCP stream. |
-| **TCP Receive** | `tcp_receive` | Receives TCP data with framing strategies: Fixed Length, Delimiter (e.g. `\r\n`), or Inactivity Timeout. |
-| **TCP Close** | `tcp_close` | Closes active TCP socket stream. |
-| **UDP Bind** | `udp_bind` | Binds local UDP socket to `host:port`. |
-| **UDP SendTo** | `udp_send_to` | Sends datagram to target `host:port`. |
-| **UDP RecvFrom** | `udp_recv_from` | Awaits datagram with configurable buffer size and timeout. |
-| **UDP Close** | `udp_close` | Releases bound UDP socket. |
-| **SSE Connect** | `sse_connect` | Establishes Server-Sent Events HTTP stream. |
-| **SSE Listen** | `sse_listen` | Listens for specific event types (`event: <name>`) or extracts data payload matching filters. |
-| **SSE Disconnect** | `sse_disconnect` | Terminates active SSE stream. |
-| **GraphQL Query** | `graphql_query` | Executes GraphQL Query or Mutation with endpoint, variables, and header authentication. |
-| **GraphQL Introspect** | `graphql_introspect` | Queries remote GraphQL schema (`__schema`) for type discovery. |
-| **GraphQL Subscribe** | `graphql_subscribe` | Subscribes to GraphQL subscription over WebSocket transport. |
+| **HTTP Request** | `http:request` | Full HTTP/1.1 & HTTP/2 client. Supports URL, Method (`GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `HEAD`, `OPTIONS`), Headers, Query Params, Auth (Bearer, Basic, API Key, OAuth2), Multipart/Form-data, JSON/Raw body, Proxy settings, Timeout, and JSONPath output extraction. |
+| **WebSocket Connect** | `ws:connect` | Establishes persistent WebSocket connection. Parameters: `url`, `headers`, `protocols`, `tls`, `heartbeat_interval_sec`. |
+| **WebSocket Send & Collect** | `ws:send_collect` | Sends payload and captures response matching criteria (timeout, regex pattern, JSON path condition). |
+| **WebSocket Close** | `ws:close` | Gracefully terminates active WebSocket session with status code and reason. |
+| **TCP Connect** | `tcp:connect` | Connects raw TCP/TLS socket. Parameters: `host`, `port`, `tls` (enabled, ca_cert, client_cert, client_key), `connect_timeout_ms`. |
+| **TCP Send** | `tcp:send` | Transmits raw bytes, hex, UTF-8 strings, or structured delimiters over established TCP stream. |
+| **TCP Receive** | `tcp:receive` | Receives TCP data with framing strategies: Fixed Length, Delimiter (e.g. `\r\n`), or Inactivity Timeout. |
+| **TCP Close** | `tcp:close` | Closes active TCP socket stream. |
+| **UDP Bind** | `udp:bind` | Binds local UDP socket to `host:port`. |
+| **UDP SendTo** | `udp:send_to` | Sends datagram to target `host:port`. |
+| **UDP RecvFrom** | `udp:recv_from` | Awaits datagram with configurable buffer size and timeout. |
+| **UDP Close** | `udp:close` | Releases bound UDP socket. |
+| **SSE Connect** | `sse:connect` | Establishes Server-Sent Events HTTP stream. |
+| **SSE Listen** | `sse:listen` | Listens for specific event types (`event: <name>`) or extracts data payload matching filters. |
+| **SSE Disconnect** | `sse:disconnect` | Terminates active SSE stream. |
+| **GraphQL Query** | `graphql:query` | Executes GraphQL Query or Mutation with endpoint, variables, and header authentication. |
+| **GraphQL Introspect** | `graphql:introspect` | Queries remote GraphQL schema (`__schema`) for type discovery. |
+| **GraphQL Subscribe** | `graphql:subscribe` | Subscribes to GraphQL subscription over WebSocket transport. |
 
 ### 2.2 Logic & Flow Control Nodes
 
 - **Entry Node (`entry`):** Workflow entry point defining input parameters and schema validation.
 - **End Node (`end`):** Workflow termination point aggregating final outputs, status codes, and latency metrics.
-- **Subflow Node (`sub_flow`):** Embeds and reuses independent workflows. Referenced via `target_flow_id` (workspace UUID) or `target_flow_path` (relative/absolute file path). Supports variable inheritance (`inherit_all_variables`), input parameter mappings (`variable_mappings`), output exports (`export_all_variables`), and output return mappings (`output_mappings`). Includes cycle detection and canvas drag-and-drop creation from the flow list.
+- **Subflow Node (`flow:sub`):** Embeds and reuses independent workflows. Referenced via `target_flow_id` (workspace UUID) or `target_flow_path` (relative/absolute file path). Supports variable inheritance (`inherit_all_variables`), input parameter mappings (`variable_mappings`), output exports (`export_all_variables`), and output return mappings (`output_mappings`). Includes cycle detection and canvas drag-and-drop creation from the flow list.
 - **Conditional Branching (`conditional`):** Evaluates Boolean logic using JS expressions or CEL (Common Expression Language). Routes flow execution to `true` or `false` outbound ports.
 - **Script Node (`script`):** Executes sandboxed JavaScript (via QuickJS) for dynamic transformations, crypto hashes (SHA256, HMAC, MD5), base64 encoding, and custom math.
 - **Assertion Node (`assertion`):** Validates execution state against expectations (e.g., status code equals 200, response time < 500ms, JSON schema compliance, regex body match).
-- **Variable Extractor (`variable_extractor`):** Extracts values from upstream node outputs via JSONPath, Regex, or XPath and assigns them to workflow context variables.
+- **Variable Extractor (`variable:extractor`):** Extracts values from upstream node outputs via JSONPath, Regex, or XPath and assigns them to workflow context variables.
 - **Proxy Node (`proxy`):** Intercepts or routes requests through forward or SOCKS5 proxies.
 
 ### 2.3 Plugin Protocols (via `mpe-plugin-sdk`)
@@ -94,13 +94,13 @@ flow:
       data:
         type: entry
     - uuid: node_auth
-      type: http
+      type: http:request
       name: Authenticate User
       position:
         x: 300
         y: 200
       data:
-        type: http
+        type: http:request
         method: POST
         url: "{{BASE_URL}}/v1/auth/login"
         headers:
@@ -109,7 +109,7 @@ flow:
           type: json
           content: '{"username": "admin", "password": "secret"}'
     - uuid: node_extract_token
-      type: variable_extractor
+      type: variable:extractor
       name: Extract Token
       position:
         x: 500
@@ -121,7 +121,7 @@ flow:
             path: $.access_token
             type: jsonpath
     - uuid: node_ws_connect
-      type: ws_connect
+      type: ws:connect
       name: Connect Live Stream
       position:
         x: 700
@@ -131,7 +131,7 @@ flow:
         headers:
           Authorization: "Bearer {{AUTH_TOKEN}}"
     - uuid: node_ws_listen
-      type: ws_send_collect
+      type: ws:send_collect
       name: Collect Stream Event
       position:
         x: 900
@@ -141,7 +141,7 @@ flow:
         send_message: '{"action": "subscribe", "topic": "telemetry"}'
         timeout_ms: 5000
     - uuid: node_tcp_push
-      type: tcp_send
+      type: tcp:send
       name: Push to TCP Ingest
       position:
         x: 1100
@@ -304,7 +304,7 @@ mpe debug ./flows/complex_pipeline.mpf --breakpoint node_ws_listen
 
 MPE Flow's debugging engine supports:
 - **Breakpoints:** Visual node breakpoints and CLI `--breakpoint <node_id>` flags.
-- **Stepping Controls:** Step Over (`F10`), Step Into (`F11`, enters `sub_flow` nodes to debug child flows), Step Out (`Shift + F11`, completes remaining subflow steps and returns to caller), and Skip Node.
+- **Stepping Controls:** Step Over (`F10`), Step Into (`F11`, enters `flow:sub` nodes to debug child flows), Step Out (`Shift + F11`, completes remaining subflow steps and returns to caller), and Skip Node.
 - **Multi-Level Call Frames (`DebugCallFrame`):** Hierarchical stack trace (`#0 Root Flow -> #1 Subflow`) with visual frame switching and per-frame variable inspection.
 - **In-Flight Mutation:** Live variable pool editing and temporary node configuration updates during active pause.
 ### 5.6 CLI AI Copilot Bridge (`mpe ai`)

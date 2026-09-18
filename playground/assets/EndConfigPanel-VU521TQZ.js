@@ -1,0 +1,1 @@
+import{k as t,j as e}from"./index-D9On9Tcz.js";function s(){const n=t();return e.jsx("div",{className:"p-4 text-sm text-muted-foreground",children:n.nodes.end_config_hint()})}export{s as EndConfigPanel};
