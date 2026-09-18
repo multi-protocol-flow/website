@@ -97,6 +97,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/png" href="favicon.png">
+</head>
 <body>
   <!-- Header -->
   <header class="site-header">
@@ -118,24 +119,74 @@
   </header>
 
   <!-- Changelog Content -->
-  <section class="changelog-page">
+  <main class="changelog-page">
     <div class="container">
-      <h1>Changelog</h1>
+      <header class="page-head">
+        <span class="page-tag">Release History</span>
+        <h1>Changelog</h1>
+        <p class="page-subtitle">
+          Every published build of the MPE Flow desktop app and CLI, newest first.
+          Expand a version to read its notes, or grab the installer for your platform straight from the card.
+        </p>
+      </header>
 
-      <div class="docs-info" style="margin-top: var(--spacing-4); margin-bottom: var(--spacing-6);">
-        <strong>macOS Notice:</strong> Release builds are not yet signed with an Apple Developer certificate. If you see an "App is damaged" or "Unverified Developer" warning on first launch, please see the <a href="docs.html#macos-unnotarized" style="text-decoration: underline;">macOS First Run Guide</a> to open it via <code>xattr -cr /Applications/MPE.app</code> or right-click.
-      </div>
+      <section class="release-stats" id="cl-stats" hidden aria-label="Release summary">
+        <div class="stat">
+          <span class="stat-value" id="stat-latest">—</span>
+          <span class="stat-label">Latest version</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="stat-updated">—</span>
+          <span class="stat-label">Last updated</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="stat-count">—</span>
+          <span class="stat-label">Versions published</span>
+        </div>
+      </section>
+
+      <!-- macOS first-run notice -->
+      <aside class="firstrun-notice" id="mac-notice" hidden>
+        <span class="firstrun-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M17.05 12.54c-.02-2.4 1.96-3.55 2.05-3.61-1.12-1.63-2.86-1.86-3.48-1.88-1.48-.15-2.89.87-3.64.87-.75 0-1.91-.85-3.14-.83-1.61.02-3.1.94-3.93 2.38-1.68 2.91-.43 7.22 1.2 9.58.8 1.16 1.75 2.46 3 2.41 1.2-.05 1.66-.78 3.11-.78 1.45 0 1.86.78 3.13.75 1.29-.02 2.11-1.18 2.9-2.34.91-1.34 1.28-2.64 1.3-2.71-.03-.01-2.49-.96-2.52-3.83zM14.7 5.6c.66-.8 1.11-1.92.99-3.03-.95.04-2.11.63-2.8 1.43-.61.71-1.15 1.85-1.01 2.94 1.07.08 2.16-.54 2.82-1.34z"/></svg>
+        </span>
+        <div class="firstrun-content">
+          <h2>Installing on macOS? One command clears the Gatekeeper warning</h2>
+          <p>
+            macOS builds are <strong>not signed with a paid Apple Developer certificate</strong> yet, so the first launch can be
+            blocked with <em>“MPE is damaged and can’t be opened”</em> or <em>“unverified developer”</em>.
+            Clear the quarantine flag once — afterwards the app opens normally, forever:
+          </p>
+          <div class="cmd-box">
+            <span class="cmd-prompt" aria-hidden="true">$</span>
+            <code id="mac-cmd">xattr -cr /Applications/MPE.app</code>
+            <button type="button" class="cmd-copy" id="mac-copy">Copy</button>
+          </div>
+          <p class="firstrun-alt">
+            Prefer Finder? <strong>Control-click</strong> MPE in <strong>Applications</strong> → <strong>Open</strong> → <strong>Open</strong>.
+            Full walkthrough in the <a href="docs.html#macos-unnotarized">macOS first-run guide</a>.
+          </p>
+        </div>
+        <button type="button" class="notice-dismiss" id="mac-dismiss" aria-label="Dismiss the macOS notice" title="Dismiss">×</button>
+      </aside>
 
       <div id="cl-status" class="download-status">
         <div class="spinner"></div>
-        <p>Loading release history...</p>
+        <p>Loading release history…</p>
       </div>
 
-      <div id="release-list" class="release-list" style="display:none;">
+      <div id="release-list" class="release-list" hidden>
         <!-- populated by JavaScript -->
       </div>
+
+      <noscript>
+        <div class="docs-info">
+          Release history is loaded dynamically. Enable JavaScript, or browse the binaries directly at
+          <a href="https://download.mpe.run">download.mpe.run</a>.
+        </div>
+      </noscript>
     </div>
-  </section>
+  </main>
 
   <!-- Footer -->
   <footer class="site-footer">
@@ -151,106 +202,8 @@
     </div>
   </footer>
 
+  <script src="/changelog.js"></script>
   <script>
-    // ---- Config ----
-    var R2_BASE = 'https://download.mpe.run';
-    var CHANGELOG_URL = R2_BASE + '/changelog.json';
-
-    // ---- Render a release card ----
-    function renderRelease(release) {
-      var notes = release.notes || 'No release notes available.';
-      var date = release.date || '';
-      var version = release.tag || release.version || 'v?.?.?';
-      var isPrerelease = release.prerelease;
-      var downloads = release.downloads || {};
-
-      // Format date
-      if (date && date.indexOf('T') !== -1) {
-        try { date = new Date(date).toISOString().split('T')[0]; } catch (e) { /* keep original */ }
-      }
-
-      var html = '<div class="release-card">';
-      html += '<div class="release-header">';
-      html += '<span class="release-version">' + escapeHtml(version) + '</span>';
-      if (isPrerelease) {
-        html += '<span class="release-badge prerelease">Pre-release</span>';
-      }
-      if (date) {
-        html += '<span class="release-date">' + date + '</span>';
-      }
-      html += '</div>';
-      html += '<div class="release-notes">' + escapeHtml(notes) + '</div>';
-      if (downloads.windows || downloads.macos || downloads.linux || downloads.linux_appimage || downloads.linux_deb) {
-        html += '<div class="release-downloads">';
-        if (downloads.windows) {
-          html += '<a href="' + downloads.windows + '" class="btn btn-sm" download>Windows</a>';
-        }
-        if (downloads.macos) {
-          html += '<a href="' + downloads.macos + '" class="btn btn-sm" download>macOS</a>';
-        }
-        if (downloads.linux_appimage) {
-          html += '<a href="' + downloads.linux_appimage + '" class="btn btn-sm" download>Linux AppImage</a>';
-        }
-        if (downloads.linux_deb) {
-          html += '<a href="' + downloads.linux_deb + '" class="btn btn-sm" download>Linux DEB</a>';
-        }
-        if (downloads.linux) {
-          html += '<a href="' + downloads.linux + '" class="btn btn-sm" download>Linux CLI</a>';
-        }
-        html += '</div>';
-      }
-      html += '</div>';
-      return html;
-    }
-
-    // ---- Simple HTML escaping ----
-    function escapeHtml(str) {
-      var div = document.createElement('div');
-      div.appendChild(document.createTextNode(str));
-      return div.innerHTML;
-    }
-
-    // ---- Main ----
-    (function init() {
-      var statusEl = document.getElementById('cl-status');
-      var listEl = document.getElementById('release-list');
-
-      fetch(CHANGELOG_URL)
-        .then(function (r) {
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-          return r.json();
-        })
-        .then(function (releases) {
-          if (!Array.isArray(releases) || releases.length === 0) {
-            listEl.innerHTML = '<div class="error-state"><h2>No releases found</h2></div>';
-          } else {
-            // Deduplicate: keep only the latest entry for each version
-            var seen = {};
-            var uniqueReleases = [];
-            for (var i = 0; i < releases.length; i++) {
-              var key = releases[i].tag || releases[i].version;
-              if (key && !seen[key]) {
-                seen[key] = true;
-                uniqueReleases.push(releases[i]);
-              }
-            }
-
-            var html = '';
-            for (var i = 0; i < uniqueReleases.length; i++) {
-              html += renderRelease(uniqueReleases[i]);
-            }
-            listEl.innerHTML = html;
-          }
-          statusEl.style.display = 'none';
-          listEl.style.display = '';
-        })
-        .catch(function (err) {
-          statusEl.className = 'download-status error';
-          statusEl.innerHTML = '<h2>Could not load release history</h2><p>Unable to reach the release server. Please try again later.</p>';
-        });
-    })();
-
-    // ---- Footer year ----
     document.getElementById('footer-year').textContent = new Date().getFullYear();
   </script>
 </body>

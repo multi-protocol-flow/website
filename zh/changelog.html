@@ -97,6 +97,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
   <link rel="icon" type="image/png" href="../favicon.png">
+</head>
 <body>
   <!-- Header -->
   <header class="site-header">
@@ -104,7 +105,7 @@
       <a href="/zh/" class="logo">
         <img src="../mpe-logo.svg" alt="MPE Flow" class="logo-img">
       </a>
-      <nav aria-label="Main navigation">
+      <nav aria-label="主导航">
         <ul class="nav-links">
           <li><a href="/zh/">首页</a></li>
           <li><a href="/playground/">演练场</a></li>
@@ -118,24 +119,74 @@
   </header>
 
   <!-- Changelog Content -->
-  <section class="changelog-page">
+  <main class="changelog-page">
     <div class="container">
-      <h1>更新日志</h1>
+      <header class="page-head">
+        <span class="page-tag">发布历史</span>
+        <h1>更新日志</h1>
+        <p class="page-subtitle">
+          按时间倒序列出 MPE Flow 桌面端与 CLI 的全部已发布版本。展开任意版本即可阅读更新说明，
+          也可以直接在卡片上选择对应平台的安装包下载。
+        </p>
+      </header>
 
-      <div class="docs-info" style="margin-top: var(--spacing-4); margin-bottom: var(--spacing-6);">
-        <strong>macOS 用户安装提示：</strong>由于开源版本尚未配置商业开发者证书公证，首次打开若弹出“无法验证开发者”或“文件已损坏”提示，请参阅 <a href="docs.html#macos-unnotarized" style="text-decoration: underline;">macOS 首次打开指南</a>，通过终端执行 <code>xattr -cr /Applications/MPE.app</code> 或右键即可正常打开。
-      </div>
+      <section class="release-stats" id="cl-stats" hidden aria-label="版本概览">
+        <div class="stat">
+          <span class="stat-value" id="stat-latest">—</span>
+          <span class="stat-label">最新版本</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="stat-updated">—</span>
+          <span class="stat-label">最近更新</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="stat-count">—</span>
+          <span class="stat-label">已发布版本</span>
+        </div>
+      </section>
+
+      <!-- macOS 首次打开提示 -->
+      <aside class="firstrun-notice" id="mac-notice" hidden>
+        <span class="firstrun-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M17.05 12.54c-.02-2.4 1.96-3.55 2.05-3.61-1.12-1.63-2.86-1.86-3.48-1.88-1.48-.15-2.89.87-3.64.87-.75 0-1.91-.85-3.14-.83-1.61.02-3.1.94-3.93 2.38-1.68 2.91-.43 7.22 1.2 9.58.8 1.16 1.75 2.46 3 2.41 1.2-.05 1.66-.78 3.11-.78 1.45 0 1.86.78 3.13.75 1.29-.02 2.11-1.18 2.9-2.34.91-1.34 1.28-2.64 1.3-2.71-.03-.01-2.49-.96-2.52-3.83zM14.7 5.6c.66-.8 1.11-1.92.99-3.03-.95.04-2.11.63-2.8 1.43-.61.71-1.15 1.85-1.01 2.94 1.07.08 2.16-.54 2.82-1.34z"/></svg>
+        </span>
+        <div class="firstrun-content">
+          <h2>macOS 用户：一条命令即可解除 Gatekeeper 拦截</h2>
+          <p>
+            macOS 安装包<strong>尚未使用 Apple 付费开发者证书签名</strong>，首次打开可能被系统拦截，提示
+            <em>“MPE 已损坏，无法打开”</em> 或 <em>“无法验证开发者”</em>。
+            只需执行一次下面的命令清除隔离属性，之后即可永久正常双击启动：
+          </p>
+          <div class="cmd-box">
+            <span class="cmd-prompt" aria-hidden="true">$</span>
+            <code id="mac-cmd">xattr -cr /Applications/MPE.app</code>
+            <button type="button" class="cmd-copy" id="mac-copy">复制</button>
+          </div>
+          <p class="firstrun-alt">
+            不想用终端？在「访达」的「应用程序」中<strong>按住 Control 右键点击</strong> MPE → <strong>打开</strong> → 再次点击<strong>「打开」</strong>。
+            完整步骤见 <a href="docs.html#macos-unnotarized">macOS 首次打开指南</a>。
+          </p>
+        </div>
+        <button type="button" class="notice-dismiss" id="mac-dismiss" aria-label="不再显示该提示" title="不再显示">×</button>
+      </aside>
 
       <div id="cl-status" class="download-status">
         <div class="spinner"></div>
-        <p>正在加载发布历史...</p>
+        <p>正在加载发布历史…</p>
       </div>
 
-      <div id="release-list" class="release-list" style="display:none;">
-        <!-- populated by JavaScript -->
+      <div id="release-list" class="release-list" hidden>
+        <!-- 由 JavaScript 渲染 -->
       </div>
+
+      <noscript>
+        <div class="docs-info">
+          发布历史通过 JavaScript 动态加载，请启用 JavaScript 后查看，或直接访问
+          <a href="https://download.mpe.run">download.mpe.run</a>。
+        </div>
+      </noscript>
     </div>
-  </section>
+  </main>
 
   <!-- Footer -->
   <footer class="site-footer">
@@ -151,106 +202,8 @@
     </div>
   </footer>
 
+  <script src="/changelog.js"></script>
   <script>
-    // ---- Config ----
-    var R2_BASE = 'https://download.mpe.run';
-    var CHANGELOG_URL = R2_BASE + '/changelog.json';
-
-    // ---- Render a release card ----
-    function renderRelease(release) {
-      var notes = release.notes || '暂无发布说明。';
-      var date = release.date || '';
-      var version = release.tag || release.version || 'v?.?.?';
-      var isPrerelease = release.prerelease;
-      var downloads = release.downloads || {};
-
-      // Format date
-      if (date && date.indexOf('T') !== -1) {
-        try { date = new Date(date).toISOString().split('T')[0]; } catch (e) { /* keep original */ }
-      }
-
-      var html = '<div class="release-card">';
-      html += '<div class="release-header">';
-      html += '<span class="release-version">' + escapeHtml(version) + '</span>';
-      if (isPrerelease) {
-        html += '<span class="release-badge prerelease">预览版</span>';
-      }
-      if (date) {
-        html += '<span class="release-date">' + date + '</span>';
-      }
-      html += '</div>';
-      html += '<div class="release-notes">' + escapeHtml(notes) + '</div>';
-      if (downloads.windows || downloads.macos || downloads.linux || downloads.linux_appimage || downloads.linux_deb) {
-        html += '<div class="release-downloads">';
-        if (downloads.windows) {
-          html += '<a href="' + downloads.windows + '" class="btn btn-sm" download>Windows</a>';
-        }
-        if (downloads.macos) {
-          html += '<a href="' + downloads.macos + '" class="btn btn-sm" download>macOS</a>';
-        }
-        if (downloads.linux_appimage) {
-          html += '<a href="' + downloads.linux_appimage + '" class="btn btn-sm" download>Linux AppImage</a>';
-        }
-        if (downloads.linux_deb) {
-          html += '<a href="' + downloads.linux_deb + '" class="btn btn-sm" download>Linux DEB</a>';
-        }
-        if (downloads.linux) {
-          html += '<a href="' + downloads.linux + '" class="btn btn-sm" download>Linux CLI</a>';
-        }
-        html += '</div>';
-      }
-      html += '</div>';
-      return html;
-    }
-
-    // ---- Simple HTML escaping ----
-    function escapeHtml(str) {
-      var div = document.createElement('div');
-      div.appendChild(document.createTextNode(str));
-      return div.innerHTML;
-    }
-
-    // ---- Main ----
-    (function init() {
-      var statusEl = document.getElementById('cl-status');
-      var listEl = document.getElementById('release-list');
-
-      fetch(CHANGELOG_URL)
-        .then(function (r) {
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-          return r.json();
-        })
-        .then(function (releases) {
-          if (!Array.isArray(releases) || releases.length === 0) {
-            listEl.innerHTML = '<div class="error-state"><h2>No releases found</h2></div>';
-          } else {
-            // Deduplicate: keep only the latest entry for each version
-            var seen = {};
-            var uniqueReleases = [];
-            for (var i = 0; i < releases.length; i++) {
-              var key = releases[i].tag || releases[i].version;
-              if (key && !seen[key]) {
-                seen[key] = true;
-                uniqueReleases.push(releases[i]);
-              }
-            }
-
-            var html = '';
-            for (var i = 0; i < uniqueReleases.length; i++) {
-              html += renderRelease(uniqueReleases[i]);
-            }
-            listEl.innerHTML = html;
-          }
-          statusEl.style.display = 'none';
-          listEl.style.display = '';
-        })
-        .catch(function (err) {
-          statusEl.className = 'download-status error';
-          statusEl.innerHTML = '<h2>Could not load release history</h2><p>Unable to reach the release server. Please try again later.</p>';
-        });
-    })();
-
-    // ---- Footer year ----
     document.getElementById('footer-year').textContent = new Date().getFullYear();
   </script>
 </body>
