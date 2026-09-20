@@ -280,6 +280,14 @@
           <h3>高并发压测与自动化测试报告</h3>
           <p>多虚拟用户 (VUs) 阶梯加压执行跨协议流程。实时采集 P50/P90/P99 延迟分布与吞吐量，生成交互式 HTML 与 JSON 测试报告。</p>
         </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <h3>全局环境解耦与机密安全分层</h3>
+          <p>将环境变量从流程中解耦为独立的全局 YAML 文件（<code>dev.yaml</code>、<code>staging.yaml</code>、<code>prod.yaml</code>），团队共享配置安全入库 Git，私有密钥通过 <code>.local.yaml</code> 覆盖不入库。具备四级变量级联解析、凭证防泄漏导出扫描与无头 CI 环境管理（<code>mpe env</code>）。</p>
+        </div>
       </div>
     </div>
   </section>
@@ -381,7 +389,7 @@
         </div>
         <div class="faq-card">
           <h3>MPE Flow 可以集成到 CI/CD 流水线中吗？</h3>
-          <p>完全可以。MPE Flow 采用单二进制双模式架构，内置独立的 <code>mpe</code> CLI 命令。在 GitHub Actions、GitLab CI、Jenkins 或 Docker 容器中直接执行 <code>mpe run flow.mpf --report json</code> 即可无 GUI 依赖高速运行流程并输出结构化测试报告。</p>
+          <p>完全可以。MPE Flow 采用单二进制双模式架构，内置独立的 <code>mpe</code> CLI 命令。在 GitHub Actions、GitLab CI、Jenkins 或 Docker 容器中直接执行 <code>mpe run flow.mpf -e staging --report-format junit --report-file results.xml</code> 即可无 GUI 依赖高速运行流程并输出结构化测试报告。</p>
         </div>
         <div class="faq-card">
           <h3>MPE Flow 是开源免费的吗？</h3>

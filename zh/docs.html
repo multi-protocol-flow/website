@@ -122,6 +122,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
   <link rel="icon" type="image/png" href="../favicon.png">
+</head>
 <body>
   <!-- Header -->
   <header class="site-header">
@@ -184,6 +185,7 @@
               <li><a href="#node-structure">节点结构</a></li>
               <li><a href="#connections">连线关系</a></li>
               <li><a href="#variables">变量系统</a></li>
+              <li><a href="#environments">全局环境与机密分层</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
@@ -437,8 +439,8 @@ flow:
             <tbody>
               <tr>
                 <td><code>mpe run</code></td>
-                <td>执行工作流文件 (.mpf)</td>
-                <td><code>mpe run -f flow.mpf</code></td>
+                <td>执行工作流文件 (.mpf)，支持指定激活环境与运行时变量覆盖</td>
+                <td><code>mpe run -f flow.mpf -e staging --var TIMEOUT=5000</code></td>
               </tr>
               <tr>
                 <td><code>mpe validate</code></td>
@@ -447,13 +449,18 @@ flow:
               </tr>
               <tr>
                 <td><code>mpe debug</code></td>
-                <td>单步调试输出（NDJSON 协议）</td>
-                <td><code>mpe debug -f flow.mpf</code></td>
+                <td>单步调试输出（NDJSON 协议），自动带入激活环境</td>
+                <td><code>mpe debug -f flow.mpf -e dev</code></td>
               </tr>
               <tr>
                 <td><code>mpe stress</code></td>
-                <td>运行压力测试</td>
-                <td><code>mpe stress run -f flow.mpf</code></td>
+                <td>运行多协议压力测试，支持环境解析</td>
+                <td><code>mpe stress run -f flow.mpf -e staging -u 50 -r 10</code></td>
+              </tr>
+              <tr>
+                <td><code>mpe env</code></td>
+                <td>全局环境文件管理（list, show, set, delete）</td>
+                <td><code>mpe env list --format table</code></td>
               </tr>
               <tr>
                 <td><code>mpe flow</code></td>
@@ -492,12 +499,22 @@ flow:
             <pre><code># 查看所有命令
 mpe --help
 
+# 指定激活环境与运行时变量覆盖执行流程
+mpe run -f flow.mpf -e staging --var TIMEOUT=5000 --var RETRIES=3
+
+# 全局环境文件管理
+mpe env list --format table
+mpe env show staging --source merged
+mpe env set staging API_BASE=https://api.staging.com --local
+mpe env delete staging --local
+
 # 格式化流程文件或在 YAML 与 JSON 之间转换
 mpe flow fmt ./flows/hello.mpf --to yaml
 mpe flow fmt --all --to yaml
 
 # 查看特定命令帮助
-mpe run --help</code></pre>
+mpe run --help
+mpe env --help</code></pre>
           </div>
         </article>
 
@@ -507,9 +524,8 @@ mpe run --help</code></pre>
           <p><code>mpe run</code> 支持将执行结果导出为标准 JUnit XML 格式，可直接被 Jenkins、GitHub Actions 和 GitLab CI 等持续集成平台识别与解析。工作流中的每个节点对应一个 <code>&lt;testcase&gt;</code>；执行失败和跳过的节点分别映射为 <code>&lt;failure&gt;</code> 和 <code>&lt;skipped&gt;</code> 元素。</p>
 
           <div class="docs-code">
-            <pre><code># 导出 JUnit XML 报告供 CI 使用
-mpe run -f flow.mpf --report-format junit --report-file results.xml
-
+            <pre><code># 导出指定 staging 环境的 JUnit XML 报告供 CI 使用
+mpe run -f flow.mpf -e staging --report-format junit --report-file results.xml
 # 或者直接将 JUnit XML 输出到 stdout（不带 --report-file）
 mpe run -f flow.mpf --report-format junit</code></pre>
           </div>
@@ -691,7 +707,7 @@ flow:
                 <td><code>initial_variables</code></td>
                 <td>object</td>
                 <td>No</td>
-                <td>Variables available via <code>{{key}}</code> syntax</td>
+                <td>工作流自身内置的兜底变量（通过 <code>{{key}}</code> 插值）。作为四级级联解析中的兜底层。</td>
               </tr>
               <tr>
                 <td><code>nodes</code></td>
@@ -707,6 +723,10 @@ flow:
               </tr>
             </tbody>
           </table>
+          <div class="docs-info">
+            <h4>环境定义解耦存储说明</h4>
+            <p>环境变量集已不再内嵌保存在 <code>.mpf</code> 流程文件中，而是作为独立的 YAML 文件存储在 <code>&lt;flows_dir&gt;/environments/</code> 目录下（如 <code>dev.yaml</code>、<code>staging.yaml</code>、<code>prod.yaml</code>），支持跨所有流程全局共享。历史旧流程文件中内嵌的环境配置在加载时会自动忽略，请通过环境管理器或 <code>mpe env</code> 命令重新创建。</p>
+          </div>
         </article>
 
         <!-- Node Structure -->
@@ -958,12 +978,142 @@ target_port_id: in</code></pre>
           </table>
 
           <div class="docs-warning">
-            <h4>Limitations</h4>
+            <h4>语法约束</h4>
             <ul>
-              <li>Only dot notation: <code>{{obj.field.subfield}}</code></li>
-              <li>No array indexing: <code>{{items[0]}}</code> &mdash; not supported</li>
-              <li>No function calls: <code>{{func()}}</code> &mdash; not supported</li>
+              <li>仅支持对象点号属性访问：<code>{{obj.field.subfield}}</code></li>
+              <li>暂不支持数组下标索引：<code>{{items[0]}}</code></li>
+              <li>暂不支持行内函数调用：<code>{{func()}}</code></li>
             </ul>
+          </div>
+        </article>
+
+        <!-- Global Environments -->
+        <article id="environments" class="docs-section">
+          <h2>全局环境与机密安全分层</h2>
+          <p>MPE Flow 将环境配置从工作流文件中彻底解耦。环境定义作为独立的 YAML 文件存储在 <code>&lt;flows_dir&gt;/environments/</code> 目录下（默认位于 <code>~/.app/flows/environments/</code>，亦可通过 <code>MPE_ENVIRONMENTS_DIR</code> 环境变量覆盖），支持在所有工作流之间全局复用 <code>dev</code>、<code>staging</code>、<code>prod</code> 等多套环境变量集。</p>
+
+          <h3>双文件机密隔离架构</h3>
+          <p>每个环境均支持双文件设计，天然兼顾团队协同共享与个人本地敏感机密隔离：</p>
+          <ul>
+            <li><strong>共享基础文件（<code>&lt;name&gt;.yaml</code>）：</strong> 存储团队通用配置（如服务域名、公共端口、公共超时策略等），直接随工作流一同提交入库 Git。</li>
+            <li><strong>机器私有覆盖层（<code>&lt;name&gt;.local.yaml</code>）：</strong> 在本地机器上无缝覆盖共享文件中的同名变量，专用于存放开发者个人 API Token、数据库密码与私钥。<em>建议在 <code>.gitignore</code> 中添加 <code>*.local.yaml</code>，彻底杜绝机密误入代码仓库。</em></li>
+          </ul>
+
+          <div class="docs-code">
+            <pre><code># &lt;flows_dir&gt;/environments/staging.yaml（团队共享，提交入库 Git）
+name: staging
+description: 测试环境配置
+variables:
+  API_URL: https://staging-api.example.com
+  TIMEOUT_MS: 5000
+  MOCK_MODE: false
+
+# &lt;flows_dir&gt;/environments/staging.local.yaml（个人本地私有，加入 .gitignore）
+name: staging
+variables:
+  AUTH_TOKEN: dev_secret_bearer_token_xyz987
+  CLIENT_SECRET: sk_staging_99214a8f</code></pre>
+          </div>
+
+          <h3>四级变量解析级联优先级</h3>
+          <p>在单次执行、单步调试或并发压测工作流时，变量将严格按照以下四级优先级进行级联解析与合并：</p>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>优先级</th>
+                <th>变量层级</th>
+                <th>作用域与来源</th>
+                <th>典型应用场景</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1 (最低)</td>
+                <td><strong>流程兜底变量 (Flow Fallback)</strong></td>
+                <td><code>.mpf</code> 流程内的 <code>flow.initial_variables</code></td>
+                <td>工作流自身内置的缺省变量，保证脱离全局环境时流程依然可自包含运行。</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><strong>共享环境文件</strong></td>
+                <td>环境目录下的 <code>&lt;name&gt;.yaml</code></td>
+                <td>团队共享的全局环境地址、公共超时阈值与通用开关配置。</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><strong>本地私有覆盖</strong></td>
+                <td>环境目录下的 <code>&lt;name&gt;.local.yaml</code></td>
+                <td>当前开发机私有的密码、测试账号凭据或本地代理配置。</td>
+              </tr>
+              <tr>
+                <td>4 (最高)</td>
+                <td><strong>运行时参数覆盖</strong></td>
+                <td>CLI <code>--var KEY=VALUE</code> 或运行入参</td>
+                <td>CI/CD 动态临时注入的构建流水线号、单次测试参数或运行时环境变量。</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="docs-warning">
+            <h4>变量插值语法规范</h4>
+            <p>级联合并后的变量统一通过裸键语法读取：<code>{{API_URL}}</code> 或嵌套字段 <code>{{USER.id}}</code>。<strong>请勿添加 <code>env.</code> 前缀</strong>（如 <code>{{env.API_URL}}</code> 属于无效语法，引擎将提示找不到该变量）。</p>
+          </div>
+
+          <h3>GUI 桌面端环境交互</h3>
+          <ul>
+            <li><strong>左侧面板环境折叠区：</strong> 侧边栏支持按需展开/收起环境列表，支持显示各环境变量数量角标，并可一键完成环境激活、重命名、复制副本与删除。</li>
+            <li><strong>画布顶部工具栏选择器：</strong> 在画布顶部快速切换当前激活环境，即时生效，无需退出画布。</li>
+            <li><strong>环境管理器弹窗（双模式）：</strong>
+              <ul>
+                <li><em>全局模式：</em> 支持带语法高亮与校验的 YAML 直读直写编辑，独立切换查看与编辑共享层及本地私有覆盖层。</li>
+                <li><em>画布模式：</em> 并排展示当前流程的兜底变量，并通过<strong>级联对比矩阵 (Cascade Comparison Matrix)</strong> 直观对比各层取值与最终生效值。</li>
+              </ul>
+            </li>
+            <li><strong>全执行链路贯通：</strong> 交互式运行、单步断点调试（F10/F11）与高并发压测均会自动带入并合并当前激活环境。</li>
+            <li><strong>流程导出环境烘焙与敏感凭证扫描：</strong> 导出工作流时可选择将当前激活环境的变量直接“烘焙”写入 <code>flow.initial_variables</code>，生成自包含的单文件。内置<strong>凭据安全扫描</strong>，自动检测 <code>key</code>、<code>secret</code>、<code>token</code>、<code>password</code>、<code>auth</code>、<code>cred</code>、<code>cert</code>、<code>private</code> 等敏感关键字并提示清除，避免密钥外泄。</li>
+          </ul>
+
+          <h3>环境存储目录配置</h3>
+          <p>环境目录默认跟随流程目录派生（<code>&lt;flows_dir&gt;/environments</code>），支持通过以下方式灵活自定义：</p>
+          <ul>
+            <li><strong>GUI 设置：</strong> 设置 (Settings) &rarr; 存储 (Storage) &rarr; 环境文件目录 (<code>environmentsDir</code>)。</li>
+            <li><strong>环境变量：</strong> 设置 <code>MPE_ENVIRONMENTS_DIR=/path/to/environments</code>。</li>
+            <li><strong>配置文件：</strong> 在 <code>config.toml</code>（位于 <code>$MPE_CONFIG</code> 或系统数据目录）中设置 <code>storage.environments_dir</code>。</li>
+          </ul>
+
+          <h3>CLI 环境管理 (<code>mpe env</code>)</h3>
+          <p>在无头 CI/CD 服务器或脚本中，可直接通过 <code>mpe env</code> 子命令全功能管理环境文件：</p>
+          <div class="docs-code">
+            <pre><code># 列出所有环境（名称、变量数、是否存在本地私有覆盖、文件路径）
+mpe env list --format table
+
+# 查看指定环境变量（支持查看 merged 合并层、base 共享层或 local 本地层）
+mpe env show staging --source merged
+mpe env show staging --source base
+mpe env show staging --source local
+
+# 向团队共享环境写入变量
+mpe env set staging API_URL=https://staging.example.com TIMEOUT_MS=6000
+
+# 向本地私有覆盖层写入敏感机密（保存至 .local.yaml）
+mpe env set staging AUTH_TOKEN=secret_token_12345 --local
+
+# 删除指定环境的本地覆盖层或完整删除环境
+mpe env delete staging --local
+mpe env delete staging</code></pre>
+          </div>
+
+          <h3>指定环境执行工作流</h3>
+          <p>在 <code>mpe run</code>、<code>mpe debug</code> 或 <code>mpe stress run</code> 中通过 <code>-e, --env &lt;NAME&gt;</code> 指定环境：</p>
+          <div class="docs-code">
+            <pre><code># 指定 staging 环境执行流程
+mpe run -f flows/checkout.mpf -e staging
+
+# 指定环境并附加运行时变量临时覆盖
+mpe run -f flows/checkout.mpf -e staging --var TIMEOUT_MS=10000 --var NOTIFY=true
+
+# 指定 staging 环境进行压力测试
+mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
           </div>
         </article>
 

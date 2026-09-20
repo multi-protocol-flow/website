@@ -122,6 +122,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/png" href="favicon.png">
+</head>
 <body>
   <!-- Header -->
   <header class="site-header">
@@ -184,6 +185,7 @@
               <li><a href="#node-structure">Node Structure</a></li>
               <li><a href="#connections">Connections</a></li>
               <li><a href="#variables">Variables</a></li>
+              <li><a href="#environments">Global Environments</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
@@ -438,8 +440,8 @@ flow:
             <tbody>
               <tr>
                 <td><code>mpe run</code></td>
-                <td>Execute a flow file (.mpf)</td>
-                <td><code>mpe run -f flow.mpf</code></td>
+                <td>Execute a flow file (.mpf) with optional environment and variable overrides</td>
+                <td><code>mpe run -f flow.mpf -e staging --var TIMEOUT=5000</code></td>
               </tr>
               <tr>
                 <td><code>mpe validate</code></td>
@@ -448,13 +450,18 @@ flow:
               </tr>
               <tr>
                 <td><code>mpe debug</code></td>
-                <td>Run with debug output (NDJSON protocol)</td>
-                <td><code>mpe debug -f flow.mpf</code></td>
+                <td>Run with debug output (NDJSON protocol) and active environment</td>
+                <td><code>mpe debug -f flow.mpf -e dev</code></td>
               </tr>
               <tr>
                 <td><code>mpe stress</code></td>
-                <td>Run stress test</td>
-                <td><code>mpe stress run -f flow.mpf</code></td>
+                <td>Run multi-protocol stress test with environment resolution</td>
+                <td><code>mpe stress run -f flow.mpf -e staging -u 50 -r 10</code></td>
+              </tr>
+              <tr>
+                <td><code>mpe env</code></td>
+                <td>Manage global environments and local overrides (list, show, set, delete)</td>
+                <td><code>mpe env list --format table</code></td>
               </tr>
               <tr>
                 <td><code>mpe flow</code></td>
@@ -493,12 +500,22 @@ flow:
             <pre><code># View all commands
 mpe --help
 
+# Run flow with active environment and runtime variable overrides
+mpe run -f flow.mpf -e staging --var TIMEOUT=5000 --var RETRIES=3
+
+# Manage global environments
+mpe env list --format table
+mpe env show staging --source merged
+mpe env set staging API_BASE=https://api.staging.com --local
+mpe env delete staging --local
+
 # Format flow file or convert between YAML and JSON
 mpe flow fmt ./flows/hello.mpf --to yaml
 mpe flow fmt --all --to yaml
 
 # View command-specific help
-mpe run --help</code></pre>
+mpe run --help
+mpe env --help</code></pre>
           </div>
         </article>
 
@@ -508,9 +525,8 @@ mpe run --help</code></pre>
           <p><code>mpe run</code> can export execution results as standard JUnit XML, which is natively understood by Jenkins, GitHub Actions, and GitLab CI. Each node in the flow becomes a <code>&lt;testcase&gt;</code>; failed and skipped nodes map to <code>&lt;failure&gt;</code> and <code>&lt;skipped&gt;</code> elements.</p>
 
           <div class="docs-code">
-            <pre><code># Export a JUnit XML report for CI consumers
-mpe run -f flow.mpf --report-format junit --report-file results.xml
-
+            <pre><code># Export a JUnit XML report for CI consumers with staging environment
+mpe run -f flow.mpf -e staging --report-format junit --report-file results.xml
 # Or print the JUnit XML directly to stdout (no --report-file)
 mpe run -f flow.mpf --report-format junit</code></pre>
           </div>
@@ -692,7 +708,7 @@ flow:
                 <td><code>initial_variables</code></td>
                 <td>object</td>
                 <td>No</td>
-                <td>Variables available via <code>{{key}}</code> syntax</td>
+                <td>Flow fallback variables available via <code>{{key}}</code> syntax. Serves as base layer in the resolution cascade.</td>
               </tr>
               <tr>
                 <td><code>nodes</code></td>
@@ -708,6 +724,10 @@ flow:
               </tr>
             </tbody>
           </table>
+          <div class="docs-info">
+            <h4>Decoupled Environment Storage</h4>
+            <p>Environment definitions are no longer embedded inside <code>.mpf</code> flow files. Environment files are managed independently as standalone YAML files under <code>&lt;flows_dir&gt;/environments/</code> (e.g. <code>dev.yaml</code>, <code>staging.yaml</code>, <code>prod.yaml</code>). Any legacy embedded environment fields in older flow files are ignored upon loading.</p>
+          </div>
         </article>
 
         <!-- Node Structure -->
@@ -966,6 +986,136 @@ target_port_id: in</code></pre>
               <li>No array indexing: <code>{{items[0]}}</code> &mdash; not supported</li>
               <li>No function calls: <code>{{func()}}</code> &mdash; not supported</li>
             </ul>
+          </div>
+        </article>
+
+        <!-- Global Environments -->
+        <article id="environments" class="docs-section">
+          <h2>Global Environments &amp; Secret Layering</h2>
+          <p>MPE Flow decouples environment variables from individual workflow files. Environments are stored as standalone YAML files under <code>&lt;flows_dir&gt;/environments/</code> (default: <code>~/.app/flows/environments/</code>, or configured via <code>MPE_ENVIRONMENTS_DIR</code>), allowing variable sets such as <code>dev</code>, <code>staging</code>, and <code>prod</code> to be shared across all workflows.</p>
+
+          <h3>Two-File Secret Architecture</h3>
+          <p>Every environment supports a two-file structure designed for version control safety:</p>
+          <ul>
+            <li><strong>Shared Base File (<code>&lt;name&gt;.yaml</code>):</strong> Contains team-wide non-sensitive configuration (base URLs, service ports, retry policies). Check this into Git along with workflows.</li>
+            <li><strong>Machine-Local Override (<code>&lt;name&gt;.local.yaml</code>):</strong> Merged transparently on top of the shared file on the local machine. Ideal for developer-specific credentials, tokens, and private keys. <em>Add <code>*.local.yaml</code> to your <code>.gitignore</code> to prevent accidental secret leakage.</em></li>
+          </ul>
+
+          <div class="docs-code">
+            <pre><code># &lt;flows_dir&gt;/environments/staging.yaml (committed to Git)
+name: staging
+description: Staging Environment
+variables:
+  API_URL: https://staging-api.example.com
+  TIMEOUT_MS: 5000
+  MOCK_MODE: false
+
+# &lt;flows_dir&gt;/environments/staging.local.yaml (git-ignored on local machine)
+name: staging
+variables:
+  AUTH_TOKEN: dev_secret_bearer_token_xyz987
+  CLIENT_SECRET: sk_staging_99214a8f</code></pre>
+          </div>
+
+          <h3>4-Tier Variable Resolution Cascade</h3>
+          <p>When executing, debugging, or stress-testing a flow, variables are resolved through a strict 4-tier cascading priority:</p>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Priority</th>
+                <th>Layer</th>
+                <th>Scope &amp; Source</th>
+                <th>Typical Usage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1 (Lowest)</td>
+                <td><strong>Flow Fallback</strong></td>
+                <td><code>flow.initial_variables</code> in <code>.mpf</code></td>
+                <td>Default baseline values so the flow remains runnable when no environment is active.</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><strong>Shared Environment</strong></td>
+                <td><code>&lt;name&gt;.yaml</code> in environments directory</td>
+                <td>Team-wide environment endpoints, common timeouts, and feature flags.</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><strong>Local Override</strong></td>
+                <td><code>&lt;name&gt;.local.yaml</code> in environments directory</td>
+                <td>Machine-private secrets, personal API tokens, or local proxy overrides.</td>
+              </tr>
+              <tr>
+                <td>4 (Highest)</td>
+                <td><strong>Runtime Override</strong></td>
+                <td>CLI <code>--var KEY=VALUE</code> or explicit run input</td>
+                <td>One-off dynamic overrides from CI/CD jobs or automation scripts.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="docs-warning">
+            <h4>Variable Reference Syntax</h4>
+            <p>Variables resolved from all layers are accessible directly via bare keys: <code>{{API_URL}}</code> or nested fields <code>{{USER.id}}</code>. Do NOT prefix with <code>env.</code> (e.g. <code>{{env.API_URL}}</code> is invalid and will not be found).</p>
+          </div>
+
+          <h3>GUI Environment Controls</h3>
+          <ul>
+            <li><strong>Sidebar Environments Panel:</strong> A resizable section in the left sidebar displaying all discovered environments, active state indicators, and quick actions (activate, rename, duplicate, delete).</li>
+            <li><strong>Canvas Toolbar Selector:</strong> Switch the active environment directly from the top canvas bar without leaving your workflow.</li>
+            <li><strong>Environment Manager Dialog:</strong>
+              <ul>
+                <li><em>Global Mode:</em> Edit environment YAML directly with inline syntax highlighting, toggle local override layers, and manage secrets safely.</li>
+                <li><em>Canvas Mode:</em> Compare flow fallback variables side-by-side against the active environment in a <strong>Cascade Comparison Matrix</strong>, visually inspecting which layer wins for every key.</li>
+              </ul>
+            </li>
+            <li><strong>Unified Debug &amp; Stress Execution:</strong> Interactive single runs, step debugging (F10/F11), and high-concurrency stress tests all automatically inherit and merge the active environment.</li>
+            <li><strong>Flow Export with Environment Bake:</strong> When sharing a flow with external parties, export can optionally bake active environment variables into <code>flow.initial_variables</code>. An integrated <strong>Credential Scanner</strong> automatically detects sensitive keywords (<code>key</code>, <code>secret</code>, <code>token</code>, <code>password</code>, <code>auth</code>, <code>cred</code>, <code>cert</code>, <code>private</code>) and prompts you to redact them before export.</li>
+          </ul>
+
+          <h3>Storage Configuration</h3>
+          <p>The environments directory defaults to <code>&lt;flows_dir&gt;/environments</code> and can be configured through multiple methods:</p>
+          <ul>
+            <li><strong>GUI:</strong> Settings &rarr; Storage &rarr; Environments Directory (<code>environmentsDir</code>).</li>
+            <li><strong>Environment Variable:</strong> <code>MPE_ENVIRONMENTS_DIR=/custom/path/environments</code></li>
+            <li><strong>Configuration File:</strong> Set <code>storage.environments_dir</code> in <code>config.toml</code> (located at <code>$MPE_CONFIG</code> or user data directory).</li>
+          </ul>
+
+          <h3>CLI Environment Management (<code>mpe env</code>)</h3>
+          <p>Manage environments in headless CI/CD environments without opening the desktop GUI:</p>
+          <div class="docs-code">
+            <pre><code># List all environments with variable counts and local override flags
+mpe env list --format table
+
+# Inspect variables in an environment (merged, base, or local layer)
+mpe env show staging --source merged
+mpe env show staging --source base
+mpe env show staging --source local
+
+# Set variables in the shared base file
+mpe env set staging API_URL=https://staging.example.com TIMEOUT_MS=6000
+
+# Set sensitive credentials in the local private override (.local.yaml)
+mpe env set staging AUTH_TOKEN=secret_token_12345 --local
+
+# Delete a local override layer or the entire environment
+mpe env delete staging --local
+mpe env delete staging</code></pre>
+          </div>
+
+          <h3>Running Workflows with Environments</h3>
+          <p>Pass <code>-e, --env &lt;NAME&gt;</code> to <code>mpe run</code>, <code>mpe debug</code>, or <code>mpe stress run</code>:</p>
+          <div class="docs-code">
+            <pre><code># Run flow against staging environment
+mpe run -f flows/checkout.mpf -e staging
+
+# Run with environment plus one-off runtime overrides
+mpe run -f flows/checkout.mpf -e staging --var TIMEOUT_MS=10000 --var NOTIFY=true
+
+# Run stress test against staging environment
+mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
           </div>
         </article>
 

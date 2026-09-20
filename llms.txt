@@ -50,13 +50,17 @@ Plugins run as isolated, high-performance sidecar processes via the `mpe-plugin-
 MPE delivers a dual-mode single binary (`mpe` for GUI + CLI, or pure headless `mpe-cli`):
 
 - `mpe run <file.mpf>`: Execute a workflow file headlessly with JSON/JUnit/HTML output.
-  - `--env <file.env>`: Inject environment variables.
+  - `-e, --env <NAME>`: Activate global environment (loads `<flows_dir>/environments/<NAME>.yaml` + `.local.yaml`).
+  - `--var <key=val>`: Override workflow variables at runtime.
   - `--report <format>`: Export report (`junit`, `json`, `html`, `markdown`).
-  - `--var <key=val>`: Override workflow variables.
+  - `--report-file <path>`: Write report to destination file.
+  - `--stream`: Stream real-time execution events.
+  - `--fail-fast`: Abort immediately on the first node failure.
 - `mpe validate <file.mpf>`: Statically validate node schemas, circular dependencies, and variable references.
-- `mpe stress <file.mpf>`: Run multi-protocol load and stress tests (concurrency, ramp-up, RPS targets, latency percentiles p50/p90/p99).
+- `mpe env <list|show|set|delete>`: Manage global environment YAML files and machine-private local overrides (`--local`, `--source`, `--format table`).
+- `mpe stress <file.mpf>`: Run multi-protocol load and stress tests (`-e <NAME>`, `--var KEY=VAL`, concurrency, ramp-up).
 - `mpe flow <list|show|export|fmt>`: Inspect, manage, and format workflow structures (convert between YAML and JSON).
-- `mpe debug <file.mpf>`: Interactive step debugger with breakpoint support, subflow Step-Into (F11) / Step-Out (Shift+F11), and multi-level call frame stack tracking.
+- `mpe debug <file.mpf>`: Interactive step debugger with breakpoint support (`-e <NAME>`, `--break <node>`), subflow Step-Into (F11) / Step-Out (Shift+F11), and multi-level call frame stack tracking.
 - `mpe ai "<prompt>"`: Query or drive the AI Copilot from terminal (bridges with GUI or runs headless).
 - `mpe open <file.mpf>`: Open a workflow file in the active desktop GUI instance.
 ## Workflow File Format (.mpf)
@@ -64,10 +68,10 @@ MPE delivers a dual-mode single binary (`mpe` for GUI + CLI, or pure headless `m
 `.mpf` (Multi-Protocol Flow) defaults to a clean, declarative, human-readable YAML format (with seamless backward compatibility for JSON):
 - `_version`: File format version (default: 1)
 - `flow`: Flow container object
-  - `uuid`, `name`, `description`, `initial_variables`
+  - `uuid`, `name`, `description`, `initial_variables` (flow fallback baseline variables)
   - `nodes`: Array of protocol and logic nodes with typed configurations.
   - `connections`: Directed edges with source/target handles (`out`, `true`, `false`, `error` -> `in`).
-- `variables`: Global and workflow-scoped variables (`{{var_name}}`) plus built-in runtime dynamic variables (`{{$timestamp}}`, `{{$isoTimestamp}}`, `{{$guid}}` / `{{$uuid}}`, `{{$randomInt}}`, `{{$randomAlphaNumeric}}`).
+- `variables & environments`: Variables resolve via a 4-tier cascade: `flow.initial_variables` -> `<name>.yaml` (shared base) -> `<name>.local.yaml` (git-ignored secrets) -> runtime `--var`. Referenced in nodes via bare keys (`{{var_name}}`) or dot notation (`{{obj.field}}`), alongside built-in runtime dynamic variables (`{{$timestamp}}`, `{{$isoTimestamp}}`, `{{$guid}}` / `{{$uuid}}`, `{{$randomInt}}`, `{{$randomAlphaNumeric}}`).
 - `settings`: Execution error policies (`RouteToFalse`, `Ignore`, `AbortFlow`), timeout configs, and concurrency limits.
 
 ## Key Advantages over Postman, JMeter, and Bruno
@@ -77,3 +81,4 @@ MPE delivers a dual-mode single binary (`mpe` for GUI + CLI, or pure headless `m
 3. **Rust-Powered High Performance:** Sub-millisecond execution overhead, low memory footprint, and high-throughput stress testing.
 4. **CI/CD Native:** Direct exit codes, JUnit XML output, GitHub Actions / GitLab CI ready without wrapper node scripts.
 5. **Native Full-Canvas AI Copilot:** From prompt to executable multi-protocol graph with autonomous self-healing, adaptive layout, and local code awareness.
+6. **Git-Safe Global Environments:** Decoupled YAML environments with machine-private `.local.yaml` secret layering, 4-tier resolution cascade, and leak-proof credential scanning.

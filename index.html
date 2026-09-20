@@ -256,6 +256,14 @@
           <h3>Automated CI/CD Integration</h3>
           <p>Native JUnit XML reports (<code>--report-format junit --report-file results.xml</code>) plug straight into Jenkins, GitHub Actions, and GitLab CI — every node maps to a test case, so PRs surface flow results without custom tooling.</p>
         </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <h3>Global Environments &amp; Zero-Leak Secret Layering</h3>
+          <p>Decouple environment sets (<code>dev</code>, <code>staging</code>, <code>prod</code>) into git-shared YAML files, paired with git-ignored <code>.local.yaml</code> private overrides for credentials. Features 4-tier cascading resolution, credential leak scanners, and headless CI management via <code>mpe env</code>.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -435,7 +443,7 @@
         </div>
         <div class="faq-card">
           <h3>Can MPE Flow run in CI/CD pipelines?</h3>
-          <p>Yes. MPE Flow ships as a dual-mode single binary containing both the GUI and the standalone <code>mpe</code> CLI. You can run <code>mpe run flow.mpf --report json</code> directly in GitHub Actions, GitLab CI, Jenkins, or Docker without GUI dependencies.</p>
+          <p>Yes. MPE Flow ships as a dual-mode single binary containing both the GUI and the standalone <code>mpe</code> CLI. You can run <code>mpe run flow.mpf -e staging --report-format junit --report-file results.xml</code> directly in GitHub Actions, GitLab CI, Jenkins, or Docker without GUI dependencies.</p>
         </div>
         <div class="faq-card">
           <h3>Is MPE Flow open source and free to use?</h3>

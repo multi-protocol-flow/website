@@ -14,7 +14,7 @@ Traditional tools (Postman, Insomnia, JMeter, Bruno) focus predominantly on HTTP
 
 - **Rust Workspace Engine:** 18 decoupled crates ensuring sub-millisecond step execution, zero garbage collection pauses, and minimal memory usage (<30MB baseline).
 - **Single Dual-Mode Binary:** Launching without CLI arguments starts the visual Tauri 2 desktop canvas; supplying CLI arguments switches instantly to headless high-throughput CLI mode with zero GUI overhead.
-- **Offline-First & Sovereign Privacy:** 100% local `.mpf` workflow files and `.env` environment variables. No mandatory accounts, telemetry lock-in, or third-party cloud synchronization.
+- **Offline-First & Sovereign Privacy:** 100% local `.mpf` workflow files and standalone YAML environment definitions with git-ignored `.local.yaml` secret overrides. No mandatory accounts, telemetry lock-in, or third-party cloud synchronization.
 - **Unified Schema & Typing:** Strict JSON Schema validation across all protocol nodes and variable interpolations.
 - **Pluggable Sidecar Architecture:** Third-party and enterprise protocols (MCP, Kafka, Redis, MongoDB, gRPC, Mail) operate via the standalone `mpe-plugin-sdk` wire protocol over standard IPC, guaranteeing process isolation and safety.
 - **Built-in Agentic AI Copilot:** Native full-canvas AI assistant supporting OpenAI-compatible providers, natural language to DAG workflow generation, autonomous execution to goal, midway steering, 1-click execution error self-healing, and local codebase awareness.
@@ -191,6 +191,10 @@ flow:
       target_port_id: in
 ```
 
+## 3. Workflow File Structure, Variables & Global Environments
+
+MPE Flow `.mpf` files store workflow topologies, logic, and fallback variables in declarative YAML format.
+
 ### 3.1 Built-in Dynamic Variables
 
 In addition to user-defined variables (`{{variable_name}}`) and node output mappings (`{{$nodes.node_id.output.field}}`), MPE Flow provides zero-declaration dynamic runtime variables evaluated fresh on each step:
@@ -201,6 +205,21 @@ In addition to user-defined variables (`{{variable_name}}`) and node output mapp
 - `{{$randomInt}}`: Random 6-digit integer (`0` to `999999`).
 - `{{$randomAlphaNumeric}}`: Random 8-character alphanumeric string.
 
+### 3.2 Global Environments & Variable Resolution Cascade
+
+Environment variable sets are decoupled from individual workflows and stored as standalone YAML files under `<flows_dir>/environments/` (default: `~/.app/flows/environments/`, configurable via `MPE_ENVIRONMENTS_DIR` or `storage.environments_dir` in `config.toml`).
+
+- **Two-File Secret Architecture:**
+  - `<name>.yaml`: Shared base environment definitions (e.g. `staging.yaml`) containing team-wide non-sensitive endpoints and flags; checked into Git.
+  - `<name>.local.yaml`: Machine-private override layer (e.g. `staging.local.yaml`) transparently merged on the local workstation. Add `*.local.yaml` to `.gitignore` to keep API tokens and private passwords out of version control.
+- **4-Tier Variable Resolution Cascade:**
+  1. `flow.initial_variables`: Flow-scoped fallback defaults embedded in the `.mpf` file.
+  2. `<name>.yaml`: Shared global environment configuration.
+  3. `<name>.local.yaml`: Machine-private secret overrides.
+  4. Runtime variables: CLI `--var KEY=VALUE` or dynamic execution input parameters.
+- **Bare Interpolation Syntax:** Resolved variables are accessed directly via bare keys (e.g. `{{API_URL}}` or `{{USER.id}}`). Never prefix with `env.`.
+- **Unified Execution:** Single runs, interactive debugging, and stress testing all inherit and merge the active environment automatically.
+- **Export with Environment Bake & Credential Scanner:** Exporting a flow allows baking active environment variables into `flow.initial_variables` for standalone sharing. A built-in credential scanner detects sensitive keys (`key`, `secret`, `token`, `password`, `auth`, `cred`, `cert`, `private`) and prompts users to redact them before distribution.
 ---
 
 ## 4. Built-in Agentic AI Copilot & Smart Orchestration
@@ -237,7 +256,7 @@ The Copilot manipulates the workflow canvas using typed tool calls:
 
 The MPE CLI offers comprehensive command-line operations designed for developer ergonomics and CI/CD pipelines.
 
-### 4.1 Running Workflows (`mpe run`)
+### 5.1 Running Workflows (`mpe run`)
 
 Executes a workflow file headlessly.
 
@@ -245,20 +264,20 @@ Executes a workflow file headlessly.
 # Basic run
 mpe run ./tests/flows/e2e_checkout.mpf
 
-# Inject environment file and override variables
-mpe run ./tests/flows/e2e_checkout.mpf --env staging.env --var TIMEOUT=5000 --var RETRIES=3
+# Run with active environment and runtime variable overrides
+mpe run ./tests/flows/e2e_checkout.mpf -e staging --var TIMEOUT=5000 --var RETRIES=3
 
 # Output structured JUnit XML for GitHub Actions / GitLab CI
-mpe run ./tests/flows/e2e_checkout.mpf --report junit --output ./test-results/junit.xml
+mpe run ./tests/flows/e2e_checkout.mpf -e staging --report-format junit --report-file ./test-results/junit.xml
 
 # Output detailed JSON report
-mpe run ./tests/flows/e2e_checkout.mpf --report json --output ./test-results/report.json
+mpe run ./tests/flows/e2e_checkout.mpf --report-format json --report-file ./test-results/report.json
 
 # Fail fast on first error
 mpe run ./tests/flows/e2e_checkout.mpf --fail-fast
 ```
 
-### 4.2 Validating Workflows (`mpe validate`)
+### 5.2 Validating Workflows (`mpe validate`)
 
 Performs static analysis to detect syntax errors, dangling node references, schema mismatches, or infinite loops before execution.
 
@@ -266,19 +285,43 @@ Performs static analysis to detect syntax errors, dangling node references, sche
 mpe validate ./flows/*.mpf
 ```
 
-### 4.3 High-Throughput Stress Testing (`mpe stress`)
+### 5.3 Global Environment Management (`mpe env`)
 
-Executes multi-protocol load testing directly against the DAG workflow.
+Manage shared environment definitions and machine-private local overrides from CI/CD without the desktop GUI.
 
 ```bash
-# Run 100 concurrent virtual users for 60 seconds with 10s ramp-up
-mpe stress ./flows/api_benchmark.mpf --concurrency 100 --duration 60s --ramp-up 10s
+# List all environments (name, variable count, local override status, file path)
+mpe env list --format table
 
-# Set RPS target limit and generate HTML latency percentile chart
-mpe stress ./flows/api_benchmark.mpf --rps 500 --report html --output stress_report.html
+# Inspect variables in an environment (merged, base, or local layer)
+mpe env show staging --source merged
+mpe env show staging --source base
+mpe env show staging --source local
+
+# Set variables in the shared base file
+mpe env set staging API_URL=https://staging.example.com TIMEOUT_MS=6000
+
+# Set sensitive credentials in the local private override (.local.yaml)
+mpe env set staging AUTH_TOKEN=dev_secret_token_12345 --local
+
+# Delete a local override layer or the entire environment
+mpe env delete staging --local
+mpe env delete staging
 ```
 
-### 4.4 Flow Management (`mpe flow`)
+### 5.4 High-Throughput Stress Testing (`mpe stress`)
+
+Executes multi-protocol load testing directly against the DAG workflow with environment resolution.
+
+```bash
+# Run 100 concurrent virtual users with active staging environment
+mpe stress run ./flows/api_benchmark.mpf -e staging -u 100 -r 10
+
+# Override variables for the stress session
+mpe stress run ./flows/api_benchmark.mpf -e staging --var CONCURRENCY_FLAG=true -u 50 -r 5
+```
+
+### 5.5 Flow Management (`mpe flow`)
 
 ```bash
 # List all nodes in a flow
@@ -295,11 +338,11 @@ mpe flow fmt ./flows/checkout.mpf --to yaml
 mpe flow fmt --all --to yaml
 ```
 
-### 4.5 Interactive Debugging (`mpe debug`)
+### 5.6 Interactive Debugging (`mpe debug`)
 
 ```bash
-# Start interactive CLI step debugger
-mpe debug ./flows/complex_pipeline.mpf --breakpoint node_ws_listen
+# Start interactive CLI step debugger with active environment and breakpoint
+mpe debug ./flows/complex_pipeline.mpf -e dev --break node_ws_listen
 ```
 
 MPE Flow's debugging engine supports:
@@ -307,14 +350,14 @@ MPE Flow's debugging engine supports:
 - **Stepping Controls:** Step Over (`F10`), Step Into (`F11`, enters `flow:sub` nodes to debug child flows), Step Out (`Shift + F11`, completes remaining subflow steps and returns to caller), and Skip Node.
 - **Multi-Level Call Frames (`DebugCallFrame`):** Hierarchical stack trace (`#0 Root Flow -> #1 Subflow`) with visual frame switching and per-frame variable inspection.
 - **In-Flight Mutation:** Live variable pool editing and temporary node configuration updates during active pause.
-### 5.6 CLI AI Copilot Bridge (`mpe ai`)
+### 5.7 CLI AI Copilot Bridge (`mpe ai`)
 
 ```bash
 # Query or drive the AI Copilot directly from the terminal
 mpe ai "Create an HTTP authentication flow and pipe bearer token to WebSocket"
 ```
 
-### 5.7 Open Flow in Desktop GUI (`mpe open`)
+### 5.8 Open Flow in Desktop GUI (`mpe open`)
 
 ```bash
 # Open a workflow file in the running desktop GUI instance
