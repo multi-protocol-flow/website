@@ -167,6 +167,7 @@
               <li><a href="#ai-autonomous">自主执行与中途纠偏</a></li>
               <li><a href="#ai-diagnostics">错误诊断与智能自愈</a></li>
               <li><a href="#ai-workspace">本地工程代码感知</a></li>
+              <li><a href="#ai-slash-commands">快捷斜杠指令与交互工具</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
@@ -186,6 +187,7 @@
               <li><a href="#connections">连线关系</a></li>
               <li><a href="#variables">变量系统</a></li>
               <li><a href="#environments">全局环境与机密分层</a></li>
+              <li><a href="#lifecycle-stages">生命周期阶段 (Setup / Main / Teardown)</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
@@ -194,6 +196,7 @@
               <li><a href="#node-entry">Entry / End 节点</a></li>
               <li><a href="#node-subflow">子流程节点 (Subflow)</a></li>
               <li><a href="#node-http">HTTP 节点</a></li>
+              <li><a href="#node-http-ingress">HTTP Ingress 与 Webhook 模拟</a></li>
               <li><a href="#node-conditional">条件分支节点</a></li>
               <li><a href="#node-script">脚本节点</a></li>
               <li><a href="#node-assertion">断言节点</a></li>
@@ -206,6 +209,8 @@
             <ul>
               <li><a href="#debugging-overview">断点与控制工具栏</a></li>
               <li><a href="#debugging-subflow">子流程步入步出与调用栈</a></li>
+              <li><a href="#slice-execution">局部切片执行与人机协同</a></li>
+              <li><a href="#debugging-lifecycle">生命周期阶段调试与视图联动</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
@@ -422,6 +427,22 @@ flow:
             <li><strong>切片阅读与代码检索：</strong> 检索后端 Controller、DTO 定义与环境变量规范，精准填充接口路径与请求体格式。</li>
             <li><strong>截图多模态输入：</strong> 支持直接粘贴或拖拽接口文档截图、错误弹窗截图，AI 自动结合图像信息完成配置。</li>
           </ul>
+
+          <h3 id="ai-slash-commands">快捷斜杠指令与人机交互工具</h3>
+          <p>MPE Flow 为全域 AI 助手配备了高频键盘快捷指令与人机协同工具桥接：</p>
+          <ul>
+            <li><strong>斜杠快捷指令 (<code>/</code>)：</strong> 在聊天输入框中输入 <code>/</code> 即可呼出自动补全悬浮面板：
+              <ul>
+                <li><code>/fix</code> &mdash; 一键深度诊断并修复当前选中节点或最近失败节点的配置报错。</li>
+                <li><code>/explain</code> &mdash; 剖析当前激活工作流的拓扑结构、变量流转与业务链路。</li>
+                <li><code>/test</code> &mdash; 根据上游协议返回的数据特征，智能生成断言节点与边界用例。</li>
+              </ul>
+            </li>
+            <li><strong>交互式问询卡片 (<code>ask_user</code>)：</strong> 当大模型需要用户决策（如选取鉴权范围、确认环境地址、选择替代分支方案）时，自动生成交互式单选/多选或表单卡片，并安全挂起工具执行循环，等待用户点击提交后继续推进。</li>
+            <li><strong>安全白名单终端工具 (<code>terminal_exec</code>)：</strong> AI 可在关联的工作区中执行经白名单严格校验的系统命令（如 <code>git status</code>、<code>npm test</code>、<code>cargo check</code>），高危操作强制触发卡片二次确认。</li>
+            <li><strong>全信任自主模式 (Full Trust Mode)：</strong> 资深开发者可在设置中启用全信任模式，自主推进执行时免除频繁手动卡片点击，实现全自动端到端探索。</li>
+            <li><strong>思考水滴物理动效与 Token 统计：</strong> 深度思考模型推理时，实时显示字数统计与下落堆叠水滴加载动画，推理链路直观生动。</li>
+          </ul>
         </article>
 
         <!-- Commands -->
@@ -566,8 +587,8 @@ jobs:
 
         <!-- Output Format -->
         <article id="output-format" class="docs-section">
-          <h2>Output Format</h2>
-          <p>All commands output JSON to stdout:</p>
+          <h2>标准输出格式 (Output Format)</h2>
+          <p>CLI 命令执行时默认向标准输出 (stdout) 输出规范的 JSON 结构体：</p>
           <div class="docs-code">
             <pre><code>{
   "success": true,
@@ -610,26 +631,26 @@ jobs:
 
         <!-- Exit Codes -->
         <article id="exit-codes" class="docs-section">
-          <h2>Exit Codes</h2>
+          <h2>退出状态码 (Exit Codes)</h2>
           <table class="docs-table">
             <thead>
               <tr>
-                <th>Code</th>
-                <th>Meaning</th>
+                <th>状态码</th>
+                <th>含义说明</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td><code>0</code></td>
-                <td>Success</td>
+                <td>执行成功 (Success)</td>
               </tr>
               <tr>
                 <td><code>1</code></td>
-                <td>Failure (error details in stderr and JSON output)</td>
+                <td>执行失败（详细错误信息输出在 stderr 与 JSON 数据中）</td>
               </tr>
               <tr>
                 <td><code>2</code></td>
-                <td>Invalid arguments</td>
+                <td>命令行参数非法或缺失必要参数</td>
               </tr>
             </tbody>
           </table>
@@ -713,13 +734,25 @@ flow:
                 <td><code>nodes</code></td>
                 <td>array</td>
                 <td>Yes</td>
-                <td>List of nodes</td>
+                <td>属于 <strong>Main</strong> 业务核心阶段的节点列表</td>
               </tr>
               <tr>
                 <td><code>connections</code></td>
                 <td>array</td>
                 <td>Yes</td>
-                <td>Connections between nodes</td>
+                <td>Main 阶段节点之间的有向连线集合</td>
+              </tr>
+              <tr>
+                <td><code>setup</code></td>
+                <td>object</td>
+                <td>No</td>
+                <td>可选的 <code>FlowSubGraph</code> 子图（<code>{ nodes: [], connections: [] }</code>），在测试前单次执行，导出的变量直接注入 Main 阶段。</td>
+              </tr>
+              <tr>
+                <td><code>teardown</code></td>
+                <td>object</td>
+                <td>No</td>
+                <td>可选的 <code>FlowSubGraph</code> 子图，在测试后单次执行（用于告警通知与清理），注入只读保留变量 <code>$report</code>。</td>
               </tr>
             </tbody>
           </table>
@@ -786,15 +819,15 @@ data:
           </table>
 
           <div class="docs-warning">
-            <h4>Important: data.type Field</h4>
-            <p>Every <code>data</code> object must include <code>"type": "&lt;node_type&gt;"</code> for Rust deserialization. The value must match the node's top-level <code>type</code> field.</p>
+            <h4>重要规则：data.type 字段</h4>
+            <p>每个节点的 <code>data</code> 对象内部必须显式包含 <code>"type": "&lt;node_type&gt;"</code> 以便 Rust 核心引擎正确反序列化，其取值必须与节点顶层的 <code>type</code> 字段完全保持一致。</p>
           </div>
         </article>
 
         <!-- Connections -->
         <article id="connections" class="docs-section">
-          <h2>Connections</h2>
-          <p>Connections define the execution flow between nodes.</p>
+          <h2>节点连线规范 (Connections)</h2>
+          <p>连线定义了工作流节点之间的有向执行流向与数据传递拓扑。</p>
           <div class="docs-code">
             <pre><code>id: conn-1
 source_node_uuid: entry-1
@@ -806,57 +839,60 @@ target_port_id: in</code></pre>
           <table class="docs-table">
             <thead>
               <tr>
-                <th>Field</th>
-                <th>Description</th>
+                <th>字段</th>
+                <th>说明</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td><code>source_node_uuid</code></td>
-                <td>UUID of the source node</td>
+                <td>源节点的 UUID</td>
               </tr>
               <tr>
                 <td><code>target_node_uuid</code></td>
-                <td>UUID of the target node</td>
+                <td>目标节点的 UUID</td>
               </tr>
               <tr>
                 <td><code>source_port_id</code></td>
-                <td>Output port: <code>out</code> (single output), <code>true</code>/<code>false</code> (dual output)</td>
+                <td>源节点输出端口：<code>out</code>（单输出端口）、<code>true</code>/<code>false</code>（双分支端口）</td>
               </tr>
               <tr>
                 <td><code>target_port_id</code></td>
-                <td><strong>Must be <code>"in"</code></strong> for all nodes</td>
+                <td>所有节点的输入端口统一<strong>必须为 <code>"in"</code></strong></td>
               </tr>
             </tbody>
           </table>
 
           <div class="docs-warning">
-            <h4>Critical Port Rules</h4>
+            <h4>关键端口连线约束</h4>
             <ul>
-              <li><code>target_port_id</code> must always be <code>"in"</code> (not <code>"input"</code>)</li>
-              <li>Nodes with dual output (<code>true</code>/<code>false</code>) should have both ports connected to prevent flow termination on failure</li>
-              <li><code>entry</code> uses <code>out</code>, <code>end</code> has no output</li>
+              <li>所有节点的 <code>target_port_id</code> 必须是 <code>"in"</code>（而非 <code>"input"</code>）</li>
+              <li>具备双输出端口（<code>true</code>/<code>false</code>）的节点，建议同时连接两条分支连线，避免某分支无连线导致意外终止流程</li>
+              <li><code>entry</code> 只有 <code>out</code> 输出端口，<code>end</code> 只有 <code>in</code> 输入端口无输出端口</li>
             </ul>
           </div>
 
-          <h3>Port Reference</h3>
+          <h3>端口对应速查表 (Port Reference)</h3>
           <table class="docs-table">
             <thead>
               <tr>
-                <th>Node Type</th>
-                <th>Input</th>
-                <th>Output</th>
+                <th>节点类型 (Node Type)</th>
+                <th>输入端口 (Input)</th>
+                <th>输出端口 (Output)</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td><code>entry</code></td><td>none</td><td><code>out</code></td></tr>
-              <tr><td><code>end</code></td><td><code>in</code></td><td>none</td></tr>
-              <tr><td><code>http</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
+              <tr><td><code>entry</code></td><td>无</td><td><code>out</code></td></tr>
+              <tr><td><code>end</code></td><td><code>in</code></td><td>无</td></tr>
+              <tr><td><code>http:request</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
+              <tr><td><code>http:ingress</code></td><td><code>in</code>（可选触发）</td><td><code>out</code></td></tr>
+              <tr><td><code>http:respond</code></td><td><code>in</code></td><td><code>out</code></td></tr>
               <tr><td><code>conditional</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
               <tr><td><code>script</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
               <tr><td><code>assertion</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
               <tr><td><code>variable:extractor</code></td><td><code>in</code></td><td><code>out</code></td></tr>
-              <tr><td><code>ws_*</code>, <code>tcp_*</code>, <code>udp_*</code>, <code>sse:connect</code>/<code>sse:listen</code>, <code>graphql:connect</code>/<code>query</code>/<code>subscribe</code>/<code>introspect</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
+              <tr><td><code>flow:sub</code> (Subflow)</td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
+              <tr><td><code>ws:*</code>, <code>tcp:*</code>, <code>udp:*</code>, <code>sse:connect</code>/<code>listen</code>, <code>graphql:*</code></td><td><code>in</code></td><td><code>true</code> / <code>false</code></td></tr>
               <tr><td><code>sse:disconnect</code>, <code>graphql:disconnect</code>, <code>proxy</code></td><td><code>in</code></td><td><code>out</code></td></tr>
             </tbody>
           </table>
@@ -1117,28 +1153,99 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
           </div>
         </article>
 
+        <!-- Flow Lifecycle Stages -->
+        <article id="lifecycle-stages" class="docs-section">
+          <h2>流程生命周期阶段 (Setup / Main / Teardown)</h2>
+          <p>MPE Flow 将工作流执行模型升级为原生的一等公民生命周期三阶段架构。告别了脆弱、难以排查的回调函数机制，每个阶段均是完整的可视化多协议画布子图，无缝兼容所有协议节点：</p>
+
+          <div class="docs-info">
+            <h4>传统 Hook 机制已全面替换为 Teardown 阶段</h4>
+            <p>在 <code>0.5.0-beta</code> 版本中，传统的流程 Hook 机制（<code>EntryConfig.hooks</code>）已被彻底移除。取而代之的是功能强大、可视化可编排的 <strong>Teardown 后置阶段</strong>。支持在测试结束后使用真实的协议节点（HTTP、脚本、断言、数据库操作）执行告警与清理，具备完整的连线路由、变量插值与断点调试能力。</p>
+          </div>
+
+          <h3>三大阶段职责分工</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>阶段名称</th>
+                <th>对应字段</th>
+                <th>执行频次与场景</th>
+                <th>核心职责与变量流转</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Setup (前置预热)</strong></td>
+                <td><code>flow.setup</code></td>
+                <td>运行前<strong>单次</strong>执行</td>
+                <td>登录认证预热、Token 获取、测试数据集初始化与测试环境预校验。Setup 节点中导出的所有变量会自动合并注入 Main 业务阶段的变量上下文。</td>
+              </tr>
+              <tr>
+                <td><strong>Main (核心业务)</strong></td>
+                <td><code>flow.nodes</code> / <code>flow.connections</code></td>
+                <td>单次运行 / 压测并发循环 / 数据集逐行消费</td>
+                <td>被测试的核心业务拓扑图。在阶梯高并发压测 (<code>mpe stress run</code>) 时，仅在各虚拟用户间并发循环 Main 阶段节点，Setup 与 Teardown 仅在加压前后单次执行，确保 QPS/P99 指标纯净。</td>
+              </tr>
+              <tr>
+                <td><strong>Teardown (后置清理)</strong></td>
+                <td><code>flow.teardown</code></td>
+                <td>运行后<strong>单次</strong>执行（无论成败）</td>
+                <td>飞书/企业微信/Slack/邮件告警推送、临时脏数据与测试会话清理。继承 Main 阶段所有变量，并注入只读保留变量 <code>$report</code>。</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Teardown 阶段中的只读 <code>$report</code> 报告变量</h3>
+          <p>Teardown 阶段在启动时会自动注入代表 Main 核心业务执行结果的保留变量 <code>$report</code>，可在节点配置或脚本中直接读取：</p>
+          <ul>
+            <li><code>{{$report.status}}</code> &mdash; Main 阶段执行状态（<code>"success"</code>、<code>"failed"</code>、<code>"cancelled"</code>）。</li>
+            <li><code>{{$report.duration_ms}}</code> &mdash; 核心业务流程的实际执行耗时（毫秒）。</li>
+            <li><code>{{$report.node_reports}}</code> &mdash; 各节点执行明细、输出数据、状态码与断言判定结果列表。</li>
+          </ul>
+
+          <div class="docs-code">
+            <pre><code># 示例：在 Teardown 的 HTTP 节点中向群机器人发送自动化测试汇总卡片
+{
+  "msg_type": "text",
+  "content": {
+    "text": "【API 自动化测试报告】状态: {{$report.status}}, 核心链路耗时: {{$report.duration_ms}}ms"
+  }
+}</code></pre>
+          </div>
+
+          <h3>阶段失败与容错传播规则</h3>
+          <ul>
+            <li><strong>Setup 阶段失败：</strong> 若 Setup 中任一节点遇到未捕获异常或路由至 <code>false</code> 端口，系统将跳过 Main 阶段（标记为 <code>stages.main.status == "skipped"</code>），但依然会执行 Teardown 阶段清理已申请的前置资源。</li>
+            <li><strong>Teardown 阶段失败：</strong> 若 Main 业务已顺利通过但 Teardown 阶段清理失败，整体流程标记为失败，但报告中 <code>stages.main.status</code> 保持 <code>"success"</code> &mdash; 严格区分业务功能正确性与基础设施清理偶发故障。</li>
+            <li><strong>无依赖根节点确定性执行：</strong> 在 Setup 和 Teardown 子图中，若存在多个无前驱连线的根节点（入度为 0），执行引擎将严格依据画布上的 <code>(y, x)</code> 坐标自上而下、从左向右确定性执行，彻底杜绝 JSON 数组乱序执行隐患。</li>
+          </ul>
+
+          <h3>画布阶段切换胶囊栏 (StageTabBar)</h3>
+          <p>画布左上方常驻紧凑的阶段切换胶囊栏（<strong>Setup</strong> | <strong>Main</strong> | <strong>Teardown</strong>），悬停即可查看各阶段说明。添加、连线、删除节点以及撤销/重做操作均严格隔离在当前活跃阶段内。</p>
+        </article>
+
         <!-- Node Types: Entry / End -->
         <article id="node-entry" class="docs-section">
-          <h2>Entry &amp; End Nodes</h2>
+          <h2>开始与结束节点 (Entry / End)</h2>
           
-          <h3>Entry Node</h3>
-          <p>Starting point of every flow. Exactly one required.</p>
+          <h3>Entry 开始节点</h3>
+          <p>工作流各阶段的起始触发点，单图画布中必须且只能存在一个有效 Entry 节点（支持画布调色板便捷添加，具备防重复唯一性保护）。</p>
           <div class="docs-code">
             <pre><code>{
   "uuid": "entry-1",
   "type": "entry",
-  "name": "Start",
+  "name": "开始",
   "data": { "type": "entry" }
 }</code></pre>
           </div>
 
-          <h3>End Node</h3>
-          <p>Terminal node. Flow ends when reaching <code>end</code>.</p>
+          <h3>End 结束节点</h3>
+          <p>工作流终端节点。当执行流推进至 <code>end</code> 节点时，当前阶段正常终止。</p>
           <div class="docs-code">
             <pre><code>{
   "uuid": "end-1",
   "type": "end",
-  "name": "End",
+  "name": "结束",
   "data": { "type": "end" }
 }</code></pre>
           </div>
@@ -1194,6 +1301,9 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
             </tbody>
           </table>
 
+          <h3>导出变量静态推断与预期预览</h3>
+          <p>MPE Flow 内置静态代码与变量流转推断分析引擎。配置面板能够深度解析目标子流程结构，预先推断出其内部提取并导出的变量清单（如 <code>variable:extractor</code> 或 <code>script</code> 导出的变量），在子流程面板中直接呈现「预期导出变量预览」，支持一键复制变量名，并在下游节点引用时智能弱化未声明告警提示。</p>
+
           <h3>环路依赖检测与防死锁</h3>
           <p>MPE Flow 的 DAG 编译器在预检阶段即对子流程依赖图执行拓扑排序与环路检测。若存在直接自引用（A &rarr; A）或相互间接循环调用（A &rarr; B &rarr; A），校验器将立即拦截并给出明确的环路路径报错，彻底防止无限递归死锁。</p>
 
@@ -1205,36 +1315,36 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
 
         <!-- Node Types: HTTP -->
         <article id="node-http" class="docs-section">
-          <h2>HTTP Node</h2>
-          <p>Send HTTP requests. Supports GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS.</p>
+          <h2>HTTP 请求节点 (http:request)</h2>
+          <p>发送高吞吐 HTTP/HTTPS 网络请求，支持 GET、POST、PUT、DELETE、PATCH、HEAD、OPTIONS 等全套标准方法。</p>
           <div class="docs-code">
             <pre><code>{
   "uuid": "http-1",
   "type": "http:request",
-  "name": "API Call",
+  "name": "用户登录接口",
   "data": {
     "type": "http:request",
-    "url": "{{api_base}}/users",
+    "url": "{{api_base}}/api/v1/auth/login",
     "method": "post",
     "headers": {
       "Authorization": "Bearer {{token}}"
     },
     "body_type": "body",
     "content_type": "json",
-    "body": "{\"name\": \"test\"}",
+    "body": "{\"username\": \"admin\", \"password\": \"{{password}}\"}",
     "timeout_ms": 30000
   }
 }</code></pre>
           </div>
 
-          <h3>Core Fields</h3>
+          <h3>核心配置参数 (Core Fields)</h3>
           <table class="docs-table">
             <thead>
               <tr>
-                <th>Field</th>
-                <th>Type</th>
-                <th>Default</th>
-                <th>Description</th>
+                <th>参数名</th>
+                <th>类型</th>
+                <th>默认值</th>
+                <th>说明</th>
               </tr>
             </thead>
             <tbody>
@@ -1242,64 +1352,121 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
                 <td><code>url</code></td>
                 <td>string</td>
                 <td>&mdash;</td>
-                <td>Request URL (supports <code>{{var}}</code>)</td>
+                <td>目标请求地址，全面支持 <code>{{var}}</code> 变量动态插值</td>
               </tr>
               <tr>
                 <td><code>method</code></td>
                 <td>string</td>
                 <td><code>get</code></td>
-                <td>HTTP method</td>
+                <td>HTTP 方法（大小写不敏感）</td>
               </tr>
               <tr>
                 <td><code>headers</code></td>
                 <td>object</td>
                 <td><code>{}</code></td>
-                <td>Request headers</td>
+                <td>请求头键值对映射表，支持环境变量注入</td>
               </tr>
               <tr>
                 <td><code>body_type</code></td>
                 <td>string</td>
                 <td><code>none</code></td>
-                <td><code>none</code> / <code>body</code> / <code>form-data</code> / <code>x-www-form-urlencoded</code> / <code>binary</code></td>
+                <td>请求体格式：<code>none</code> / <code>body</code> (文本/JSON) / <code>form-data</code> / <code>x-www-form-urlencoded</code> / <code>binary</code></td>
               </tr>
               <tr>
                 <td><code>content_type</code></td>
                 <td>string</td>
                 <td><code>json</code></td>
-                <td><code>json</code> / <code>text</code> / <code>html</code> / <code>xml</code></td>
+                <td>内容类型提示：<code>json</code> / <code>text</code> / <code>html</code> / <code>xml</code></td>
               </tr>
               <tr>
                 <td><code>timeout_ms</code></td>
                 <td>number</td>
                 <td><code>30000</code></td>
-                <td>Timeout (1000&ndash;300000ms)</td>
+                <td>超时毫秒数 (支持 1000&ndash;300000ms)</td>
               </tr>
             </tbody>
           </table>
 
-          <h3>HTTP Output</h3>
+          <h3>HTTP 节点输出数据结构</h3>
           <div class="docs-code">
             <pre><code>{
   "success": true,
   "status": 200,
-  "body": { "id": 1, "name": "test" },
+  "body": { "id": 1, "token": "eyJhbGciOi..." },
   "headers": { "content-type": "application/json" },
   "timing": { "connect_ms": 45, "total_ms": 150 }
 }</code></pre>
           </div>
         </article>
 
+        <!-- Node Types: HTTP Ingress & Mock -->
+        <article id="node-http-ingress" class="docs-section">
+          <h2>HTTP Ingress 与 Webhook 模拟服务</h2>
+          <p>MPE Flow 支持在工作流内直接启动轻量级内嵌 HTTP 服务端监听，无需启动独立的 Express/Nginx 即可完成 Webhook 触发、异步回调与接口 Mock 仿真验证。</p>
+
+          <h3>http:ingress &mdash; HTTP 服务端监听节点</h3>
+          <p><code>http:ingress</code> 节点在指定端口上启动监听，负责捕获外部推送的 Webhook 请求或客户端调用。执行器与调试引擎会自动将其作为起始根节点优先触发。</p>
+
+          <div class="docs-code">
+            <pre><code>uuid: ingress-1
+type: http:ingress
+name: 订单 Webhook 接收器
+data:
+  type: http:ingress
+  port: 8080
+  path: /api/v1/webhook/order
+  method: post
+  timeout_ms: 30000</code></pre>
+          </div>
+
+          <table class="docs-table">
+            <thead>
+              <tr><th>参数名</th><th>类型</th><th>默认值</th><th>说明</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>port</code></td><td>number</td><td><code>8080</code></td><td>本地监听绑定的 TCP 端口</td></tr>
+              <tr><td><code>path</code></td><td>string</td><td><code>/</code></td><td>匹配的 URL 路由路径（如 <code>/api/webhook</code>）</td></tr>
+              <tr><td><code>method</code></td><td>string</td><td><code>any</code></td><td>期待的 HTTP 请求方法（<code>get</code>、<code>post</code>、<code>put</code>、<code>delete</code>、<code>any</code>）</td></tr>
+              <tr><td><code>timeout_ms</code></td><td>number</td><td><code>30000</code></td><td>等待接收请求的最大超时时间（毫秒）</td></tr>
+            </tbody>
+          </table>
+
+          <h4>Ingress 节点输出数据 (下游可直接引用)</h4>
+          <ul>
+            <li><code>{{request_body}}</code> &mdash; 外部客户端发来的 JSON 或原始请求体文本。</li>
+            <li><code>{{headers}}</code> &mdash; 请求头映射（如 <code>x-hub-signature-256</code>、<code>authorization</code>）。</li>
+            <li><code>{{query}}</code> &mdash; URL Query 查询参数键值对。</li>
+            <li><code>{{connection_id}}</code> &mdash; 本次 HTTP 连接上下文 ID（供下游 <code>http:respond</code> 关联回包）。</li>
+          </ul>
+
+          <h3>http:respond &mdash; HTTP 模拟响应节点</h3>
+          <p><code>http:respond</code> 节点与 <code>http:ingress</code> 节点配合使用，通过 <code>connection_id</code> 将自定义的状态码、响应头与响应体回写给外部客户端。</p>
+
+          <div class="docs-code">
+            <pre><code>uuid: respond-1
+type: http:respond
+name: 确认回调成功
+data:
+  type: http:respond
+  connection_id: "{{connection_id}}"
+  status_code: 200
+  headers:
+    Content-Type: application/json
+  body: '{"code": 0, "msg": "Webhook received successfully", "order_id": "{{order_id}}"}'</code></pre>
+          </div>
+        </article>
+
         <!-- Node Types: Conditional -->
         <article id="node-conditional" class="docs-section">
-          <h2>Conditional Node</h2>
-          <p>Branch execution based on conditions. Routes to <code>true</code> or <code>false</code> port.</p>
+          <h2>条件分支节点 (Conditional)</h2>
+          <p>根据预设规则或动态表达式判定执行分支，将流程路由至 <code>true</code> 或 <code>false</code> 输出端口。</p>
           
-          <h3>Simple Condition</h3>
+          <h3>简单条件 (Simple Condition)</h3>
           <div class="docs-code">
             <pre><code>{
   "uuid": "cond-1",
   "type": "conditional",
-  "name": "Check Status",
+  "name": "校验 HTTP 状态码",
   "data": {
     "type": "conditional",
     "condition_type": "simple",
@@ -1310,7 +1477,7 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
 }</code></pre>
           </div>
 
-          <h3>Advanced Expression</h3>
+          <h3>高级表达式 (Advanced Expression)</h3>
           <div class="docs-code">
             <pre><code>{
   "data": {
@@ -1321,38 +1488,38 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
 }</code></pre>
           </div>
 
-          <h3>Operators</h3>
+          <h3>比较操作符 (Operators)</h3>
           <table class="docs-table">
             <thead>
               <tr>
-                <th>Operator</th>
-                <th>Description</th>
+                <th>操作符</th>
+                <th>说明</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td><code>equal</code></td><td>Equals</td></tr>
-              <tr><td><code>not_equal</code></td><td>Not equals</td></tr>
-              <tr><td><code>greater</code></td><td>Greater than</td></tr>
-              <tr><td><code>greater_or_equal</code></td><td>Greater or equal</td></tr>
-              <tr><td><code>less</code></td><td>Less than</td></tr>
-              <tr><td><code>less_or_equal</code></td><td>Less or equal</td></tr>
-              <tr><td><code>contains</code></td><td>Contains substring</td></tr>
-              <tr><td><code>starts_with</code></td><td>Starts with</td></tr>
-              <tr><td><code>ends_with</code></td><td>Ends with</td></tr>
-              <tr><td><code>exists</code></td><td>Field exists</td></tr>
+              <tr><td><code>equal</code></td><td>等于</td></tr>
+              <tr><td><code>not_equal</code></td><td>不等于</td></tr>
+              <tr><td><code>greater</code></td><td>大于</td></tr>
+              <tr><td><code>greater_or_equal</code></td><td>大于等于</td></tr>
+              <tr><td><code>less</code></td><td>小于</td></tr>
+              <tr><td><code>less_or_equal</code></td><td>小于等于</td></tr>
+              <tr><td><code>contains</code></td><td>包含子字符串</td></tr>
+              <tr><td><code>starts_with</code></td><td>以此开头</td></tr>
+              <tr><td><code>ends_with</code></td><td>以此结尾</td></tr>
+              <tr><td><code>exists</code></td><td>字段存在</td></tr>
             </tbody>
           </table>
         </article>
 
         <!-- Node Types: Script -->
         <article id="node-script" class="docs-section">
-          <h2>Script Node</h2>
-          <p>Execute JavaScript code in a QuickJS runtime (ES2020 subset).</p>
+          <h2>JavaScript 脚本节点 (Script)</h2>
+          <p>在高性能轻量级 QuickJS 安全沙箱运行时中执行 JavaScript 代码（支持完整 ES2020 语法标准）。</p>
           <div class="docs-code">
             <pre><code>{
   "uuid": "script-1",
   "type": "script",
-  "name": "Process Data",
+  "name": "处理业务数据",
   "data": {
     "type": "script",
     "script": "const data = JSON.parse(fn.response.raw); fn.variables.set('user_id', data.body.id);",
@@ -1361,84 +1528,85 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
 }</code></pre>
           </div>
 
-          <h3>Script API</h3>
+          <h3>脚本内置沙箱 API (Script API)</h3>
           <table class="docs-table">
             <thead>
               <tr>
-                <th>API</th>
-                <th>Description</th>
+                <th>API 方法 / 属性</th>
+                <th>说明</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td><code>fn.variables.get(name)</code></td><td>Read variable from pool</td></tr>
-              <tr><td><code>fn.variables.set(name, value)</code></td><td>Write variable to pool</td></tr>
-              <tr><td><code>fn.response.raw</code></td><td>Full upstream node output (JSON string)</td></tr>
-              <tr><td><code>fn.response.code</code></td><td>HTTP status code (HTTP nodes only)</td></tr>
-              <tr><td><code>fn.console.log(msg)</code></td><td>Log to execution output</td></tr>
-              <tr><td><code>fn.flow.stop(reason)</code></td><td>Stop flow execution</td></tr>
-              <tr><td><code>fn.util.encodeBase64(str)</code></td><td>Base64 encode</td></tr>
-              <tr><td><code>fn.util.md5(str)</code></td><td>MD5 hash</td></tr>
-              <tr><td><code>fn.util.sha256(str)</code></td><td>SHA-256 hash</td></tr>
-              <tr><td><code>fn.util.uuid()</code></td><td>Generate UUID v4</td></tr>
-              <tr><td><code>fn.util.sleep(ms)</code></td><td>Pause execution</td></tr>
+              <tr><td><code>fn.variables.get(name)</code></td><td>从当前流程变量池中读取变量</td></tr>
+              <tr><td><code>fn.variables.set(name, value)</code></td><td>向当前流程变量池中写入变量（自动传递给下游）</td></tr>
+              <tr><td><code>fn.response.raw</code></td><td>上游节点完整原始响应内容（JSON 序列化字符串）</td></tr>
+              <tr><td><code>fn.response.code</code></td><td>上游 HTTP 状态码（仅 HTTP 节点生效）</td></tr>
+              <tr><td><code>fn.console.log(msg)</code></td><td>向执行详情面板的日志控制台输出运行日志</td></tr>
+              <tr><td><code>fn.flow.stop(reason)</code></td><td>正常终止流程执行</td></tr>
+              <tr><td><code>fn.flow.abort(reason)</code></td><td>异常中止流程执行</td></tr>
+              <tr><td><code>fn.util.encodeBase64(str)</code></td><td>Base64 字符串编码</td></tr>
+              <tr><td><code>fn.util.md5(str)</code></td><td>计算 MD5 哈希摘要</td></tr>
+              <tr><td><code>fn.util.sha256(str)</code></td><td>计算 SHA-256 哈希摘要</td></tr>
+              <tr><td><code>fn.util.uuid()</code></td><td>生成标准 UUID v4 字符串</td></tr>
+              <tr><td><code>fn.util.sleep(ms)</code></td><td>挂起当前执行指定毫秒数</td></tr>
             </tbody>
           </table>
         </article>
 
         <!-- Node Types: Assertion -->
         <article id="node-assertion" class="docs-section">
-          <h2>Assertion Node</h2>
-          <p>Validate conditions with detailed pass/fail reporting.</p>
+          <h2>断言验证节点 (Assertion)</h2>
+          <p>校验上游数据是否符合业务预期，生成包含实际值、期望值与判定耗时的结构化测试报告。</p>
           <div class="docs-code">
             <pre><code>{
   "uuid": "assert-1",
   "type": "assertion",
-  "name": "Validate Response",
+  "name": "校验接口返回",
   "data": {
     "type": "assertion",
     "mode": "all",
     "assertions": [
-      { "id": "a1", "description": "Status is 200", "target": "$.status", "operator": "eq", "expected": 200 },
-      { "id": "a2", "description": "Has data", "target": "$.body.data", "operator": "exists" }
+      { "id": "a1", "description": "状态码为 200", "target": "$.status", "operator": "eq", "expected": 200 },
+      { "id": "a2", "description": "包含业务数据", "target": "$.body.data", "operator": "exists" }
     ]
   }
 }</code></pre>
           </div>
 
-          <h3>Assertion Operators</h3>
+          <h3>断言操作符分类 (Assertion Operators)</h3>
           <table class="docs-table">
             <thead>
               <tr>
-                <th>Category</th>
-                <th>Operators</th>
+                <th>类别</th>
+                <th>支持的操作符</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td>Comparison</td><td><code>eq</code>, <code>ne</code></td></tr>
-              <tr><td>Numeric</td><td><code>gt</code>, <code>gte</code>, <code>lt</code>, <code>lte</code></td></tr>
-              <tr><td>String</td><td><code>contains</code>, <code>not_contains</code>, <code>matches</code></td></tr>
-              <tr><td>Existence</td><td><code>exists</code>, <code>not_exists</code></td></tr>
-              <tr><td>Collection</td><td><code>in</code>, <code>not_in</code></td></tr>
-              <tr><td>Type</td><td><code>type_is</code></td></tr>
-              <tr><td>Range</td><td><code>between</code></td></tr>
+              <tr><td>等值比对</td><td><code>eq</code> (等于), <code>ne</code> (不等于)</td></tr>
+              <tr><td>数值比对</td><td><code>gt</code> (大于), <code>gte</code> (大于等于), <code>lt</code> (小于), <code>lte</code> (小于等于)</td></tr>
+              <tr><td>字符串比对</td><td><code>contains</code> (包含), <code>not_contains</code> (不包含), <code>matches</code> (正则匹配)</td></tr>
+              <tr><td>存在性判定</td><td><code>exists</code> (字段存在且非空), <code>not_exists</code> (字段不存在)</td></tr>
+              <tr><td>集合包含</td><td><code>in</code> (属于集合), <code>not_in</code> (不属于集合)</td></tr>
+              <tr><td>类型校验</td><td><code>type_is</code> (类型为 string/number/boolean/array/object)</td></tr>
+              <tr><td>区间范围</td><td><code>between</code> (数值在区间内)</td></tr>
             </tbody>
           </table>
 
           <div class="docs-warning">
-            <h4>Target Path Format</h4>
-            <p>Assertion <code>target</code> must use JSONPath with <code>$.</code> prefix (e.g. <code>$.status</code>, <code>$.body.id</code>). Do not add <code>body.</code> prefix for non-HTTP nodes.</p>
+            <h4>目标字段路径规范 (JSONPath)</h4>
+            <p>断言的目标路径 <code>target</code> 统一采用以 <code>$.</code> 开头的标准 JSONPath 语法（例如 <code>$.status</code>、<code>$.body.id</code>、<code>$.body.users[0].name</code>）。</p>
           </div>
         </article>
 
         <!-- Node Types: WebSocket -->
         <article id="node-websocket" class="docs-section">
-          <h2>WebSocket Nodes</h2>
-          <p>Three nodes for WebSocket communication: connect, send/collect, close.</p>
+          <h2>WebSocket 长连接节点组</h2>
+          <p>提供针对 WebSocket 双向长连接全生命周期管控的三个专用节点：连接、收发/消息收集与关闭。</p>
           <div class="docs-code">
-            <pre><code>// Connect
+            <pre><code>// 建立 WebSocket 连接 (ws:connect)
 { "type": "ws:connect", "data": { "type": "ws:connect", "url": "wss://echo.example.com/ws" } }
 
-// Send and collect response
+// 发送消息并收集对端回包 (ws:send_collect)
 { "type": "ws:send_collect", "data": {
     "type": "ws:send_collect",
     "connection_id": "ws-connect-uuid",
@@ -1447,16 +1615,16 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
   }
 }
 
-// Close
+// 主动断开连接 (ws:close)
 { "type": "ws:close", "data": { "type": "ws:close", "connection_id": "ws-connect-uuid" } }</code></pre>
           </div>
         </article>
 
         <!-- Node Types: Other -->
         <article id="node-other" class="docs-section">
-          <h2>Other Protocols</h2>
+          <h2>其他核心协议节点 (TCP / UDP / SSE / GraphQL)</h2>
           
-          <h3>TCP</h3>
+          <h3>TCP 原始套接字</h3>
           <div class="docs-code">
             <pre><code>{ "type": "tcp:connect", "data": { "type": "tcp:connect", "host": "localhost", "port": 8080 } }
 { "type": "tcp:send", "data": { "type": "tcp:send", "connection_id": "uuid", "data": "Hello" } }
@@ -1464,7 +1632,7 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
 { "type": "tcp:close", "data": { "type": "tcp:close", "connection_id": "uuid" } }</code></pre>
           </div>
 
-          <h3>UDP</h3>
+          <h3>UDP 数据报文</h3>
           <div class="docs-code">
             <pre><code>{ "type": "udp:bind", "data": { "type": "udp:bind", "local_addr": "0.0.0.0", "local_port": 8888 } }
 { "type": "udp:send_to", "data": { "type": "udp:send_to", "connection_id": "uuid", "data": "Hello", "target_addr": "192.168.1.100", "target_port": 9999 } }
@@ -1472,14 +1640,14 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
 { "type": "udp:close", "data": { "type": "udp:close", "connection_id": "uuid" } }</code></pre>
           </div>
 
-          <h3>SSE (Server-Sent Events)</h3>
+          <h3>SSE (Server-Sent Events) 服务端流式推送</h3>
           <div class="docs-code">
             <pre><code>{ "type": "sse:connect", "data": { "type": "sse:connect", "url": "https://api.example.com/events" } }
 { "type": "sse:listen", "data": { "type": "sse:listen", "connection_id": "uuid", "max_events": 100 } }
 { "type": "sse:disconnect", "data": { "type": "sse:disconnect", "connection_id": "uuid" } }</code></pre>
           </div>
 
-          <h3>GraphQL</h3>
+          <h3>GraphQL 查询与订阅</h3>
           <div class="docs-code">
             <pre><code>{ "type": "graphql:connect", "data": { "type": "graphql:connect", "endpoint": "https://api.example.com/graphql" } }
 { "type": "graphql:query", "data": { "type": "graphql:query", "connection_id": "uuid", "query": "query { users { id name } }" } }
@@ -1489,8 +1657,8 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
           </div>
 
           <div class="docs-info">
-            <h4>Plugin Protocols</h4>
-            <p>More protocols (Redis, MySQL/PostgreSQL, MongoDB, SMTP, gRPC, MCP) are available as installable plugins &mdash; see Plugin Development below.</p>
+            <h4>丰富插件扩展协议</h4>
+            <p>更多应用层与存储协议（Redis、MySQL/PostgreSQL、MongoDB、Kafka、SMTP、gRPC、MCP 等）均以一键安装的轻量级侧边进程插件形式提供 &mdash; 详见下方插件开发章节或访问 <a href="plugins.html">插件市场</a>。</p>
           </div>
         </article>
 
@@ -1546,77 +1714,114 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
           <p>点击调用栈中的任意父级栈帧，画布视口与变量面板将即刻回溯切换至该层级的工作流视图与变量快照，支持在父子流程之间随时横向对照调试数据。</p>
         </article>
 
+        <!-- Slice Execution & HITL -->
+        <article id="slice-execution" class="docs-section">
+          <h2>交互式流程切片执行与人机协同 (HITL)</h2>
+          <p>MPE Flow 支持从庞大的工作流中框选局部子图或单节点按需独立触发执行，无需从 Entry 节点完整跑完全流程。</p>
+
+          <h3>执行选中节点 (<code>run_slice</code>)</h3>
+          <p>在画布上框选或多选目标节点，右键唤出上下文菜单并选择 <strong>执行选中节点</strong>：</p>
+          <ul>
+            <li><strong>零入度根节点自动推导：</strong> 编译器自动分析选中节点集合，将集合内部入度为 0 的节点识别为局部执行根节点，即使切片中没有 Entry 节点也能正常运行。</li>
+            <li><strong>临时运行防污染：</strong> 切片执行产生的数据纯内存运转，不会持久化写入左侧历史执行记录列表，保持测试历史整洁干净。</li>
+            <li><strong>敏捷调优验证：</strong> 适合在下游节点修改脚本算法、数据提取表达式或断言规则后，单步即时复测，免受上游耗时数据库或限流接口困扰。</li>
+          </ul>
+
+          <h3>人机协同 (HITL) 动态交互卡片</h3>
+          <p>在自动化流转过程中，协议节点或 AI 智能体可通过 <code>ask_human</code> 协议发起人工确认或补充输入：</p>
+          <ul>
+            <li><strong>流程安全挂起：</strong> 遇到人机交互步骤时，执行流程自动挂起等待，并在右侧 <strong>执行面板 (ExecutionPanel)</strong> 中弹出结构化交互卡片。</li>
+            <li><strong>表单数据提交：</strong> 用户可在卡片中输入文本、选择分支策略或授权操作。提交后，数据自动作为该节点的输出注入上下文变量池，驱动下游继续推进。</li>
+            <li><strong>切片运行指示徽标：</strong> 执行中的切片具备醒目的状态徽章与一键中止控制。</li>
+          </ul>
+        </article>
+
+        <!-- Full Lifecycle Debugging -->
+        <article id="debugging-lifecycle" class="docs-section">
+          <h2>生命周期全阶段调试与视图联动</h2>
+          <p>MPE Flow 调试引擎支持贯穿 <strong>Setup &rarr; Main &rarr; Teardown</strong> 全生命周期的无缝断点调试。</p>
+
+          <h3>画布阶段自动跟踪与视口聚焦</h3>
+          <p>在单步步进 (F10/F11) 或恢复执行直至遇到 Setup/Teardown 中的断点节点时：</p>
+          <ul>
+            <li>画布视口将自动切换展示当前暂停节点所在的阶段，免除用户手动点击阶段标签栏。</li>
+            <li>顶部多标签栏实时显示各阶段的单步调试状态（<code>已完成</code>、<code>暂停中</code>、<code>等待执行</code>）。</li>
+            <li>若用户在暂停状态下主动切换到其他阶段，顶部会常驻显示「一键跳转回暂停节点所在阶段」的快捷横幅。</li>
+            <li>在 Teardown 阶段调试时，右侧变量池可直接查看已注入的 Main 阶段完整报告变量快照 <code>$report</code>。</li>
+          </ul>
+        </article>
+
         <!-- Plugin Development: Overview -->
         <article id="plugin-overview" class="docs-section">
-          <h2>Plugin Overview</h2>
-          <p>Plugins extend MPE Flow with new protocol node types. A plugin runs as a sidecar process that communicates with the host over stdio using JSON-RPC 2.0 &mdash; one JSON message per line (LF-delimited, CRLF tolerated). At startup the host spawns each plugin process and performs a <code>describe</code> handshake, registering the declared node types into the shared NodeRegistry. Plugin nodes behave identically to built-in nodes in flows, the executor, and execution reports.</p>
+          <h2>插件系统概述</h2>
+          <p>插件用于扩展 MPE Flow 的协议节点生态。插件作为独立的侧边子进程（Sidecar Process）运行，通过标准输入输出 (stdio) 与宿主进行轻量级 JSON-RPC 2.0 通信（按行分隔，支持 LF 与 CRLF）。应用启动时宿主自动拉起插件完成 <code>describe</code> 握手，将其声明的节点动态注册到全局 NodeRegistry 中。插件节点在工作流编排、执行引擎与测试报告中与内置原生节点享有完全一致的一等公民体验。</p>
 
-          <h3>Installation</h3>
-          <p>Place a plugin directory containing a <code>plugin.json</code> manifest into the plugin directory (default <code>get_data_dir()/plugins</code>; <code>%APPDATA%/multi-protocol-flow-executor/plugins</code> on Windows; override with the <code>MPE_PLUGIN_DIR</code> environment variable). The host scans synchronously at startup: invalid manifests are skipped without crashing, and a plugin whose <code>describe</code> fails 3 consecutive times is quarantined for the host's lifetime.</p>
+          <h3>插件安装目录</h3>
+          <p>将包含 <code>plugin.json</code> 元数据清单的插件目录放入系统插件存放目录（默认位于 <code>get_data_dir()/plugins</code>；Windows 下位于 <code>%APPDATA%/multi-protocol-flow-executor/plugins</code>；可通过 <code>MPE_PLUGIN_DIR</code> 环境变量自定义覆盖）。宿主在启动时自动同步扫描：格式不合法的插件将被安全跳过，连续 3 次握手失败的插件将被临时隔离以保障宿主稳定性。</p>
 
-          <h3>plugin.json Fields</h3>
+          <h3>plugin.json 清单规范</h3>
           <table class="docs-table">
             <thead>
               <tr>
-                <th>Field</th>
-                <th>Description</th>
+                <th>配置项</th>
+                <th>说明</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td><code>name</code></td><td>Plugin name (convention: directory name)</td></tr>
-              <tr><td><code>version</code></td><td>Semantic version</td></tr>
-              <tr><td><code>description</code></td><td>Human-readable description</td></tr>
-              <tr><td><code>min_host_version</code></td><td>Optional version gate for host compatibility</td></tr>
-              <tr><td><code>entry</code></td><td><code>command</code> + <code>args</code> used to launch the plugin; interpreter plugins are first-class citizens (e.g. <code>"python"</code> + <code>["plugin.py"]</code>)</td></tr>
-              <tr><td><code>env</code></td><td>Environment variables injected into the plugin process</td></tr>
-              <tr><td><code>permissions</code></td><td>Reserved; ignored in P0</td></tr>
-              <tr><td><code>capabilities.streaming</code></td><td><code>true</code> = resident process; <code>false</code> = spawned on demand and recycled after 60s idle</td></tr>
-              <tr><td><code>capabilities.single_node</code></td><td>Node-level capability; <code>true</code> = runnable standalone via <code>mpe run-node</code> for connectivity verification</td></tr>
-              <tr><td><code>locales</code> / <code>default_locale</code></td><td>UI language declarations; the host injects the active locale via <code>MPE_LOCALE</code></td></tr>
+              <tr><td><code>name</code></td><td>插件唯一标识（遵循命名规范，通常与插件目录名一致）</td></tr>
+              <tr><td><code>version</code></td><td>语义化版本号 (SemVer)</td></tr>
+              <tr><td><code>description</code></td><td>插件功能中文/英文描述</td></tr>
+              <tr><td><code>min_host_version</code></td><td>兼容的最低宿主版本限制</td></tr>
+              <tr><td><code>entry</code></td><td>启动该插件的命令 <code>command</code> 与参数 <code>args</code>（原生支持 Python/Node 等解释型脚本作为插件直接运行）</td></tr>
+              <tr><td><code>env</code></td><td>注入到插件子进程的环境变量键值对</td></tr>
+              <tr><td><code>permissions</code></td><td>权限声明项</td></tr>
+              <tr><td><code>capabilities.streaming</code></td><td><code>true</code> 表示常驻守护进程；<code>false</code> 表示按需启动并在空闲 60 秒后自动回收</td></tr>
+              <tr><td><code>capabilities.single_node</code></td><td>节点级能力：<code>true</code> 表示支持通过 <code>mpe run-node</code> 命令单节点测试连通性</td></tr>
+              <tr><td><code>locales</code> / <code>default_locale</code></td><td>界面多语言支持声明，宿主通过 <code>MPE_LOCALE</code> 环境变量向插件下发当前语言</td></tr>
             </tbody>
           </table>
 
-          <h3>Protocol Plugins in This Repository</h3>
-          <p>The <code>plugins/</code> directory ships protocol plugins for: amqp, db (SQLite/MySQL/PostgreSQL), grpc, imap, kafka, mcp, mongo, mqtt, redis, smtp. Install by building a plugin and placing its directory into the plugin directory, or install from the <a href="plugins.html">Plugins page</a>.</p>
+          <h3>官方开源协议插件</h3>
+          <p>官方插件仓库已开源提供丰富的协议插件：amqp (RabbitMQ)、db (SQLite/MySQL/PostgreSQL)、grpc、imap、kafka、mcp、mongo、mqtt、redis、smtp 等。可通过编译放入插件目录，或直接通过内置的 <a href="plugins.html">插件市场</a> 一键安装。</p>
         </article>
 
         <!-- Plugin Development: SDK -->
         <article id="plugin-sdk" class="docs-section">
-          <h2>SDK &amp; Development</h2>
-          <p>The SDK and wire contract live in the standalone public repository <a href="https://github.com/multi-protocol-flow/mpe-plugin-sdk" target="_blank" rel="noopener">multi-protocol-flow/mpe-plugin-sdk</a>. The Rust SDK is first-class; lightweight Python and Node templates are also provided. Wire types are shared from <code>mpe-plugin-sdk::protocol</code>, so host and plugin never drift.</p>
+          <h2>SDK 与自定义插件开发</h2>
+          <p>插件 SDK 与底层 Wire 通信协议契约统一托管在独立的开源公共仓库中：<a href="https://github.com/multi-protocol-flow/mpe-plugin-sdk" target="_blank" rel="noopener">multi-protocol-flow/mpe-plugin-sdk</a>。Rust SDK 提供一等公民的强类型支持，同时提供轻量级 Python 和 Node.js 插件脚手架。Wire 类型直接共享自 <code>mpe-plugin-sdk::protocol</code>，确保宿主与插件之间永远不会产生协议漂移。</p>
 
-          <h3>Development Flow</h3>
+          <h3>开发流程</h3>
           <ol>
-            <li>Clone the SDK repository</li>
-            <li>Implement the <code>Plugin</code> trait (<code>describe</code> + <code>execute</code>; optional <code>flow_ended</code> to release per-execution resources)</li>
-            <li>Build the sidecar binary</li>
-            <li>Place it into the plugin directory</li>
+            <li>克隆或引用 SDK 仓库</li>
+            <li>实现 <code>Plugin</code> Trait（实现 <code>describe</code> 声明节点元数据 + <code>execute</code> 执行协议调用；可选实现 <code>flow_ended</code> 释放每轮执行资源）</li>
+            <li>编译为跨平台二进制或编写启动脚本</li>
+            <li>将输出目录放置在 <code>plugins/</code> 插件目录中进行联调</li>
           </ol>
 
-          <h3>Reference Docs</h3>
+          <h3>参考文档</h3>
           <ul>
-            <li>SDK repository: <code>docs/plugin-guide.md</code> (EN) / <code>docs/plugin-guide.zh-CN.md</code> (中文) and <code>docs/plugin-protocol.md</code></li>
-            <li>Host repository: <code>docs/plugin-architecture.md</code>, <code>docs/plugin-perf.md</code> (visible under the <a href="https://github.com/multi-protocol-flow" target="_blank" rel="noopener">multi-protocol-flow</a> GitHub organization)</li>
+            <li>SDK 仓库开发指南：<code>docs/plugin-guide.md</code> (英文) / <code>docs/plugin-guide.zh-CN.md</code> (中文) 以及 <code>docs/plugin-protocol.md</code></li>
+            <li>宿主架构文档：<code>docs/plugin-architecture.md</code>、<code>docs/plugin-perf.md</code>（可在 <a href="https://github.com/multi-protocol-flow" target="_blank" rel="noopener">multi-protocol-flow</a> GitHub 组织中查阅）</li>
           </ul>
         </article>
 
         <!-- Plugin Development: Marketplace -->
         <article id="plugin-marketplace" class="docs-section">
-          <h2>Marketplace</h2>
-          <p>Plugins can be installed from the GUI settings panel's <strong>Plugin Market</strong> tab, or from the CLI:</p>
+          <h2>插件市场与分发</h2>
+          <p>可在桌面端 GUI 设置面板的 <strong>插件市场 (Plugin Market)</strong> 标签页中一键浏览与安装插件，或直接通过 CLI 命令行进行管理：</p>
           <div class="docs-code">
             <pre><code>mpe plugin dir
 mpe plugin list
 mpe plugin install &lt;name&gt; [--version &lt;v&gt;] [--registry &lt;url&gt;] [--dir &lt;dir&gt;] [--force]</code></pre>
           </div>
 
-          <h3>Registry Contract</h3>
+          <h3>注册中心契约规范</h3>
           <ul>
-            <li><code>GET {base}/plugins</code> returns the plugin list; each entry has a platform asset (zip) <code>url</code> and an optional <code>sha256</code> &mdash; when provided the host enforces checksum validation and refuses mismatched installs.</li>
-            <li>Platform keys: <code>windows-x64</code> | <code>windows-arm64</code> | <code>linux-x64</code> | <code>linux-arm64</code> | <code>macos-x64</code> | <code>macos-arm64</code>.</li>
-            <li>The zip root must contain a single top-level directory named after the plugin, holding <code>plugin.json</code> and the plugin files.</li>
+            <li><code>GET {base}/plugins</code> 返回可用插件列表，每项包含各操作系统平台的打包资产 (zip) <code>url</code> 与可选的 <code>sha256</code> 校验和（宿主将严格校验哈希，杜绝篡改）。</li>
+            <li>支持的操作系统平台键：<code>windows-x64</code> | <code>windows-arm64</code> | <code>linux-x64</code> | <code>linux-arm64</code> | <code>macos-x64</code> | <code>macos-arm64</code>。</li>
+            <li>Zip 包根目录必须包含以插件同名的唯一顶层文件夹，内部放置 <code>plugin.json</code> 与所有相关依赖产物。</li>
           </ul>
-          <p>The registry base URL is configured via the <code>MPE_PLUGIN_REGISTRY</code> environment variable or the <code>--registry</code> flag. The public registry is served from GitHub Pages (<a href="https://multi-protocol-flow.github.io/mpe-plugin-registry/plugins" target="_blank" rel="noopener">multi-protocol-flow.github.io/mpe-plugin-registry</a>) as a static JSON implementing this contract &mdash; browse and install plugins on the <a href="plugins.html">Plugins page</a>.</p>
+          <p>公共插件注册中心默认通过 GitHub Pages 静态托管 (<a href="https://multi-protocol-flow.github.io/mpe-plugin-registry/plugins" target="_blank" rel="noopener">multi-protocol-flow.github.io/mpe-plugin-registry</a>)。在网站的 <a href="plugins.html">插件市场页面</a> 也可直接浏览最新插件生态。</p>
         </article>
       </main>
     </div>

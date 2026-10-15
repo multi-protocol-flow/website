@@ -15,19 +15,25 @@
 
 ## Core Built-in Protocols & Nodes
 
-- **HTTP / REST:** Full HTTP client with methods (GET, POST, PUT, DELETE, PATCH, etc.), headers, multipart/form-data, URL params, proxy support, body formatting, and JSON path extraction.
-- **WebSocket:** Session lifecycle management (Connect, Send/Collect with bidirectional matching, Close, Ping/Pong heartbeat).
-- **TCP Socket:** Direct raw socket communication (Connect, Send, Receive with framing/delimiter/fixed length, Close, TLS/mTLS).
-- **UDP:** Connectionless datagram networking (Bind, SendTo, RecvFrom, Close, Broadcast).
-- **Server-Sent Events (SSE):** Streaming event streams (Connect, Event listener with filter/type matching, Disconnect).
-- **GraphQL:** Full GraphQL operations (Query, Mutation, Schema Introspection, WebSocket-based Subscriptions).
-- **Flow Control & Data Ops:** Entry, End, Subflow (nested modular workflows with input/output variable mappings, cycle detection, and canvas drag-and-drop), Conditional Branching (JS / CEL expressions), Script Execution (JavaScript via QuickJS), Assertions (JSON schema, status code, response time, headers), and Variable Extractors.
+- **HTTP / REST & Ingress Mock:** Full HTTP client (`http:request`) supporting GET, POST, PUT, DELETE, PATCH, multipart/form-data, proxy, and body formatting. Native embedded HTTP server listener (`http:ingress`) and mock response node (`http:respond`) for simulating webhooks and local mock servers.
+- **WebSocket:** Session lifecycle management (`ws:connect`, `ws:send_collect` with bidirectional matching, `ws:close`, Ping/Pong heartbeat).
+- **TCP Socket:** Direct raw socket communication (`tcp:connect`, `tcp:send`, `tcp:receive` with framing/delimiter/fixed length, `tcp:close`, TLS/mTLS).
+- **UDP:** Connectionless datagram networking (`udp:bind`, `udp:send_to`, `udp:recv_from`, `udp:close`, Broadcast).
+- **Server-Sent Events (SSE):** Streaming event streams (`sse:connect`, `sse:listen` with filter/type matching, `sse:disconnect`).
+- **GraphQL:** Full GraphQL operations (`graphql:connect`, `graphql:query`, `graphql:subscribe`, `graphql:introspect`, `graphql:disconnect`).
+- **Flow Control & Data Ops:** Entry, End, Subflow (`flow:sub` with static exported variable deduction, cycle detection, and canvas drag-and-drop), Conditional Branching, Script Execution (JavaScript via QuickJS), Assertions, and Variable Extractors (`variable:extractor`).
+- **Lifecycle Stages (Setup / Main / Teardown):** Workflows are structured into 3 isolated sub-graphs: Setup (runs once for login warm-up, exports variables to Main), Main (core business flow, looped during stress testing), and Teardown (runs once for cleanup and alerts, receiving the read-only `$report` variable).
+- **Interactive Slices & HITL:** Right-click canvas "Run Selected Nodes" (`run_slice`) with zero-indegree root derivation, and Human-in-the-Loop (`ask_human`) prompt cards in the execution panel.
 
 ## Built-in Agentic AI Copilot & Automation
 
 MPE Flow integrates a native AI Copilot designed for natural language orchestration and self-healing:
 - **OpenAI-Compatible Architecture:** Connects to any OpenAI-compatible provider (DeepSeek, OpenAI, Claude, Kimi, or local offline models via Ollama / vLLM). No cloud lock-in.
 - **Natural Language to DAG:** Generates complete workflows and pipelines from prompt descriptions (`batch_create_pipeline`).
+- **Slash Shortcut Commands:** Fast keyboard overlay (`/fix` for error auto-repair, `/explain` for flow topology analysis, `/test` for generating assertion suites).
+- **Interactive Inquiries (`ask_user`):** Model requests user choices or parameters via interactive UI cards, cleanly suspending tool execution until user response.
+- **Sandboxed Terminal Execution (`terminal_exec`):** Executes whitelisted CLI commands with high-risk confirmation cards.
+- **Full Trust Mode:** Power-user setting enabling uninterrupted agentic workflows without repetitive manual confirmations.
 - **Adaptive Wrap Auto-Layout:** Intelligently optimizes canvas node placement with adaptive row-wrapping to keep complex multi-branch graphs compact and readable.
 - **Autonomous Execution ("Run to Goal"):** Autonomously executes workflows, observes node outputs, and self-corrects until targets/assertions pass.
 - **Midway Steering:** Allows injecting real-time corrections or additional instructions during active tool execution without cancelling the task.
@@ -69,8 +75,10 @@ MPE delivers a dual-mode single binary (`mpe` for GUI + CLI, or pure headless `m
 - `_version`: File format version (default: 1)
 - `flow`: Flow container object
   - `uuid`, `name`, `description`, `initial_variables` (flow fallback baseline variables)
-  - `nodes`: Array of protocol and logic nodes with typed configurations.
-  - `connections`: Directed edges with source/target handles (`out`, `true`, `false`, `error` -> `in`).
+  - `nodes`: Array of protocol and logic nodes comprising the **Main** business stage.
+  - `connections`: Directed edges with source/target handles (`out`, `true`, `false` -> `in`).
+  - `setup`: Optional `FlowSubGraph` (`{ nodes, connections }`) executed once before Main.
+  - `teardown`: Optional `FlowSubGraph` executed once after Main, receiving read-only `$report`.
 - `variables & environments`: Variables resolve via a 4-tier cascade: `flow.initial_variables` -> `<name>.yaml` (shared base) -> `<name>.local.yaml` (git-ignored secrets) -> runtime `--var`. Referenced in nodes via bare keys (`{{var_name}}`) or dot notation (`{{obj.field}}`), alongside built-in runtime dynamic variables (`{{$timestamp}}`, `{{$isoTimestamp}}`, `{{$guid}}` / `{{$uuid}}`, `{{$randomInt}}`, `{{$randomAlphaNumeric}}`).
 - `settings`: Execution error policies (`RouteToFalse`, `Ignore`, `AbortFlow`), timeout configs, and concurrency limits.
 

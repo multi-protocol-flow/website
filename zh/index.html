@@ -51,7 +51,7 @@
         "applicationSubCategory": "API 测试与跨协议工作流自动化工具",
         "operatingSystem": "Windows, macOS, Linux",
         "softwareRequirements": "Rust, Tauri 2",
-        "softwareVersion": "1.0.0",
+        "softwareVersion": "0.5.0-beta",
         "downloadUrl": "https://mpe.run/zh/changelog.html",
         "license": "https://opensource.org/licenses/MIT",
         "releaseNotes": "https://mpe.run/zh/changelog.html",
@@ -59,15 +59,17 @@
         "url": "https://mpe.run/zh/",
         "image": "https://mpe.run/og-image.png",
         "screenshot": "https://mpe.run/og-image.png",
-        "featureList": [
-          "内置全域 AI 助手：支持自然语言多协议工作流生成、自主执行到底与一键错误智能自愈",
+          "内置全域 AI 助手：支持斜杠快捷指令 (/fix, /explain)、交互式选项卡片 (ask_user)、安全终端工具与自主执行自愈",
+          "流程生命周期三阶段 (Setup / Main / Teardown) 原生编排与只读 $report 变量跨阶段传递",
+          "内置 HTTP Ingress 与 Webhook 模拟服务 (http:ingress 与 http:respond) 本地模拟服务端",
+          "画布交互式切片执行 (run_slice) 与人机协同交互卡片 (ask_human)",
           "原生支持 HTTP、WebSocket、TCP、UDP、SSE 与 GraphQL 跨协议链路串联",
           "Model Context Protocol (MCP) 智能体服务可视化调试与自动化评测",
           "单二进制双模式：桌面端可视化 GUI 与无头高并发 CLI 执行引擎",
-          "内置异步 Rust 压测引擎，实时统计 p50/p90/p99 延迟分位数分布",
+          "内置异步 Rust 压测引擎，隔离 Setup/Teardown 纯净统计 Main 阶段 p50/p90/p99 延迟",
+          "全局环境配置独立解耦，Git 忽略 .local.yaml 机密安全分层与四级级联解析",
           "100% 本地离线优先，Git 友好纯文本 .mpf YAML/JSON 工作流存储",
           "原生支持 JUnit XML、JSON、HTML 测试报告输出，无缝接入 CI/CD 流水线"
-        ],
         "offers": {
           "@type": "Offer",
           "price": "0",
@@ -117,7 +119,7 @@
             "name": "什么是 MPE Flow？",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "MPE Flow (Multi-Protocol Flow Executor) 是一款基于 Rust 和 Tauri 构建的高性能跨协议工作流编排与集成测试引擎。它允许开发者通过可视化画布轻松编排跨 HTTP、WebSocket、TCP、UDP、SSE、GraphQL、Kafka 与 MCP 的复杂场景，提供桌面端 GUI 与独立无头 CLI。"
+              "text": "MPE Flow (Multi-Protocol Flow Executor) 是一款高性能跨协议工作流编排与集成测试引擎。它允许开发者通过可视化画布轻松编排跨 HTTP、WebSocket、TCP、UDP、SSE、GraphQL、Kafka 与 MCP 的复杂场景，原生支持 Setup/Main/Teardown 生命周期三阶段、HTTP Webhook 模拟服务、局部切片调试与全域 AI 助手，提供桌面端 GUI 与独立无头 CLI。"
             }
           },
           {
@@ -230,9 +232,34 @@
           <div class="feature-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
           </div>
-          <h3>内置全域 AI 助手与智能诊断修复</h3>
-          <p>输入自然语言自动批量编排多协议流水线、自适应折行排版与编写脚本。支持自主推进「执行到底」、中途插话纠偏、一键报错深度诊断与本地代码工程感知。</p>
+          <h3>全域 AI 助手与斜杠指令</h3>
+          <p>输入自然语言自动编排多协议流水线与自适应折行排版。支持斜杠快捷指令 (<code>/fix</code>、<code>/explain</code>、<code>/test</code>)、交互式问询 (<code>ask_user</code>)、白名单安全终端工具、全信任自主执行到底与一键节点报错深度自愈。</p>
         </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3>生命周期三阶段 (Setup / Main / Teardown)</h3>
+          <p>流程原生划分为三大独立子图阶段：<code>Setup</code> 单次执行完成登录预热与变量导出；<code>Main</code> 承载核心业务流（压测时仅循环此阶段，指标纯净）；<code>Teardown</code> 在测试结束后执行资源清理与告警通知，并可直接消费只读 <code>$report</code> 执行报告变量。</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          </div>
+          <h3>交互式流程切片与人机协同 (HITL)</h3>
+          <p>支持在画布上框选任意节点右键「执行选中节点」(<code>run_slice</code>)，自动推导零入度根节点运行而不污染历史执行记录。执行面板原生嵌入交互式卡片 (<code>ask_human</code>)，中途可暂停等待人工确认或输入补充数据。</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m10 10 4 4"/><path d="m14 10-4 4"/></svg>
+          </div>
+          <h3>HTTP Ingress 与 Webhook 模拟服务</h3>
+          <p>在工作流中直接启动内嵌 HTTP 服务监听。<code>http:ingress</code> 节点捕获接收外部 Webhook 推送或 HTTP 回调，下游搭配 <code>http:respond</code> 节点按需构造并返回动态响应，轻松实现端到端回调测试与 Mock 验证。</p>
+        </div>
+
         <div class="feature-card">
           <div class="feature-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
@@ -243,50 +270,26 @@
 
         <div class="feature-card">
           <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </div>
-          <h3>WebSocket &amp; SSE 实时长连接调试</h3>
-          <p>开箱即用支持持久化 WebSocket 会话与 Server-Sent Events 流式事件监听。支持消息自动匹配、流式缓冲区消费与全双工消息收发验证。</p>
+          <h3>跨协议端到端集成 (HTTP / WS / TCP / SSE)</h3>
+          <p>原生支持 HTTP、WebSocket、TCP、UDP、SSE、GraphQL 与外部插件（Kafka、Redis 等），彻底打破协议壁垒，消除分散的 Python/Go 脚本。</p>
         </div>
 
         <div class="feature-card">
           <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
           </div>
-          <h3>TCP &amp; UDP 原始套接字工作流</h3>
-          <p>支持原生二进制 Hex、ASCII 文本或 JSON 格式的 TCP/UDP 连接、数据收发与套接字管理。满足物联网、音视频信令与私有网关协议测试需求。</p>
+          <h3>CI/CD 自动化集成与 JUnit 报告</h3>
+          <p>原生生成标准 JUnit XML 测试报告（<code>--report-format junit --report-file results.xml</code>），每个节点精准映射为测试用例，一键无缝接入 GitHub Actions、GitLab CI 与 Jenkins 流水线。</p>
         </div>
 
         <div class="feature-card">
           <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          </div>
-          <h3>GraphQL 模式内省与查询订阅</h3>
-          <p>自动内省 GraphQL 架构定义、通过图形化字段树浏览字段，轻松编排复杂的 Query、Mutation 与基于 WebSocket 的 Subscription 订阅流。</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
-          </div>
-          <h3>动态变量提取与条件分支路由</h3>
-          <p>支持从上游协议响应中通过 JSONPath、正则或脚本提取变量，并在后续步骤中无缝引用（<code>{{variable}}</code>）。通过条件节点实现复杂业务分支流转。</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          </div>
-          <h3>高并发压测与自动化测试报告</h3>
-          <p>多虚拟用户 (VUs) 阶梯加压执行跨协议流程。实时采集 P50/P90/P99 延迟分布与吞吐量，生成交互式 HTML 与 JSON 测试报告。</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
           </div>
           <h3>全局环境解耦与机密安全分层</h3>
-          <p>将环境变量从流程中解耦为独立的全局 YAML 文件（<code>dev.yaml</code>、<code>staging.yaml</code>、<code>prod.yaml</code>），团队共享配置安全入库 Git，私有密钥通过 <code>.local.yaml</code> 覆盖不入库。具备四级变量级联解析、凭证防泄漏导出扫描与无头 CI 环境管理（<code>mpe env</code>）。</p>
+          <p>将环境变量从流程中解耦为独立的全局 YAML 文件（<code>dev.yaml</code>、<code>staging.yaml</code>、<code>prod.yaml</code>），团队共享配置安全入库 Git，私有密钥通过 <code>.local.yaml</code> 覆盖不入库。具备四级变量级联解析与无头 CI 环境管理（<code>mpe env</code>）。</p>
         </div>
       </div>
     </div>
@@ -316,6 +319,27 @@
               <td>仅 HTTP / 基础 WS</td>
               <td>支持（配置繁重）</td>
               <td>仅 HTTP / LLM</td>
+            </tr>
+            <tr>
+              <td>生命周期阶段编排</td>
+              <td class="highlight">&#10003; 原生 Setup / Main / Teardown 与 $report 注入</td>
+              <td>仅前置/后置脚本</td>
+              <td>setUp / tearDown 线程组</td>
+              <td>&#10007; 无</td>
+            </tr>
+            <tr>
+              <td>Webhook 模拟服务</td>
+              <td class="highlight">&#10003; 内嵌 http:ingress 与 http:respond 模拟</td>
+              <td>仅付费云端 Mock</td>
+              <td>需繁复 Sampler 编写</td>
+              <td>&#10007; 无</td>
+            </tr>
+            <tr>
+              <td>交互式切片执行 (HITL)</td>
+              <td class="highlight">&#10003; 画布右键执行选中节点 + ask_human 人机协同</td>
+              <td>&#10007; 无</td>
+              <td>&#10007; 无</td>
+              <td>&#10007; 无</td>
             </tr>
             <tr>
               <td>底层引擎</td>
@@ -373,7 +397,11 @@
       <div class="faq-grid">
         <div class="faq-card">
           <h3>MPE Flow 的内置 AI 助手如何工作？支持本地私有大模型吗？</h3>
-          <p>MPE Flow 内置全域 AI 助手，兼容任意 OpenAI 协议的大模型服务（包括 DeepSeek、OpenAI、Claude、Kimi、通义千问等，或通过 Ollama、vLLM 本地离线部署的私有开源模型）。AI 助手通过 Tool Calling 原生接入画布与执行系统，能够批量生成节点、自适应折行排版、编写动态脚本、自动关联本地项目代码感知契约，并在执行报错时一键诊断与智能自愈，全程 100% 隐私安全，不强制依赖云端账号。</p>
+          <p>MPE Flow 内置全域 AI 助手，兼容任意 OpenAI 协议的大模型服务（包括 DeepSeek、OpenAI、Claude、Kimi、通义千问等，或通过 Ollama、vLLM 本地离线部署的私有开源模型）。AI 助手通过 Tool Calling 原生接入画布与执行系统，支持斜杠快捷指令 (<code>/fix</code>、<code>/explain</code>、<code>/test</code>)、交互式选项卡片 (<code>ask_user</code>)、白名单安全终端执行工具与全信任自主执行，并在执行报错时一键诊断与智能自愈，全程 100% 隐私安全。</p>
+        </div>
+        <div class="faq-card">
+          <h3>什么是流程生命周期阶段 (Setup / Main / Teardown)？</h3>
+          <p>MPE Flow 将流程划分为一等公民的三大生命周期阶段：<strong>Setup</strong> 阶段在运行前单次执行，用于登录预热和全局变量初始化并自动导出到 Main；<strong>Main</strong> 承载核心业务流（压测时仅并发循环 Main 节点，保证 QPS/P99 指标纯净）；<strong>Teardown</strong> 在测试后单次执行用于告警通知和资源清理，并注入只读 <code>$report</code> 变量获取测试结果。画布通过左上方切换胶囊栏一键切换三阶段视图，调试器支持跨阶段断点步进。</p>
         </div>
         <div class="faq-card">
           <h3>什么是 MPE Flow？</h3>
@@ -381,11 +409,11 @@
         </div>
         <div class="faq-card">
           <h3>内置原生支持哪些协议，哪些协议通过插件扩展？</h3>
-          <p>MPE Flow 单一二进制中原生内置了 7 种核心协议与节点：HTTP/HTTPS、WebSocket、TCP、UDP、SSE (服务端推送事件)、GraphQL、以及 Script/Assertion（脚本与断言）节点。Kafka、MCP、gRPC、Redis、MongoDB、SMTP、IMAP 等其他协议则通过一键侧边进程插件生态提供支持。</p>
+          <p>MPE Flow 单一二进制中原生内置了 7 种核心协议与节点：HTTP/HTTPS（包含客户端请求及内嵌 ingress/respond webhook 模拟服务）、WebSocket、TCP、UDP、SSE (服务端推送事件)、GraphQL、以及 Script/Assertion（脚本与断言）节点。Kafka、MCP、gRPC、Redis、MongoDB、SMTP、IMAP 等其他协议则通过一键侧边进程插件生态提供支持。</p>
         </div>
         <div class="faq-card">
           <h3>MPE Flow 与 Postman 或 JMeter 相比有什么优势？</h3>
-          <p>不同于专注于 HTTP 请求的 Postman，MPE Flow 对长连接与有状态协议（TCP、WebSocket、SSE 流、Kafka 消息队列、MCP 智能体工具）提供一等公民的原生支持，并具备图节点可视化流转、分支路由、变量自动提取、强类型断言及超高并发压测能力，资源占用极低。</p>
+          <p>不同于专注于 HTTP 请求的 Postman，MPE Flow 对长连接与有状态协议（TCP、WebSocket、SSE 流、Kafka 消息队列、MCP 智能体工具）提供一等公民的原生支持，并具备图节点可视化流转、分支路由、变量自动提取、Setup/Main/Teardown 生命周期编排及超高并发压测能力，资源占用极低。</p>
         </div>
         <div class="faq-card">
           <h3>MPE Flow 可以集成到 CI/CD 流水线中吗？</h3>
@@ -395,7 +423,6 @@
           <h3>MPE Flow 是开源免费的吗？</h3>
           <p>是的，MPE Flow 采用宽松的 MIT 开源协议，代码完全托管在 GitHub：<a href="https://github.com/multi-protocol-flow" target="_blank" rel="noopener">github.com/multi-protocol-flow</a>。</p>
         </div>
-      </div>
     </div>
   </section>
 

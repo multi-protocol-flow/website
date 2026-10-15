@@ -30,6 +30,8 @@ MPE Flow categorizes nodes into Built-in Protocol Nodes, Logic/Control Nodes, an
 | Protocol Node | Variant Identifier | Description & Key Parameters |
 |---|---|---|
 | **HTTP Request** | `http:request` | Full HTTP/1.1 & HTTP/2 client. Supports URL, Method (`GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `HEAD`, `OPTIONS`), Headers, Query Params, Auth (Bearer, Basic, API Key, OAuth2), Multipart/Form-data, JSON/Raw body, Proxy settings, Timeout, and JSONPath output extraction. |
+| **HTTP Ingress (Listener)** | `http:ingress` | Embedded HTTP server listener that binds to a local port and captures incoming webhook requests and query parameters. Prioritized as execution trigger in ingress mode. |
+| **HTTP Respond (Mock Response)** | `http:respond` | Paired with `http:ingress` via `connection_id` to return customized HTTP status codes, headers, and dynamic response bodies back to the caller. |
 | **WebSocket Connect** | `ws:connect` | Establishes persistent WebSocket connection. Parameters: `url`, `headers`, `protocols`, `tls`, `heartbeat_interval_sec`. |
 | **WebSocket Send & Collect** | `ws:send_collect` | Sends payload and captures response matching criteria (timeout, regex pattern, JSON path condition). |
 | **WebSocket Close** | `ws:close` | Gracefully terminates active WebSocket session with status code and reason. |
@@ -52,12 +54,23 @@ MPE Flow categorizes nodes into Built-in Protocol Nodes, Logic/Control Nodes, an
 
 - **Entry Node (`entry`):** Workflow entry point defining input parameters and schema validation.
 - **End Node (`end`):** Workflow termination point aggregating final outputs, status codes, and latency metrics.
-- **Subflow Node (`flow:sub`):** Embeds and reuses independent workflows. Referenced via `target_flow_id` (workspace UUID) or `target_flow_path` (relative/absolute file path). Supports variable inheritance (`inherit_all_variables`), input parameter mappings (`variable_mappings`), output exports (`export_all_variables`), and output return mappings (`output_mappings`). Includes cycle detection and canvas drag-and-drop creation from the flow list.
+- **Subflow Node (`flow:sub`):** Embeds and reuses independent workflows. Features static exported variable deduction (analyzing child variable extractors and scripts to preview exported variables in the configuration panel with 1-click copying), cycle detection, variable inheritance (`inherit_all_variables`), input parameter mappings (`variable_mappings`), output exports (`export_all_variables`), and output return mappings (`output_mappings`).
 - **Conditional Branching (`conditional`):** Evaluates Boolean logic using JS expressions or CEL (Common Expression Language). Routes flow execution to `true` or `false` outbound ports.
 - **Script Node (`script`):** Executes sandboxed JavaScript (via QuickJS) for dynamic transformations, crypto hashes (SHA256, HMAC, MD5), base64 encoding, and custom math.
 - **Assertion Node (`assertion`):** Validates execution state against expectations (e.g., status code equals 200, response time < 500ms, JSON schema compliance, regex body match).
 - **Variable Extractor (`variable:extractor`):** Extracts values from upstream node outputs via JSONPath, Regex, or XPath and assigns them to workflow context variables.
 - **Proxy Node (`proxy`):** Intercepts or routes requests through forward or SOCKS5 proxies.
+
+### 2.4 Workflow Lifecycle Stages (Setup / Main / Teardown)
+MPE Flow organizes workflows into three first-class lifecycle stages:
+- **Setup (`flow.setup`):** Executed once before the test starts. Used for sign-in, token retrieval, and test data initialization. Any variables exported by Setup nodes merge directly into the Main stage variable context.
+- **Main (`flow.nodes` / `flow.connections`):** The primary business flow under test. In stress testing, virtual users loop only Main stage nodes to ensure pure QPS and P99 latency measurements.
+- **Teardown (`flow.teardown`):** Executed once after Main finishes (even on failure) for alerts, notification webhooks, and resource cleanup. Receives the read-only reserved variable `$report` (`{{$report.status}}`, `{{$report.duration_ms}}`, `{{$report.node_reports}}`).
+- Note: Legacy Flow Hooks (`flow.hooks`) were completely removed in MPE Flow 0.5.0-beta and replaced by Teardown subgraphs.
+
+### 2.5 Interactive Flow Slices & Human-in-the-Loop (HITL)
+- **Run Selected Nodes (`run_slice`):** Execute arbitrary subgraphs or single nodes on demand directly from the canvas via right-click without running the entire flow or polluting execution history. Zero-indegree nodes are automatically derived as execution roots.
+- **Human-in-the-Loop (`ask_human`):** Steps or AI agents can pause execution and present interactive cards in the Execution Panel to request human decisions or inputs before resuming.
 
 ### 2.3 Plugin Protocols (via `mpe-plugin-sdk`)
 
@@ -220,6 +233,16 @@ Environment variable sets are decoupled from individual workflows and stored as 
 - **Bare Interpolation Syntax:** Resolved variables are accessed directly via bare keys (e.g. `{{API_URL}}` or `{{USER.id}}`). Never prefix with `env.`.
 - **Unified Execution:** Single runs, interactive debugging, and stress testing all inherit and merge the active environment automatically.
 - **Export with Environment Bake & Credential Scanner:** Exporting a flow allows baking active environment variables into `flow.initial_variables` for standalone sharing. A built-in credential scanner detects sensitive keys (`key`, `secret`, `token`, `password`, `auth`, `cred`, `cert`, `private`) and prompts users to redact them before distribution.
+### 3.3 Flow Lifecycle Schema & Variable Passing
+In the `.mpf` schema, `flow` holds:
+- `nodes` & `connections`: The Main business workflow.
+- `setup`: Optional `FlowSubGraph` (`{ nodes: [], connections: [] }`).
+- `teardown`: Optional `FlowSubGraph` receiving `$report`.
+
+Execution semantics:
+- A Setup failure skips Main (`stages.main.status == "skipped"`) but proceeds to Teardown.
+- A Teardown failure marks overall flow failed while keeping `stages.main.status == "success"`.
+- Disconnected root nodes in Setup and Teardown execute deterministically from top-to-bottom and left-to-right by canvas `(y, x)` coordinates.
 ---
 
 ## 4. Built-in Agentic AI Copilot & Smart Orchestration
@@ -248,6 +271,12 @@ The Copilot manipulates the workflow canvas using typed tool calls:
 - **Link Local Workspace:** Allows the Copilot to inspect local Git repositories, scan folder layouts, read source code, and parse OpenAPI/Swagger schemas.
 - **One-Click Error Diagnosis & Fix:** On node execution failure, 1-click AI diagnosis inspects upstream outputs and root causes, proposing an automated fix on the canvas.
 - **Multimodal Support:** Paste or drag-and-drop error screenshots and API documentation images directly into the chat.
+### 4.5 Slash Commands, Interactive Tools & Full Trust Mode
+- **Slash Shortcut Commands (`/`):** Fast keyboard palette popup (`/fix` to auto-repair node errors, `/explain` to analyze flow topology, `/test` to generate assertions).
+- **Interactive Inquiries (`ask_user`):** Model emits structured choice cards or input forms, suspending tool execution cleanly until user submission.
+- **Secure Terminal Execution (`terminal_exec`):** Executes whitelisted shell commands (e.g., `git status`, `npm test`, `cargo check`) with confirmation cards for high-risk operations.
+- **Full Trust Mode:** Allows power users to enable uninterrupted autonomous execution without manual confirmation prompts.
+- **Reasoning Physics Droplet Animation:** Real-time character/token count and animated falling dot indicator during deep-thinking model inference.
 - **Interaction Surfaces:** Right sidebar panel (`Ctrl+I` / `Cmd+I`), detachable floating draggable window, center Spotlight command palette (`Ctrl+K` / `Cmd+K`), and terminal CLI bridge (`mpe ai`).
 
 ---
@@ -320,10 +349,13 @@ mpe stress run ./flows/api_benchmark.mpf -e staging -u 100 -r 10
 # Override variables for the stress session
 mpe stress run ./flows/api_benchmark.mpf -e staging --var CONCURRENCY_FLAG=true -u 50 -r 5
 ```
-
-### 5.5 Flow Management (`mpe flow`)
+### 5.5 Flow Management & Formatting (`mpe flow`)
 
 ```bash
+# Format flow file or convert between YAML and JSON
+mpe flow fmt ./flows/hello.mpf --to yaml
+mpe flow fmt --all --to yaml
+
 # List all nodes in a flow
 mpe flow list ./flows/checkout.mpf
 
@@ -332,12 +364,7 @@ mpe flow show ./flows/checkout.mpf --node node_auth
 
 # Export flow graph as Mermaid diagram or ASCII graph
 mpe flow export ./flows/checkout.mpf --format mermaid
-
-# Format or convert flow files between YAML and JSON
-mpe flow fmt ./flows/checkout.mpf --to yaml
-mpe flow fmt --all --to yaml
 ```
-
 ### 5.6 Interactive Debugging (`mpe debug`)
 
 ```bash

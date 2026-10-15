@@ -51,7 +51,7 @@
         "applicationSubCategory": "API Testing & Multi-Protocol Workflow Automation",
         "operatingSystem": "Windows, macOS, Linux",
         "softwareRequirements": "Rust, Tauri 2",
-        "softwareVersion": "1.0.0",
+        "softwareVersion": "0.5.0-beta",
         "downloadUrl": "https://mpe.run/changelog.html",
         "license": "https://opensource.org/licenses/MIT",
         "releaseNotes": "https://mpe.run/changelog.html",
@@ -59,15 +59,17 @@
         "url": "https://mpe.run/",
         "image": "https://mpe.run/og-image.png",
         "screenshot": "https://mpe.run/og-image.png",
-        "featureList": [
-          "Built-in Agentic AI Copilot for natural language workflow generation, autonomous execution, and 1-click error self-healing",
+          "Built-in Agentic AI Copilot with slash commands (/fix, /explain), interactive user input (ask_user), and autonomous self-healing",
+          "First-class three-stage workflow lifecycle (Setup / Main / Teardown) with isolated execution and $report variable passing",
+          "Embedded HTTP Ingress and Webhook Mock services (http:ingress and http:respond) for local webhook simulation",
+          "Interactive flow slice execution (run_slice) and Human-in-the-Loop (HITL) prompt cards",
           "Native cross-protocol chaining across HTTP, WebSocket, TCP, UDP, SSE, and GraphQL",
           "Model Context Protocol (MCP) server visual debugging and agentic tool evaluation",
           "Single dual-mode binary: Visual desktop GUI and headless CLI execution engine",
-          "High-throughput multi-protocol stress and load testing with p50/p90/p99 latency distribution",
+          "High-throughput multi-protocol stress and load testing with lifecycle stage isolation and p50/p90/p99 latency distribution",
+          "Decoupled global environments with git-ignored .local.yaml secret layering and 4-tier cascading resolution",
           "100% Local-first offline execution with Git-friendly .mpf YAML/JSON workflow files",
           "Native JUnit XML, JSON, and HTML test report generation for CI/CD pipelines"
-        ],
         "offers": {
           "@type": "Offer",
           "price": "0",
@@ -117,7 +119,7 @@
             "name": "What is MPE Flow?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "MPE Flow (Multi-Protocol Flow Executor) is a high-performance visual workflow orchestration and integration testing engine built with Rust and Tauri. It enables engineers to chain and automate complex scenarios across HTTP, WebSocket, TCP, UDP, SSE, GraphQL, Kafka, and MCP in a single desktop application and standalone CLI."
+              "text": "MPE Flow (Multi-Protocol Flow Executor) is a high-performance visual workflow orchestration and integration testing engine built with Rust and Tauri. It enables engineers to chain and automate complex scenarios across HTTP, WebSocket, TCP, UDP, SSE, GraphQL, Kafka, and MCP in a single desktop application and standalone CLI, complete with first-class Setup/Main/Teardown lifecycle stages, embedded webhook ingress, and interactive slice debugging."
             }
           },
           {
@@ -229,8 +231,32 @@
           <div class="feature-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
           </div>
-          <h3>Built-in Agentic AI Copilot &amp; Self-Healing</h3>
-          <p>Orchestrate multi-protocol DAGs from natural language prompts. Features autonomous goal execution, midway steering, 1-click execution error diagnosis and smart repair, and local codebase awareness.</p>
+          <h3>Built-in Agentic AI Copilot &amp; Slash Commands</h3>
+          <p>Orchestrate multi-protocol DAGs from natural language prompts. Features slash shortcut commands (<code>/fix</code>, <code>/explain</code>, <code>/test</code>), interactive user choices (<code>ask_user</code>), secure sandboxed terminal execution, full-trust autonomy, and 1-click execution error repair.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3>Lifecycle Stages (Setup / Main / Teardown)</h3>
+          <p>Orchestrate workflows across three dedicated stages: <code>Setup</code> for pre-warming auth tokens, <code>Main</code> for pure business logic, and <code>Teardown</code> for alerts and cleanup with the read-only <code>$report</code> variable. Stress tests loop only Main to preserve pristine metrics.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          </div>
+          <h3>Interactive Slices &amp; Human-in-the-Loop</h3>
+          <p>Run selected subgraphs directly from the canvas via right-click (<code>run_slice</code>) with automatic zero-indegree entry derivation. Pause runs for human intervention using interactive input cards (<code>ask_human</code>) directly inside the execution panel.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m10 10 4 4"/><path d="m14 10-4 4"/></svg>
+          </div>
+          <h3>HTTP Ingress &amp; Webhook Mock Services</h3>
+          <p>Simulate incoming webhook triggers and mock HTTP backends directly on canvas. <code>http:ingress</code> spins up an embedded HTTP server listener, and <code>http:respond</code> returns customized dynamic responses based on workflow state.</p>
         </div>
 
         <div class="feature-card">
@@ -366,6 +392,27 @@
               <td>HTTP &amp; basic GraphQL only</td>
             </tr>
             <tr>
+              <td>Workflow Lifecycle Stages</td>
+              <td class="highlight">&#10003; Native Setup / Main / Teardown with $report</td>
+              <td>Pre-request / test scripts only</td>
+              <td>setUp / tearDown Thread Groups</td>
+              <td>Pre-request / post-response scripts only</td>
+            </tr>
+            <tr>
+              <td>HTTP Ingress &amp; Webhook Mock</td>
+              <td class="highlight">&#10003; Embedded http:ingress &amp; http:respond</td>
+              <td>Paid cloud mock servers only</td>
+              <td>Complex custom HTTP sampler</td>
+              <td>&#10007; Not Supported</td>
+            </tr>
+            <tr>
+              <td>Interactive Slice &amp; HITL</td>
+              <td class="highlight">&#10003; Run Selected Nodes + ask_human cards</td>
+              <td>&#10007; Not Supported</td>
+              <td>&#10007; Not Supported</td>
+              <td>&#10007; Not Supported</td>
+            </tr>
+            <tr>
               <td>Engine &amp; Resource Footprint</td>
               <td class="highlight">&#9889; Native Rust (Zero GC, &lt;30MB RAM)</td>
               <td>Electron (Heavy memory usage)</td>
@@ -427,7 +474,11 @@
       <div class="faq-grid">
         <div class="faq-card">
           <h3>How does the built-in AI Copilot work?</h3>
-          <p>The AI Copilot connects to any OpenAI-compatible provider (such as DeepSeek, OpenAI, Claude, or local Ollama instances) and interacts directly with the MPE Flow canvas via tool calling. It can create and connect nodes, compute adaptive layouts, write JavaScript/Rhai scripts, inspect local codebases, execute workflows autonomously to reach a goal, and diagnose/repair execution errors in a single click &mdash; with zero data lock-in and offline model support.</p>
+          <p>The AI Copilot connects to any OpenAI-compatible provider (such as DeepSeek, OpenAI, Claude, or local Ollama instances) and interacts directly with the MPE Flow canvas via tool calling. It supports slash shortcut commands (<code>/fix</code>, <code>/explain</code>, <code>/test</code>), interactive user inquiries (<code>ask_user</code>), secure sandboxed terminal execution, full-trust autonomous execution, and one-click canvas error diagnosis and repair &mdash; with zero data lock-in and offline model support.</p>
+        </div>
+        <div class="faq-card">
+          <h3>What are Flow Lifecycle Stages (Setup / Main / Teardown)?</h3>
+          <p>Workflows in MPE Flow are structured into three distinct lifecycle stages: <strong>Setup</strong> runs once before the test for login pre-warming and variable initialization; <strong>Main</strong> executes the core business flow (looped during stress testing); and <strong>Teardown</strong> runs once afterwards for cleanup and notifications, equipped with the read-only <code>$report</code> variable. The canvas switches stages with a dedicated top-left pill bar, and the debugger steps smoothly across all three stages.</p>
         </div>
         <div class="faq-card">
           <h3>What is MPE Flow?</h3>
@@ -435,11 +486,11 @@
         </div>
         <div class="faq-card">
           <h3>Which protocols are natively supported vs via plugins?</h3>
-          <p>MPE Flow includes 7 native core protocols inside the single binary: HTTP/HTTPS, WebSocket, TCP, UDP, SSE (Server-Sent Events), GraphQL, and Script/Assertion nodes. Additional protocols such as Kafka, MCP, gRPC, Redis, MongoDB, SMTP, and IMAP are available through one-click sidecar plugins.</p>
+          <p>MPE Flow includes 7 native core protocols inside the single binary: HTTP/HTTPS (client and embedded ingress/respond webhook mocks), WebSocket, TCP, UDP, SSE (Server-Sent Events), GraphQL, and Script/Assertion nodes. Additional protocols such as Kafka, MCP, gRPC, Redis, MongoDB, SMTP, and IMAP are available through one-click sidecar plugins.</p>
         </div>
         <div class="faq-card">
           <h3>How does MPE Flow differ from Postman or JMeter?</h3>
-          <p>Unlike HTTP-centric tools like Postman, MPE Flow provides native first-class support for stateful protocols (TCP, WebSocket, SSE streams, Kafka pub/sub, MCP) with visual graph-based flow design, branching, variable extraction, assertion chains, and high-concurrency stress testing in a lightweight Rust binary.</p>
+          <p>Unlike HTTP-centric tools like Postman, MPE Flow provides native first-class support for stateful protocols (TCP, WebSocket, SSE streams, Kafka pub/sub, MCP) with visual graph-based flow design, branching, variable extraction, assertion chains, first-class Setup/Main/Teardown lifecycle stages, and high-concurrency stress testing in a lightweight Rust binary.</p>
         </div>
         <div class="faq-card">
           <h3>Can MPE Flow run in CI/CD pipelines?</h3>
@@ -449,7 +500,6 @@
           <h3>Is MPE Flow open source and free to use?</h3>
           <p>Yes, MPE Flow is open source under the MIT License, hosted on GitHub at <a href="https://github.com/multi-protocol-flow" target="_blank" rel="noopener">github.com/multi-protocol-flow</a>.</p>
         </div>
-      </div>
     </div>
   </section>
 

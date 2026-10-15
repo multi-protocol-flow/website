@@ -167,6 +167,7 @@
               <li><a href="#ai-autonomous">Autonomous Run &amp; Steering</a></li>
               <li><a href="#ai-diagnostics">Error Diagnosis &amp; Self-Healing</a></li>
               <li><a href="#ai-workspace">Local Workspace Awareness</a></li>
+              <li><a href="#ai-slash-commands">Slash Commands &amp; Interactive Tools</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
@@ -186,6 +187,7 @@
               <li><a href="#connections">Connections</a></li>
               <li><a href="#variables">Variables</a></li>
               <li><a href="#environments">Global Environments</a></li>
+              <li><a href="#lifecycle-stages">Lifecycle Stages (Setup / Main / Teardown)</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
@@ -194,6 +196,7 @@
               <li><a href="#node-entry">Entry / End</a></li>
               <li><a href="#node-subflow">Subflow</a></li>
               <li><a href="#node-http">HTTP</a></li>
+              <li><a href="#node-http-ingress">HTTP Ingress &amp; Mock (Webhook)</a></li>
               <li><a href="#node-conditional">Conditional</a></li>
               <li><a href="#node-script">Script</a></li>
               <li><a href="#node-assertion">Assertion</a></li>
@@ -206,6 +209,8 @@
             <ul>
               <li><a href="#debugging-overview">Debug Controls &amp; Breakpoints</a></li>
               <li><a href="#debugging-subflow">Subflow Stepping &amp; Call Stack</a></li>
+              <li><a href="#slice-execution">Slice Execution &amp; HITL</a></li>
+              <li><a href="#debugging-lifecycle">Debug Lifecycle Sync</a></li>
             </ul>
           </div>
           <div class="docs-nav-section">
@@ -422,6 +427,22 @@ flow:
             <li><strong>Project Structure Scanning:</strong> Detects frameworks, OpenAPI / Swagger specs, and config files.</li>
             <li><strong>Code Search &amp; Snippet Reading:</strong> Discovers backend route signatures, payload DTOs, and environment contracts to accurately configure node URLs and request bodies.</li>
             <li><strong>Multimodal Screenshot Upload:</strong> Paste or drag-and-drop screenshots of API documentation, Swagger UIs, or terminal error traces directly into the chat for instant visual comprehension.</li>
+          </ul>
+
+          <h3 id="ai-slash-commands">Slash Commands &amp; Interactive Tools</h3>
+          <p>MPE Flow enhances AI Copilot productivity with fast keyboard shortcuts and human-in-the-loop tool collaboration:</p>
+          <ul>
+            <li><strong>Slash Commands (<code>/</code>):</strong> Type <code>/</code> in the Copilot chat input to summon the autocomplete command overlay:
+              <ul>
+                <li><code>/fix</code> &mdash; Auto-diagnose and apply a 1-click self-healing repair for the currently selected or latest failed node.</li>
+                <li><code>/explain</code> &mdash; Analyze the topology, variable bindings, and edge transitions of the active flow or selected nodes.</li>
+                <li><code>/test</code> &mdash; Generate assertion nodes and validation boundaries tailored to current upstream protocol responses.</li>
+              </ul>
+            </li>
+            <li><strong>Interactive User Inquiries (<code>ask_user</code>):</strong> When the model requires human decisions (e.g., selecting authentication scopes, providing tokens, choosing between branching topologies), it emits an interactive choice card. Tool execution suspends cleanly until you submit your choice.</li>
+            <li><strong>Secure Sandboxed Terminal (<code>terminal_exec</code>):</strong> The AI Copilot can execute shell commands against your linked workspace with strict command whitelisting (e.g., <code>git status</code>, <code>npm test</code>, <code>cargo test</code>), requiring explicit one-time confirmation before running high-risk commands.</li>
+            <li><strong>Full Trust Mode:</strong> Power users can enable <em>Full Trust Mode</em> in AI Settings to execute multi-step agentic workflows without repetitive manual confirmation cards.</li>
+            <li><strong>Reasoning Physics Animation:</strong> Displays real-time thinking token metrics and a physics droplet loading indicator while models generate internal thought traces.</li>
           </ul>
         </article>
 
@@ -714,13 +735,25 @@ flow:
                 <td><code>nodes</code></td>
                 <td>array</td>
                 <td>Yes</td>
-                <td>List of nodes</td>
+                <td>List of nodes comprising the <strong>Main</strong> business stage</td>
               </tr>
               <tr>
                 <td><code>connections</code></td>
                 <td>array</td>
                 <td>Yes</td>
-                <td>Connections between nodes</td>
+                <td>Directed connections between Main stage nodes</td>
+              </tr>
+              <tr>
+                <td><code>setup</code></td>
+                <td>object</td>
+                <td>No</td>
+                <td>Optional <code>FlowSubGraph</code> (<code>{ nodes: [], connections: [] }</code>) executed once before Main. Exports variables into Main context.</td>
+              </tr>
+              <tr>
+                <td><code>teardown</code></td>
+                <td>object</td>
+                <td>No</td>
+                <td>Optional <code>FlowSubGraph</code> executed once after Main for cleanup and notifications. Receives the read-only <code>$report</code> variable.</td>
               </tr>
             </tbody>
           </table>
@@ -1119,6 +1152,75 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
           </div>
         </article>
 
+        <!-- Flow Lifecycle Stages -->
+        <article id="lifecycle-stages" class="docs-section">
+          <h2>Flow Lifecycle Stages (Setup / Main / Teardown)</h2>
+          <p>MPE Flow treats workflow lifecycles as a first-class three-stage architecture. Instead of rigid callback hooks, every stage is a full visual sub-graph accepting the entire multi-protocol node suite:</p>
+
+          <div class="docs-info">
+            <h4>Hooks Replaced by Teardown Subgraphs</h4>
+            <p>Legacy Flow Hooks (<code>EntryConfig.hooks</code>, webhook/script triggers) were completely removed in MPE Flow <code>0.5.0-beta</code>. The <strong>Teardown</strong> stage replaces them with native nodes (HTTP calls, assertion steps, scripts, database queries) featuring visual routing, variable interpolation, and debug inspection.</p>
+          </div>
+
+          <h3>Three Lifecycle Stages</h3>
+          <table class="docs-table">
+            <thead>
+              <tr>
+                <th>Stage</th>
+                <th>Field</th>
+                <th>Execution Frequency</th>
+                <th>Purpose &amp; Variable Flow</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Setup</strong></td>
+                <td><code>flow.setup</code></td>
+                <td>Runs <strong>once</strong> before Main</td>
+                <td>Authentication pre-warming, token retrieval, test data seeding. Any variables exported by Setup nodes merge directly into the Main stage variable context.</td>
+              </tr>
+              <tr>
+                <td><strong>Main</strong></td>
+                <td><code>flow.nodes</code> / <code>flow.connections</code></td>
+                <td>Single run / Looped per VU / Consumed per row</td>
+                <td>The primary business flow under test. In stress testing, virtual users loop only the Main stage to keep QPS, P50, and P99 latency pure.</td>
+              </tr>
+              <tr>
+                <td><strong>Teardown</strong></td>
+                <td><code>flow.teardown</code></td>
+                <td>Runs <strong>once</strong> after Main</td>
+                <td>Alert notifications, webhook web-posting, resource teardown. Teardown inherits Main variables and receives the read-only <code>$report</code> variable.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>The <code>$report</code> Variable in Teardown</h3>
+          <p>The Teardown stage automatically receives the full Main stage execution report via the read-only reserved variable <code>$report</code>:</p>
+          <ul>
+            <li><code>{{$report.status}}</code> &mdash; Execution status (<code>"success"</code>, <code>"failed"</code>, <code>"cancelled"</code>).</li>
+            <li><code>{{$report.duration_ms}}</code> &mdash; Execution duration of the Main business flow in milliseconds.</li>
+            <li><code>{{$report.node_reports}}</code> &mdash; Individual node execution records, outputs, and assertion statuses.</li>
+          </ul>
+
+          <div class="docs-code">
+            <pre><code># Example: Slack / Discord notification in Teardown HTTP node payload
+{
+  "channel": "#ci-alerts",
+  "text": "E2E Run Finished with status: {{$report.status}} in {{$report.duration_ms}}ms"
+}</code></pre>
+          </div>
+
+          <h3>Stage Failure &amp; Execution Semantics</h3>
+          <ul>
+            <li><strong>Setup Fails:</strong> If Setup encounters an unhandled error or a node routes to <code>false</code>, execution skips Main (<code>stages.main.status == "skipped"</code>) and jumps straight to Teardown to clean up initialized resources.</li>
+            <li><strong>Teardown Fails:</strong> If Main succeeds but Teardown fails, the overall flow execution is marked as failed, but <code>stages.main.status</code> preserves its <code>"success"</code> state &mdash; allowing you to isolate operational teardown glitches from application regressions.</li>
+            <li><strong>Deterministic Root Order:</strong> In Setup and Teardown, unlinked root nodes (zero indegree) execute deterministically from top-to-bottom and left-to-right based on canvas <code>(y, x)</code> coordinates. An amber pill warns if multiple unlinked roots exist.</li>
+          </ul>
+
+          <h3>Canvas Stage Tab Bar</h3>
+          <p>The canvas features a segmented stage pill bar at the top-left (<strong>Setup</strong> | <strong>Main</strong> | <strong>Teardown</strong>). Clicking a stage switches the canvas viewport and isolates node operations, drag-and-drop additions, and undo/redo history to that specific stage.</p>
+        </article>
+
         <!-- Node Types: Entry / End -->
         <article id="node-entry" class="docs-section">
           <h2>Entry &amp; End Nodes</h2>
@@ -1198,6 +1300,9 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
 
           <h3>Cycle Detection &amp; Safety</h3>
           <p>MPE Flow's DAG compiler validates subflow references before execution. Self-references and circular dependencies (A &rarr; B &rarr; A) are detected during pre-flight validation and rejected with descriptive error reports, preventing infinite recursion.</p>
+
+          <h3>Static Exported Variable Inference</h3>
+          <p>MPE Flow features an intelligent static analysis engine that inspects target child workflows to deduce all variables exported by downstream extractors and scripts. The Subflow configuration panel surfaces an <strong>Expected Exported Variables</strong> preview card with 1-click clipboard copying, softening canvas variable-missing warnings when dynamic parameters are reliably produced by subflows.</p>
 
           <div class="docs-info">
             <h4>Nested Execution Reports</h4>
@@ -1288,6 +1393,64 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
   "headers": { "content-type": "application/json" },
   "timing": { "connect_ms": 45, "total_ms": 150 }
 }</code></pre>
+          </div>
+        </article>
+
+        <!-- Node Types: HTTP Ingress & Mock -->
+        <article id="node-http-ingress" class="docs-section">
+          <h2>HTTP Ingress &amp; Webhook Mock Services</h2>
+          <p>MPE Flow enables local webhook simulation and embedded mock HTTP backends natively inside flows without running external web servers like Express or Nginx.</p>
+
+          <h3>http:ingress &mdash; HTTP Server Listener</h3>
+          <p>The <code>http:ingress</code> node spins up an embedded HTTP server listening on a dedicated port. It captures incoming webhook payloads, callback requests, and query parameters, prioritizing them as root execution triggers.</p>
+
+          <div class="docs-code">
+            <pre><code>uuid: ingress-1
+type: http:ingress
+name: Webhook Receiver
+data:
+  type: http:ingress
+  port: 8080
+  path: /api/v1/webhook/order
+  method: post
+  timeout_ms: 30000</code></pre>
+          </div>
+
+          <table class="docs-table">
+            <thead>
+              <tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>port</code></td><td>number</td><td><code>8080</code></td><td>Local TCP port to bind the embedded listener</td></tr>
+              <tr><td><code>path</code></td><td>string</td><td><code>/</code></td><td>URL route path to match (e.g. <code>/webhook</code>)</td></tr>
+              <tr><td><code>method</code></td><td>string</td><td><code>any</code></td><td>Expected HTTP method (<code>get</code>, <code>post</code>, <code>put</code>, <code>delete</code>, <code>any</code>)</td></tr>
+              <tr><td><code>timeout_ms</code></td><td>number</td><td><code>30000</code></td><td>Maximum duration to wait for an incoming HTTP request before timing out</td></tr>
+            </tbody>
+          </table>
+
+          <h4>Ingress Node Output</h4>
+          <p>Downstream nodes receive the parsed request details from <code>last_node_output</code>:</p>
+          <ul>
+            <li><code>{{request_body}}</code> &mdash; Parsed JSON or raw text body sent by the external client.</li>
+            <li><code>{{headers}}</code> &mdash; Request headers (e.g. <code>x-webhook-signature</code>, <code>authorization</code>).</li>
+            <li><code>{{query}}</code> &mdash; URL query parameters as key-value pairs.</li>
+            <li><code>{{connection_id}}</code> &mdash; Opaque connection handle required by <code>http:respond</code>.</li>
+          </ul>
+
+          <h3>http:respond &mdash; HTTP Mock Response</h3>
+          <p>The <code>http:respond</code> node pairs with <code>http:ingress</code> using the <code>connection_id</code> to return a custom HTTP response back to the waiting client.</p>
+
+          <div class="docs-code">
+            <pre><code>uuid: respond-1
+type: http:respond
+name: Send 200 OK
+data:
+  type: http:respond
+  connection_id: "{{connection_id}}"
+  status_code: 200
+  headers:
+    Content-Type: application/json
+  body: '{"status": "accepted", "order_id": "{{order_id}}"}'</code></pre>
           </div>
         </article>
 
@@ -1546,6 +1709,43 @@ mpe stress run -f flows/checkout.mpf -e staging -u 100 -r 15</code></pre>
     #2 Auth Token (OAuth2 Refresh) &rarr; HTTP Request: /oauth/v2/token [PAUSED]</code></pre>
           </div>
           <p>Clicking any parent frame in the stack navigates the canvas to that frame's workflow and displays its local variable pool snapshot, allowing you to inspect parent and child state simultaneously.</p>
+        </article>
+
+        <!-- Slice Execution & HITL -->
+        <article id="slice-execution" class="docs-section">
+          <h2>Interactive Flow Slice Execution &amp; Human-in-the-Loop</h2>
+          <p>MPE Flow allows executing partial workflow subgraphs or isolated nodes on demand without needing to run the full end-to-end pipeline from an Entry node.</p>
+
+          <h3>Run Selected Nodes (<code>run_slice</code>)</h3>
+          <p>Select one or more nodes on the canvas (using shift-click or box selection), right-click, and choose <strong>Run Selected Nodes</strong>:</p>
+          <ul>
+            <li><strong>Zero-Indegree Root Discovery:</strong> The execution compiler automatically detects nodes within the selection that have no incoming edges from other selected nodes, treating them as execution roots. No Entry node is required.</li>
+            <li><strong>Clean Execution History:</strong> Slice runs execute ephemerally in-memory, avoiding cluttering persistent execution history with temporary exploratory runs.</li>
+            <li><strong>Targeted Retries:</strong> Test changes to downstream scripts, transformations, or assertions instantly without re-triggering slow upstream database queries or external API rate limits.</li>
+          </ul>
+
+          <h3>Human-in-the-Loop (HITL) Interactive Cards</h3>
+          <p>Workflow steps or AI agents can request human intervention during runtime via the <code>ask_human</code> bridge:</p>
+          <ul>
+            <li><strong>Execution Pause:</strong> When a HITL prompt is encountered, execution suspends cleanly and presents an interactive input card in the <strong>ExecutionPanel</strong>.</li>
+            <li><strong>Prompt Submissions:</strong> Users can enter textual input, select choices, or approve sensitive actions. Once submitted, the response is injected into downstream node variables and execution resumes automatically.</li>
+            <li><strong>Slice Badges &amp; Controls:</strong> Running slices feature visual status badges and immediate abort controls.</li>
+          </ul>
+        </article>
+
+        <!-- Full Lifecycle Debugging -->
+        <article id="debugging-lifecycle" class="docs-section">
+          <h2>Full Lifecycle Debugging &amp; Stage Sync</h2>
+          <p>The visual debug engine seamlessly orchestrates execution across all three lifecycle stages: <strong>Setup &rarr; Main &rarr; Teardown</strong>.</p>
+
+          <h3>Automatic Stage Following</h3>
+          <p>When stepping through a workflow (F10/F11) or resuming to a breakpoint located in Setup or Teardown:</p>
+          <ul>
+            <li>The canvas automatically transitions to the active stage of the paused node, eliminating manual tab switching.</li>
+            <li>The canvas tab bar indicates real-time per-stage status (<code>completed</code>, <code>paused</code>, <code>waiting</code>).</li>
+            <li>If you navigate to another stage while paused, a persistent notification banner offers a 1-click jump back to the paused node's stage.</li>
+            <li>During Teardown debugging, the <code>$report</code> variable snapshot containing the completed Main stage execution report is immediately inspectable in the Variable Pool panel.</li>
+          </ul>
         </article>
 
         <!-- Plugin Development: Overview -->
