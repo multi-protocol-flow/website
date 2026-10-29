@@ -214,6 +214,15 @@
             </ul>
           </div>
           <div class="docs-nav-section">
+            <h4>MCP Server Hosting</h4>
+            <ul>
+              <li><a href="#mcp-server-overview">Shared Gateway (Port 9528)</a></li>
+              <li><a href="#mcp-server-gui">Canvas Export &amp; Governance</a></li>
+              <li><a href="#mcp-server-clients">Cursor &amp; Claude Desktop</a></li>
+              <li><a href="#mcp-server-cli">CLI Lifecycle Management</a></li>
+            </ul>
+          </div>
+          <div class="docs-nav-section">
             <h4>Plugin Development</h4>
             <ul>
               <li><a href="#plugin-overview">Plugin Overview</a></li>
@@ -237,7 +246,7 @@
               <li><strong>No arguments</strong> &rarr; Opens the Tauri desktop GUI</li>
               <li><strong>With arguments</strong> &rarr; Runs in CLI mode</li>
             </ul>
-            <p><em>On Linux, only the CLI binary is available &mdash; no GUI dependencies required.</em></p>
+            <p><em>On Linux, both native desktop GUI packages (.deb / .AppImage) and standalone headless CLI binaries are available.</em></p>
           </div>
         </article>
 
@@ -301,6 +310,7 @@ sudo mv mpe /usr/local/bin/
 # Verify
 mpe --help</code></pre>
           </div>
+        </article>
 
         <!-- Quick Example -->
         <article id="quick-example" class="docs-section">
@@ -618,17 +628,6 @@ jobs:
           <div class="docs-info">
             <h4>3-Stage Aligned Test Suites</h4>
             <p>The JUnit XML report partitions results into aligned test suites: <code>{flow} :: Setup</code>, <code>{flow} :: Main</code>, and <code>{flow} :: Teardown</code>. Node execution outputs and failure snapshots are embedded directly inside failure traces.</p>
-          </div>
-        with:
-          name: MPE Flow Results
-          path: results.xml
-          reporter: java-junit
-          fail-on-error: 'true'</code></pre>
-          </div>
-
-          <div class="docs-info">
-            <h4>Note</h4>
-            <p>The JUnit report reflects node-level results: assertion, HTTP, WebSocket, and other protocol nodes map to individual test cases. A failed node produces a non-zero exit code, so plain <code>mpe run --report-format junit --report-file results.xml</code> also fails the job by default.</p>
           </div>
         </article>
 
@@ -1798,6 +1797,126 @@ data:
           </ul>
         </article>
 
+        <!-- MCP Server Hosting: Overview & Gateway -->
+        <article id="mcp-server-overview" class="docs-section">
+          <h2>Native MCP Server Engine &amp; Shared Gateway</h2>
+          <p>MPE Flow features an embedded native <strong>Model Context Protocol (MCP) Server</strong> engine directly inside the host runtime (<code>flow-engine/src/mcp_server</code>). You can publish any multi-protocol workflow as an AI agent tool callable by LLM clients (Cursor, Claude Desktop, local agents) without authoring adapter code or installing external plugin binaries.</p>
+
+          <div class="docs-tip">
+            <h4>Native Host Architecture</h4>
+            <p>Unlike third-party sidecars, MCP Server hosting is built directly into the MPE core runtime. It natively supports high-performance Streamable HTTP and stdio transports, zero-copy variable serialization, and automatic parameter schema derivation.</p>
+          </div>
+
+          <h3>Port 9528 Shared Gateway</h3>
+          <p>By default, published flows register onto a centralized shared gateway running on port <code>9528</code> (next to the Ingress listener <code>9527</code>, configurable in <strong>Settings &rarr; Network</strong>):</p>
+          <ul>
+            <li><strong>Unified Discovery (<code>/mcp</code>):</strong> Connect once from your AI client. Any published workflow is automatically registered and discovered as an available tool. When you publish new flows or edit existing ones, they appear immediately without reconfiguring your AI client.</li>
+            <li><strong>Path-Isolated Routing (<code>/{flow-slug}/mcp</code>):</strong> Access a specific workflow exclusively with dedicated slug routing and independent request isolation.</li>
+            <li><strong>Dedicated Port Mode:</strong> Assign an explicit port to run a specific workflow as an isolated standalone MCP server.</li>
+          </ul>
+
+          <h3>Automatic Tool Schema Derivation</h3>
+          <p>MPE Flow automatically converts workflow metadata into typed JSON Schema tool definitions:</p>
+          <ul>
+            <li><strong>Tool Name:</strong> Derived from <code>flow.name</code> (slugified with deterministic name de-duplication).</li>
+            <li><strong>Tool Description:</strong> Derived from <code>flow.description</code>.</li>
+            <li><strong>Input Schema:</strong> Automatically inferred from <code>flow.initial_variables</code>. Each variable name becomes an input parameter with description, expected type, and default value.</li>
+            <li><strong>Tool Execution Output:</strong> The final node output (e.g. from <code>variable:extractor</code>, <code>http:request</code>, or <code>script</code>) is returned as the tool call result directly to the LLM context.</li>
+          </ul>
+        </article>
+
+        <!-- MCP Server Hosting: Canvas Export & Governance -->
+        <article id="mcp-server-gui" class="docs-section">
+          <h2>Canvas Export &amp; Service Governance</h2>
+          
+          <h3>1-Click Publishing from Canvas</h3>
+          <p>To publish a workflow as an MCP tool in the desktop app:</p>
+          <ol>
+            <li>Right-click the active workflow tab in the top canvas bar, or click the flow options menu.</li>
+            <li>Select <strong>Publish as MCP Server</strong> to open the <strong>Export MCP Server</strong> dialog.</li>
+            <li>Review the generated tool name, description, and transport mode (Shared Gateway 9528, Dedicated Port, or stdio).</li>
+            <li>Click <strong>Start Server</strong> to activate, or copy the client configuration snippet directly to your clipboard.</li>
+          </ol>
+
+          <h3>Service Governance in Settings</h3>
+          <p>Open <strong>Settings &rarr; MCP Services</strong> to monitor and manage all published instances:</p>
+          <ul>
+            <li><strong>Grouped by Endpoint:</strong> View active gateways and running tools in a clean, unified dashboard.</li>
+            <li><strong>Instance Durability:</strong> Registered services persist across app restarts and reboots. If a process stops, its row remains intact with a stopped indicator.</li>
+            <li><strong>Hot Reload:</strong> Click <strong>Reload</strong> to refresh a tool's logic directly from the updated flow file on disk without restarting the gateway.</li>
+            <li><strong>Direct Canvas Navigation:</strong> Clicking any flow name in the governance table immediately navigates to and opens that flow on the visual canvas.</li>
+          </ul>
+        </article>
+
+        <!-- MCP Server Hosting: Cursor & Claude Desktop -->
+        <article id="mcp-server-clients" class="docs-section">
+          <h2>Cursor &amp; Claude Desktop Integration</h2>
+          <p>MPE Flow generates pre-configured client configuration snippets with one click:</p>
+
+          <h3>Option 1: Stdio Transport (Recommended for Cursor &amp; Claude Desktop)</h3>
+          <p>Communicates over standard input/output without opening network ports:</p>
+          <div class="docs-code">
+            <pre><code>// Claude Desktop: ~/Library/Application Support/Claude/claude_desktop_config.json
+// Cursor: .cursor/mcp.json
+{
+  "mcpServers": {
+    "mpe-search-tool": {
+      "command": "mpe",
+      "args": [
+        "mcp",
+        "serve",
+        "-f",
+        "/path/to/search_tool.mpf",
+        "--transport",
+        "stdio"
+      ]
+    }
+  }
+}</code></pre>
+          </div>
+
+          <h3>Option 2: Streamable HTTP (Shared Gateway)</h3>
+          <p>Connect multiple AI clients to the shared daemon gateway on port 9528:</p>
+          <div class="docs-code">
+            <pre><code>{
+  "mcpServers": {
+    "mpe-gateway": {
+      "url": "http://127.0.0.1:9528/mcp"
+    }
+  }
+}</code></pre>
+          </div>
+        </article>
+
+        <!-- MCP Server Hosting: CLI Lifecycle -->
+        <article id="mcp-server-cli" class="docs-section">
+          <h2>CLI MCP Management (<code>mpe mcp</code>)</h2>
+          <p>Manage and automate MCP server processes headlessly from the command line:</p>
+          <div class="docs-code">
+            <pre><code># Serve a single flow over stdio (zero-port, process-based)
+mpe mcp serve -f ./flows/weather_api.mpf --transport stdio
+
+# Start shared gateway on port 9528 in background
+mpe mcp start --gateway --port 9528 --detach
+
+# Publish a workflow to the shared gateway
+mpe mcp start -f ./flows/database_query.mpf --shared
+
+# List all registered and active MCP server instances
+mpe mcp list --all
+
+# Inspect client configuration snippet for a published flow
+mpe mcp config-snippet &lt;INSTANCE_ID_OR_NAME&gt;
+
+# Hot reload an instance after modifying the flow file
+mpe mcp reload &lt;INSTANCE_ID_OR_NAME&gt;
+
+# Stop or unpublish an instance
+mpe mcp stop &lt;INSTANCE_ID_OR_NAME&gt;
+mpe mcp remove &lt;INSTANCE_ID_OR_NAME&gt;</code></pre>
+          </div>
+        </article>
+
         <!-- Plugin Development: Overview -->
         <article id="plugin-overview" class="docs-section">
           <h2>Plugin Overview</h2>
@@ -1830,6 +1949,7 @@ data:
 
           <h3>Protocol Plugins Ecosystem</h3>
           <p>Protocol plugins operate as independent open-source repositories under the <a href="https://github.com/multi-protocol-flow" target="_blank" rel="noopener">multi-protocol-flow</a> organization (such as Kafka, Redis, MongoDB, gRPC, DB, SMTP, etc.). In addition, MPE Flow natively embeds an MCP Server hosting engine directly into the application core (served on port 9528 or custom ports), while external MCP client tools can be orchestrated via plugin or standard node connectors. Plugins can be installed from the GUI Plugin Market or the <a href="plugins.html">Plugins page</a>.</p>
+        </article>
 
         <!-- Plugin Development: SDK -->
         <article id="plugin-sdk" class="docs-section">
