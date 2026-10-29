@@ -51,25 +51,28 @@
         "applicationSubCategory": "API Testing & Multi-Protocol Workflow Automation",
         "operatingSystem": "Windows, macOS, Linux",
         "softwareRequirements": "Rust, Tauri 2",
-        "softwareVersion": "0.5.0-beta",
+        "softwareVersion": "0.5.1-beta",
         "downloadUrl": "https://mpe.run/changelog.html",
         "license": "https://opensource.org/licenses/MIT",
         "releaseNotes": "https://mpe.run/changelog.html",
-        "description": "Cross-platform multi-protocol workflow executor, built-in Agentic AI Copilot, and visual API testing engine built in Rust and Tauri 2. Natively chains HTTP, WebSocket, TCP, UDP, SSE, and GraphQL with an extensible plugin architecture for MCP, Kafka, and Redis.",
+        "description": "Cross-platform multi-protocol workflow executor, built-in Agentic AI Copilot, and visual API testing engine built in Rust and Tauri 2. Natively chains HTTP, WebSocket, TCP, UDP, SSE, and GraphQL with native MCP server hosting and extensible plugins.",
         "url": "https://mpe.run/",
         "image": "https://mpe.run/og-image.png",
         "screenshot": "https://mpe.run/og-image.png",
-          "Built-in Agentic AI Copilot with slash commands (/fix, /explain), interactive user input (ask_user), and autonomous self-healing",
+        "featureList": [
+          "Built-in Agentic AI Copilot with slash commands (/fix, /explain, /test), interactive user input (ask_user), and configurable iteration limits",
+          "Native Model Context Protocol (MCP) server engine with 9528 shared gateway, slug routing, and 1-click Cursor/Claude Desktop stdio export",
           "First-class three-stage workflow lifecycle (Setup / Main / Teardown) with isolated execution and $report variable passing",
-          "Embedded HTTP Ingress and Webhook Mock services (http:ingress and http:respond) for local webhook simulation",
+          "Embedded HTTP Ingress and Webhook Mock services (http:ingress and http:respond) plus daemonized mpe serve runtime",
+          "Declarative Flow YAML DSL without canvas coordinates for clean version control, topological auto-layout, and mpe flow convert",
           "Interactive flow slice execution (run_slice) and Human-in-the-Loop (HITL) prompt cards",
           "Native cross-protocol chaining across HTTP, WebSocket, TCP, UDP, SSE, and GraphQL",
-          "Model Context Protocol (MCP) server visual debugging and agentic tool evaluation",
-          "Single dual-mode binary: Visual desktop GUI and headless CLI execution engine",
+          "Single dual-mode binary: Visual desktop GUI (Windows, macOS, Linux AppImage/DEB) and headless CLI execution engine",
           "High-throughput multi-protocol stress and load testing with lifecycle stage isolation and p50/p90/p99 latency distribution",
           "Decoupled global environments with git-ignored .local.yaml secret layering and 4-tier cascading resolution",
           "100% Local-first offline execution with Git-friendly .mpf YAML/JSON workflow files",
-          "Native JUnit XML, JSON, and HTML test report generation for CI/CD pipelines"
+          "Native JUnit XML (3-stage aligned), GitHub Actions Step Summary Markdown, and standalone HTML test report generation"
+        ],
         "offers": {
           "@type": "Offer",
           "price": "0",
@@ -127,7 +130,7 @@
             "name": "Which protocols are natively supported versus via plugins?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "MPE Flow includes 7 native core protocols inside the single binary: HTTP/HTTPS, WebSocket, TCP, UDP, SSE (Server-Sent Events), GraphQL, and Script/Assertion nodes. Additional protocols such as Kafka, MCP, gRPC, Redis, MongoDB, SMTP, and IMAP are available through one-click sidecar plugins."
+              "text": "MPE Flow includes 7 native core protocols inside the single binary: HTTP/HTTPS (client and embedded ingress/respond webhook mocks), WebSocket, TCP, UDP, SSE (Server-Sent Events), GraphQL, and Script/Assertion nodes. It also natively hosts Model Context Protocol (MCP) servers with a shared gateway on port 9528. Additional client protocols such as Kafka, MCP client tools, gRPC, Redis, MongoDB, SMTP, and IMAP are available through one-click sidecar plugins."
             }
           },
           {
@@ -232,8 +235,7 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
           </div>
           <h3>Built-in Agentic AI Copilot &amp; Slash Commands</h3>
-          <p>Orchestrate multi-protocol DAGs from natural language prompts. Features slash shortcut commands (<code>/fix</code>, <code>/explain</code>, <code>/test</code>), interactive user choices (<code>ask_user</code>), secure sandboxed terminal execution, full-trust autonomy, and 1-click execution error repair.</p>
-        </div>
+          <p>Orchestrate multi-protocol DAGs from natural language prompts. Features slash shortcut commands (<code>/fix</code>, <code>/explain</code>, <code>/test</code>), interactive user choices (<code>ask_user</code>), quick AI provider switcher, configurable execution iteration limits (<code>aiMaxIterations</code>), secure sandboxed execution, and 1-click error self-healing.</p>
 
         <div class="feature-card">
           <div class="feature-icon">
@@ -255,17 +257,15 @@
           <div class="feature-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m10 10 4 4"/><path d="m14 10-4 4"/></svg>
           </div>
-          <h3>HTTP Ingress &amp; Webhook Mock Services</h3>
-          <p>Simulate incoming webhook triggers and mock HTTP backends directly on canvas. <code>http:ingress</code> spins up an embedded HTTP server listener, and <code>http:respond</code> returns customized dynamic responses based on workflow state.</p>
-        </div>
+          <h3>HTTP Ingress, Webhook Mocks &amp; <code>mpe serve</code></h3>
+          <p>Simulate incoming webhook triggers and mock HTTP backends directly on canvas. <code>http:ingress</code> spins up an embedded HTTP server listener, <code>http:respond</code> returns customized dynamic responses, and <code>mpe serve</code> runs long-lived daemonized mock gateways with graceful SIGTERM teardown.</p>
 
         <div class="feature-card">
           <div class="feature-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
           </div>
-          <h3>MCP Server Visual Debug &amp; Eval</h3>
-          <p>Debug Model Context Protocol (MCP) servers via stdio or SSE. Auto-discover tools and prompts, chain invocations, and evaluate output accuracy with visual assertions.</p>
-        </div>
+          <h3>Native MCP Server Hosting &amp; Visual Debug</h3>
+          <p>Natively host workflows as Model Context Protocol (MCP) tools via the built-in host engine and port 9528 shared gateway. Generate stdio configs for Claude Desktop &amp; Cursor with one click, manage services in Settings, and debug remote MCP servers visually.</p>
 
         <div class="feature-card">
           <div class="feature-icon">
@@ -279,9 +279,8 @@
           <div class="feature-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
           </div>
-          <h3>Automated CI/CD Integration</h3>
-          <p>Native JUnit XML reports (<code>--report-format junit --report-file results.xml</code>) plug straight into Jenkins, GitHub Actions, and GitLab CI — every node maps to a test case, so PRs surface flow results without custom tooling.</p>
-        </div>
+          <h3>Automated CI/CD Integration &amp; Rich Reports</h3>
+          <p>Standardized exit codes (0/1/2/3), 3-stage aligned JUnit XML reports (<code>--report junit</code>), automatic GitHub Actions step summaries (<code>--summary $GITHUB_STEP_SUMMARY</code>), and self-contained interactive HTML reports (<code>--export-html</code>) plug straight into Jenkins, GitHub Actions, and GitLab CI.</p>
 
         <div class="feature-card">
           <div class="feature-icon">
@@ -486,20 +485,23 @@
         </div>
         <div class="faq-card">
           <h3>Which protocols are natively supported vs via plugins?</h3>
-          <p>MPE Flow includes 7 native core protocols inside the single binary: HTTP/HTTPS (client and embedded ingress/respond webhook mocks), WebSocket, TCP, UDP, SSE (Server-Sent Events), GraphQL, and Script/Assertion nodes. Additional protocols such as Kafka, MCP, gRPC, Redis, MongoDB, SMTP, and IMAP are available through one-click sidecar plugins.</p>
+          <p>MPE Flow includes 7 native core protocols inside the single binary: HTTP/HTTPS (client and embedded ingress/respond webhook mocks), WebSocket, TCP, UDP, SSE (Server-Sent Events), GraphQL, and Script/Assertion nodes. It also natively hosts Model Context Protocol (MCP) servers on a shared port (9528) or dedicated ports. Additional client protocols such as Kafka, MCP client tools, gRPC, Redis, MongoDB, SMTP, and IMAP are available through one-click sidecar plugins.</p>
         </div>
         <div class="faq-card">
           <h3>How does MPE Flow differ from Postman or JMeter?</h3>
           <p>Unlike HTTP-centric tools like Postman, MPE Flow provides native first-class support for stateful protocols (TCP, WebSocket, SSE streams, Kafka pub/sub, MCP) with visual graph-based flow design, branching, variable extraction, assertion chains, first-class Setup/Main/Teardown lifecycle stages, and high-concurrency stress testing in a lightweight Rust binary.</p>
         </div>
         <div class="faq-card">
-          <h3>Can MPE Flow run in CI/CD pipelines?</h3>
-          <p>Yes. MPE Flow ships as a dual-mode single binary containing both the GUI and the standalone <code>mpe</code> CLI. You can run <code>mpe run flow.mpf -e staging --report-format junit --report-file results.xml</code> directly in GitHub Actions, GitLab CI, Jenkins, or Docker without GUI dependencies.</p>
-        </div>
-        <div class="faq-card">
           <h3>Is MPE Flow open source and free to use?</h3>
           <p>Yes, MPE Flow is open source under the MIT License, hosted on GitHub at <a href="https://github.com/multi-protocol-flow" target="_blank" rel="noopener">github.com/multi-protocol-flow</a>.</p>
         </div>
+        <div class="faq-card">
+          <h3>Can MPE Flow run in CI/CD pipelines?</h3>
+          <p>Yes. MPE Flow ships as a dual-mode single binary containing both the GUI and the standalone <code>mpe</code> CLI. You can run <code>mpe run flow.mpf -e staging --report junit --report-file results.xml --summary $GITHUB_STEP_SUMMARY --export-html report.html</code> directly in GitHub Actions, GitLab CI, Jenkins, or Docker without GUI dependencies, with standardized exit codes (0/1/2/3).</p>
+        </div>
+        <div class="faq-card">
+          <h3>Which desktop and server platforms are supported?</h3>
+          <p>MPE Flow runs natively on Windows (x64 installer &amp; portable), macOS (Universal DMG for Intel &amp; Apple Silicon), and Linux (both native GUI desktop apps via <code>.deb</code> &amp; portable <code>.AppImage</code> packages, and lightweight standalone CLI binaries for headless servers and containers).</p>
     </div>
   </section>
 

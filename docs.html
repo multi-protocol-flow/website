@@ -271,25 +271,36 @@
             </ol>
           </div>
 
-          <h3>Linux (CLI)</h3>
-          <p>Download the pre-built binary and add it to your <code>PATH</code>:</p>
+          <h3>Linux</h3>
+          <p>MPE Flow provides native desktop GUI packages as well as lightweight headless CLI binaries for Linux:</p>
+
+          <h4>Option 1: Debian / Ubuntu (.deb)</h4>
+          <p>Download the <code>.deb</code> package from the <a href="changelog.html">Changelog</a> and install:</p>
           <div class="docs-code">
-            <pre><code># Download and extract
+            <pre><code>sudo dpkg -i mpe_*_amd64.deb || sudo apt-get install -f</code></pre>
+          </div>
+
+          <h4>Option 2: Portable AppImage (.AppImage)</h4>
+          <p>Download the portable <code>.AppImage</code> from the <a href="changelog.html">Changelog</a>, make it executable, and launch:</p>
+          <div class="docs-code">
+            <pre><code>chmod +x MPE_*.AppImage
+./MPE_*.AppImage</code></pre>
+          </div>
+
+          <h4>Option 3: Headless CLI (tar.gz)</h4>
+          <p>For Docker containers, headless servers, and CI/CD pipelines:</p>
+          <div class="docs-code">
+            <pre><code># Download and extract CLI
 curl -LO https://download.mpe.run/releases/latest/mpe-vX.Y.Z-linux-x86_64.tar.gz
 tar xzf mpe-vX.Y.Z-linux-x86_64.tar.gz
 
-# Make executable and move to PATH
+# Move to PATH
 chmod +x mpe
 sudo mv mpe /usr/local/bin/
 
 # Verify
 mpe --help</code></pre>
           </div>
-          <div class="docs-info">
-            <h4>Note</h4>
-            <p>The Linux build is CLI-only &mdash; no GUI, no GTK/WebKit dependencies required.</p>
-          </div>
-        </article>
 
         <!-- Quick Example -->
         <article id="quick-example" class="docs-section">
@@ -404,12 +415,13 @@ flow:
             <li><strong>Datasource Exploration:</strong> Searches connected API specifications and automatically imports target endpoints onto the canvas.</li>
           </ul>
 
-          <h3 id="ai-autonomous">Autonomous Execution ("Run to Goal") &amp; Midway Steering</h3>
-          <p>When solving complex workflows, the AI Copilot can autonomously iterate through execution cycles:</p>
+          <h3 id="ai-autonomous">Autonomous ReAct Execution &amp; Execution Limits</h3>
+          <p>When solving complex workflows, the AI Copilot iteratively plans, acts, observes, and refines:</p>
           <ul>
-            <li><strong>Auto-Execute to Goal:</strong> Enable the <em>Auto-Execute</em> toggle to let the Copilot run the workflow, observe execution outputs, and self-correct until the desired assertion or business goal passes.</li>
+            <li><strong>Mandatory Verification by Default:</strong> Newly assembled pipelines automatically execute and verify outputs (<code>batch_create_pipeline</code> defaults <code>auto_run: true</code>), ensuring workflows work out of the box.</li>
+            <li><strong>Configurable Iteration Limits (<code>aiMaxIterations</code>):</strong> Customize the maximum ReAct reasoning iterations in AI Settings (clamped to 5–100, default 20, with quick presets for 10, 20, 40, and 60 rounds). If the model reaches the limit without completing, it pauses gracefully and delivers actionable next steps.</li>
             <li><strong>Midway Steering &amp; Interruption:</strong> While the AI is actively running tools, you can type additional instructions in the input box (e.g., <em>"Use port 8080 instead"</em>) without cancelling the task. The Copilot absorbs your correction in real-time.</li>
-            <li><strong>Thinking Chain Visibility:</strong> Full support for reasoning models (e.g. DeepSeek-R1). The stream parser extracts <code>&lt;think&gt;</code> tags and provides an interactive collapsible thinking block.</li>
+            <li><strong>Thinking Chain Visibility:</strong> Full support for reasoning models (e.g. DeepSeek-R1). The stream parser extracts <code>&lt;think&gt;</code> tags and provides an interactive collapsible thinking block with physics animation.</li>
             <li><strong>High-Risk Safety Confirmations:</strong> Destructive operations like clearing the canvas, deleting multiple nodes, or installing third-party marketplace plugins require explicit user approval before execution.</li>
           </ul>
 
@@ -439,7 +451,9 @@ flow:
                 <li><code>/test</code> &mdash; Generate assertion nodes and validation boundaries tailored to current upstream protocol responses.</li>
               </ul>
             </li>
-            <li><strong>Interactive User Inquiries (<code>ask_user</code>):</strong> When the model requires human decisions (e.g., selecting authentication scopes, providing tokens, choosing between branching topologies), it emits an interactive choice card. Tool execution suspends cleanly until you submit your choice.</li>
+            <li><strong>Interactive User Inquiries (<code>ask_user</code>):</strong> When the model requires human decisions (e.g., selecting authentication scopes, providing tokens, choosing between branching topologies), it emits an interactive choice card with optional submission support. Tool execution suspends cleanly until you respond.</li>
+            <li><strong>Fast AI Provider Switching:</strong> Switch active AI providers directly from the chat input box, panel header, or Spotlight palette (<code>Ctrl+K</code> / <code>Cmd+K</code>) without opening Settings.</li>
+            <li><strong>Upstream Variable Extractor Backtracking:</strong> When extracting variables, the engine automatically backtracks through incoming connections (skipping assertions or conditionals) to bind to the nearest data producer.</li>
             <li><strong>Secure Sandboxed Terminal (<code>terminal_exec</code>):</strong> The AI Copilot can execute shell commands against your linked workspace with strict command whitelisting (e.g., <code>git status</code>, <code>npm test</code>, <code>cargo test</code>), requiring explicit one-time confirmation before running high-risk commands.</li>
             <li><strong>Full Trust Mode:</strong> Power users can enable <em>Full Trust Mode</em> in AI Settings to execute multi-step agentic workflows without repetitive manual confirmation cards.</li>
             <li><strong>Reasoning Physics Animation:</strong> Displays real-time thinking token metrics and a physics droplet loading indicator while models generate internal thought traces.</li>
@@ -490,14 +504,19 @@ flow:
                 <td><code>mpe flow fmt -f flow.mpf --to yaml</code></td>
               </tr>
               <tr>
-                <td><code>mpe report</code></td>
-                <td>Manage reports (list, show, delete)</td>
-                <td><code>mpe report list</code></td>
+                <td><code>mpe serve</code></td>
+                <td>Run a long-lived Ingress mock gateway daemon with Tokio HTTP dispatch and graceful SIGTERM teardown</td>
+                <td><code>mpe serve -f ingress_flow.mpf -p 9527</code></td>
               </tr>
               <tr>
-                <td><code>mpe run-node</code></td>
-                <td>Execute a single protocol node for connectivity verification</td>
-                <td><code>mpe run-node '{"type":"redis:connect","host":"127.0.0.1","port":6379}'</code></td>
+                <td><code>mpe mcp serve</code></td>
+                <td>Host native Model Context Protocol (MCP) server on port 9528 or per-flow slug route</td>
+                <td><code>mpe mcp serve -f flow.mpf --transport stdio</code></td>
+              </tr>
+              <tr>
+                <td><code>mpe flow convert</code></td>
+                <td>Losslessly convert between declarative YAML DSL and standard .mpf format</td>
+                <td><code>mpe flow convert flow.mpf flow.yaml</code></td>
               </tr>
               <tr>
                 <td><code>mpe plugin</code></td>
@@ -521,8 +540,18 @@ flow:
             <pre><code># View all commands
 mpe --help
 
-# Run flow with active environment and runtime variable overrides
-mpe run -f flow.mpf -e staging --var TIMEOUT=5000 --var RETRIES=3
+# Run flow with active environment, markdown summary and standalone HTML export
+mpe run -f flow.mpf -e staging --summary summary.md --export-html report.html
+
+# Start a long-running Ingress mock daemon service
+mpe serve -f webhook_mock.mpf -p 9527
+
+# Publish flow as native MCP server over stdio for Claude Desktop / Cursor
+mpe mcp serve -f search_tool.mpf --transport stdio
+
+# Convert between standard .mpf and declarative human-readable YAML DSL
+mpe flow convert flow.mpf declarative.yaml
+mpe flow convert declarative.yaml flow.mpf
 
 # Manage global environments
 mpe env list --format table
@@ -536,6 +565,8 @@ mpe flow fmt --all --to yaml
 
 # View command-specific help
 mpe run --help
+mpe serve --help
+mpe mcp serve --help
 mpe env --help</code></pre>
           </div>
         </article>
@@ -543,13 +574,14 @@ mpe env --help</code></pre>
         <!-- CI/CD Integration -->
         <article id="ci-cd" class="docs-section">
           <h2>CI/CD Integration (GitHub Actions)</h2>
-          <p><code>mpe run</code> can export execution results as standard JUnit XML, which is natively understood by Jenkins, GitHub Actions, and GitLab CI. Each node in the flow becomes a <code>&lt;testcase&gt;</code>; failed and skipped nodes map to <code>&lt;failure&gt;</code> and <code>&lt;skipped&gt;</code> elements.</p>
+          <p><code>mpe run</code> provides first-class CI/CD support with standardized exit codes, 3-stage aligned JUnit XML suites (<code>{flow} :: Setup</code>, <code>{flow} :: Main</code>, <code>{flow} :: Teardown</code>), automatic Markdown summaries for <code>$GITHUB_STEP_SUMMARY</code>, and self-contained interactive HTML reports.</p>
 
           <div class="docs-code">
-            <pre><code># Export a JUnit XML report for CI consumers with staging environment
-mpe run -f flow.mpf -e staging --report-format junit --report-file results.xml
-# Or print the JUnit XML directly to stdout (no --report-file)
-mpe run -f flow.mpf --report-format junit</code></pre>
+            <pre><code># Export JUnit XML and GitHub Actions step summary
+mpe run -f flow.mpf -e staging \
+  --report junit --report-file results.xml \
+  --summary "$GITHUB_STEP_SUMMARY" \
+  --export-html report.html</code></pre>
           </div>
 
           <p>Add a workflow step in your repository to run flows and publish the report on pull requests with <a href="https://github.com/dorny/test-reporter">dorny/test-reporter</a>:</p>
@@ -568,11 +600,25 @@ jobs:
 
       - name: Run MPE flows
         run: |
-          mpe run -f tests/flows/api-smoke.mpf --report-format junit --report-file results.xml
+          mpe run -f tests/flows/api-smoke.mpf \
+            --report junit --report-file results.xml \
+            --summary "$GITHUB_STEP_SUMMARY" \
+            --export-html report.html
 
       - name: Publish test report
         if: always()
         uses: dorny/test-reporter@v1
+        with:
+          name: MPE Flow Results
+          path: results.xml
+          reporter: java-junit
+          fail-on-error: 'true'</code></pre>
+          </div>
+
+          <div class="docs-info">
+            <h4>3-Stage Aligned Test Suites</h4>
+            <p>The JUnit XML report partitions results into aligned test suites: <code>{flow} :: Setup</code>, <code>{flow} :: Main</code>, and <code>{flow} :: Teardown</code>. Node execution outputs and failure snapshots are embedded directly inside failure traces.</p>
+          </div>
         with:
           name: MPE Flow Results
           path: results.xml
@@ -643,15 +689,19 @@ jobs:
             <tbody>
               <tr>
                 <td><code>0</code></td>
-                <td>Success</td>
+                <td>Success: All executed nodes and assertions passed</td>
               </tr>
               <tr>
                 <td><code>1</code></td>
-                <td>Failure (error details in stderr and JSON output)</td>
+                <td>Test Failure: One or more protocol nodes or assertions failed</td>
               </tr>
               <tr>
                 <td><code>2</code></td>
-                <td>Invalid arguments</td>
+                <td>Configuration Error: Invalid CLI arguments, missing flow file, or schema validation failure</td>
+              </tr>
+              <tr>
+                <td><code>3</code></td>
+                <td>Infrastructure Failure: Network unreachable, connection refused, or step timeout</td>
               </tr>
             </tbody>
           </table>
@@ -1778,9 +1828,8 @@ data:
             </tbody>
           </table>
 
-          <h3>Protocol Plugins in This Repository</h3>
-          <p>The <code>plugins/</code> directory ships protocol plugins for: amqp, db (SQLite/MySQL/PostgreSQL), grpc, imap, kafka, mcp, mongo, mqtt, redis, smtp. Install by building a plugin and placing its directory into the plugin directory, or install from the <a href="plugins.html">Plugins page</a>.</p>
-        </article>
+          <h3>Protocol Plugins Ecosystem</h3>
+          <p>Protocol plugins operate as independent open-source repositories under the <a href="https://github.com/multi-protocol-flow" target="_blank" rel="noopener">multi-protocol-flow</a> organization (such as Kafka, Redis, MongoDB, gRPC, DB, SMTP, etc.). In addition, MPE Flow natively embeds an MCP Server hosting engine directly into the application core (served on port 9528 or custom ports), while external MCP client tools can be orchestrated via plugin or standard node connectors. Plugins can be installed from the GUI Plugin Market or the <a href="plugins.html">Plugins page</a>.</p>
 
         <!-- Plugin Development: SDK -->
         <article id="plugin-sdk" class="docs-section">

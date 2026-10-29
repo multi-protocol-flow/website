@@ -11,11 +11,11 @@
 - **Web Playground:** https://mpe.run/playground/
 - **Changelog:** https://mpe.run/changelog.html
 - **Repository:** https://github.com/multi-protocol-flow
-- **License:** Apache-2.0 / MIT
+- **License:** MIT
 
 ## Core Built-in Protocols & Nodes
 
-- **HTTP / REST & Ingress Mock:** Full HTTP client (`http:request`) supporting GET, POST, PUT, DELETE, PATCH, multipart/form-data, proxy, and body formatting. Native embedded HTTP server listener (`http:ingress`) and mock response node (`http:respond`) for simulating webhooks and local mock servers.
+- **HTTP / REST & Ingress Mock:** Full HTTP client (`http:request`) supporting GET, POST, PUT, DELETE, PATCH, multipart/form-data, proxy, and body formatting. Native embedded HTTP server listener (`http:ingress`) and mock response node (`http:respond`) for simulating webhooks and local mock servers. Daemonized long-running ingress gateway via `mpe serve` with graceful SIGTERM teardown.
 - **WebSocket:** Session lifecycle management (`ws:connect`, `ws:send_collect` with bidirectional matching, `ws:close`, Ping/Pong heartbeat).
 - **TCP Socket:** Direct raw socket communication (`tcp:connect`, `tcp:send`, `tcp:receive` with framing/delimiter/fixed length, `tcp:close`, TLS/mTLS).
 - **UDP:** Connectionless datagram networking (`udp:bind`, `udp:send_to`, `udp:recv_from`, `udp:close`, Broadcast).
@@ -24,7 +24,7 @@
 - **Flow Control & Data Ops:** Entry, End, Subflow (`flow:sub` with static exported variable deduction, cycle detection, and canvas drag-and-drop), Conditional Branching, Script Execution (JavaScript via QuickJS), Assertions, and Variable Extractors (`variable:extractor`).
 - **Lifecycle Stages (Setup / Main / Teardown):** Workflows are structured into 3 isolated sub-graphs: Setup (runs once for login warm-up, exports variables to Main), Main (core business flow, looped during stress testing), and Teardown (runs once for cleanup and alerts, receiving the read-only `$report` variable).
 - **Interactive Slices & HITL:** Right-click canvas "Run Selected Nodes" (`run_slice`) with zero-indegree root derivation, and Human-in-the-Loop (`ask_human`) prompt cards in the execution panel.
-
+- **Native Model Context Protocol (MCP) Server:** Built-in host MCP server engine serving flows as tools on shared port 9528 or per-flow slug routes, with 1-click Cursor/Claude Desktop stdio snippet export.
 ## Built-in Agentic AI Copilot & Automation
 
 MPE Flow integrates a native AI Copilot designed for natural language orchestration and self-healing:
@@ -35,7 +35,9 @@ MPE Flow integrates a native AI Copilot designed for natural language orchestrat
 - **Sandboxed Terminal Execution (`terminal_exec`):** Executes whitelisted CLI commands with high-risk confirmation cards.
 - **Full Trust Mode:** Power-user setting enabling uninterrupted agentic workflows without repetitive manual confirmations.
 - **Adaptive Wrap Auto-Layout:** Intelligently optimizes canvas node placement with adaptive row-wrapping to keep complex multi-branch graphs compact and readable.
-- **Autonomous Execution ("Run to Goal"):** Autonomously executes workflows, observes node outputs, and self-corrects until targets/assertions pass.
+- **Autonomous Execution & Auto-Verification:** Generates pipelines with mandatory automated execution verification (`auto_run: true`). Configurable reasoning iteration limit (`aiMaxIterations`, 5–100 rounds, default 20) with graceful pause guidance.
+- **Fast AI Provider Switching:** Switch configured AI models instantly from chat input, navigation bar, or Spotlight palette (`Ctrl+K` / `Cmd+K`).
+- **Intelligent Variable Extraction:** Breadth-first upstream traversal automatically backtracks through non-producer nodes (assertions, conditionals) to infer data sources.
 - **Midway Steering:** Allows injecting real-time corrections or additional instructions during active tool execution without cancelling the task.
 - **One-Click Error Diagnosis & Smart Fix:** Diagnoses failed nodes (HTTP 500, socket timeouts, assertion failures) with full error-chain analysis and provides 1-click canvas repair.
 - **Local Project Workspace Awareness:** Links to local repository code, discovers backend routes and DTOs, and parses OpenAPI / Swagger schemas.
@@ -55,20 +57,27 @@ Plugins run as isolated, high-performance sidecar processes via the `mpe-plugin-
 
 MPE delivers a dual-mode single binary (`mpe` for GUI + CLI, or pure headless `mpe-cli`):
 
-- `mpe run <file.mpf>`: Execute a workflow file headlessly with JSON/JUnit/HTML output.
+- `mpe run <file.mpf>`: Execute a workflow file headlessly with JSON, JUnit XML, Markdown summary, and HTML output.
   - `-e, --env <NAME>`: Activate global environment (loads `<flows_dir>/environments/<NAME>.yaml` + `.local.yaml`).
   - `--var <key=val>`: Override workflow variables at runtime.
   - `--report <format>`: Export report (`junit`, `json`, `html`, `markdown`).
   - `--report-file <path>`: Write report to destination file.
+  - `--summary <path>`: Write GitHub Actions Step Summary Markdown (auto-detects `$GITHUB_STEP_SUMMARY`).
+  - `--export-html <path>`: Generate a standalone interactive HTML report.
   - `--stream`: Stream real-time execution events.
   - `--fail-fast`: Abort immediately on the first node failure.
+  - Standardized exit codes: `0` (Success), `1` (Test / assertion failure), `2` (Argument / validation error), `3` (Infrastructure timeout).
+- `mpe serve <file.mpf>`: Run long-lived Ingress mock gateway daemon with Tokio dispatch, port routing, and graceful SIGTERM teardown.
+- `mpe mcp serve <file.mpf>`: Host flow as native Model Context Protocol (MCP) server over stdio or Streamable HTTP.
+- `mpe flow convert <in.mpf> <out.yaml>`: Bi-directional lossless conversion between declarative YAML DSL and standard .mpf format.
 - `mpe validate <file.mpf>`: Statically validate node schemas, circular dependencies, and variable references.
 - `mpe env <list|show|set|delete>`: Manage global environment YAML files and machine-private local overrides (`--local`, `--source`, `--format table`).
 - `mpe stress <file.mpf>`: Run multi-protocol load and stress tests (`-e <NAME>`, `--var KEY=VAL`, concurrency, ramp-up).
-- `mpe flow <list|show|export|fmt>`: Inspect, manage, and format workflow structures (convert between YAML and JSON).
+- `mpe flow <list|show|export|fmt|convert>`: Inspect, convert, manage, and format workflow structures.
 - `mpe debug <file.mpf>`: Interactive step debugger with breakpoint support (`-e <NAME>`, `--break <node>`), subflow Step-Into (F11) / Step-Out (Shift+F11), and multi-level call frame stack tracking.
 - `mpe ai "<prompt>"`: Query or drive the AI Copilot from terminal (bridges with GUI or runs headless).
 - `mpe open <file.mpf>`: Open a workflow file in the active desktop GUI instance.
+
 ## Workflow File Format (.mpf)
 
 `.mpf` (Multi-Protocol Flow) defaults to a clean, declarative, human-readable YAML format (with seamless backward compatibility for JSON):

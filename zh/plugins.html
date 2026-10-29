@@ -180,6 +180,7 @@
         <p>在桌面端应用中，打开「设置 &rarr; <strong>插件市场</strong>」，或直接对内置 AI 助手说：<em>“从插件市场安装 redis 插件”</em>。使用 CLI 时：</p>
         <div class="plugin-command">mpe plugin install &lt;name&gt; --registry https://multi-protocol-flow.github.io/mpe-plugin-registry</div>
         <p class="plugin-help-muted">或配置一次 <code>MPE_PLUGIN_REGISTRY</code> 环境变量 &mdash; 之后即可直接执行 <code>mpe plugin install &lt;name&gt;</code>。</p>
+        <p class="plugin-help-muted"><em>提示：Model Context Protocol (MCP) Server 服务发布已原生内置于宿主引擎（可通过 <code>mpe mcp serve</code> 或设置中心在 9528 共享网关一键发布）；插件主要用于连接外部 MCP 智能体工具、消息队列与数据库。</em></p>
       </div>
       <div id="plugin-grid" class="plugin-grid"></div>
       <div id="plugin-status" class="plugin-status"></div>

@@ -51,25 +51,28 @@
         "applicationSubCategory": "API 测试与跨协议工作流自动化工具",
         "operatingSystem": "Windows, macOS, Linux",
         "softwareRequirements": "Rust, Tauri 2",
-        "softwareVersion": "0.5.0-beta",
+        "softwareVersion": "0.5.1-beta",
         "downloadUrl": "https://mpe.run/zh/changelog.html",
         "license": "https://opensource.org/licenses/MIT",
         "releaseNotes": "https://mpe.run/zh/changelog.html",
-        "description": "基于 Rust + Tauri 构建的跨平台多协议工作流执行引擎、内置全域 AI 助手与可视化接口测试工具，原生内置 7 种核心协议，支持丰富的 MCP、Kafka、Redis 等侧边进程插件生态。",
+        "description": "基于 Rust + Tauri 构建的跨平台多协议工作流执行引擎、内置全域 AI 助手与可视化接口测试工具，原生内置 7 种核心协议与原生 MCP Server 服务引擎，支持丰富的 Kafka、Redis 等侧边进程插件生态。",
         "url": "https://mpe.run/zh/",
         "image": "https://mpe.run/og-image.png",
         "screenshot": "https://mpe.run/og-image.png",
-          "内置全域 AI 助手：支持斜杠快捷指令 (/fix, /explain)、交互式选项卡片 (ask_user)、安全终端工具与自主执行自愈",
+        "featureList": [
+          "内置全域 AI 助手：支持斜杠快捷指令 (/fix, /explain, /test)、交互式选项卡片 (ask_user)、多模型快速切换与最大执行轮次限制",
+          "原生内置 Model Context Protocol (MCP) Server 引擎与 9528 共享网关，一键导出 Cursor 与 Claude Desktop stdio 配置",
           "流程生命周期三阶段 (Setup / Main / Teardown) 原生编排与只读 $report 变量跨阶段传递",
-          "内置 HTTP Ingress 与 Webhook 模拟服务 (http:ingress 与 http:respond) 本地模拟服务端",
+          "内置 HTTP Ingress 与 Webhook 模拟服务 (http:ingress 与 http:respond) 及常驻网关 mpe serve 守护进程",
+          "声明式 Flow YAML DSL 规范，去除坐标/UUID噪音，支持拓扑自动排版与 mpe flow convert 双向转换",
           "画布交互式切片执行 (run_slice) 与人机协同交互卡片 (ask_human)",
           "原生支持 HTTP、WebSocket、TCP、UDP、SSE 与 GraphQL 跨协议链路串联",
-          "Model Context Protocol (MCP) 智能体服务可视化调试与自动化评测",
-          "单二进制双模式：桌面端可视化 GUI 与无头高并发 CLI 执行引擎",
+          "单二进制双模式：桌面端可视化 GUI（Windows、macOS、Linux AppImage/DEB）与无头高并发 CLI 执行引擎",
           "内置异步 Rust 压测引擎，隔离 Setup/Teardown 纯净统计 Main 阶段 p50/p90/p99 延迟",
           "全局环境配置独立解耦，Git 忽略 .local.yaml 机密安全分层与四级级联解析",
           "100% 本地离线优先，Git 友好纯文本 .mpf YAML/JSON 工作流存储",
-          "原生支持 JUnit XML、JSON、HTML 测试报告输出，无缝接入 CI/CD 流水线"
+          "原生支持三阶段对齐 JUnit XML、GitHub Actions Step Summary Markdown 摘要及独立 HTML 测试报告输出"
+        ],
         "offers": {
           "@type": "Offer",
           "price": "0",
@@ -127,7 +130,7 @@
             "name": "原生支持哪些协议，哪些协议通过插件扩展？",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "MPE Flow 单一二进制中原生内置了 7 种核心协议与节点：HTTP/HTTPS、WebSocket、TCP、UDP、SSE (服务端推送事件)、GraphQL、以及 Script/Assertion（脚本与断言）节点。Kafka、MCP、gRPC、Redis、MongoDB、SMTP、IMAP 等其他协议则通过一键侧边进程插件生态提供支持。"
+              "text": "MPE Flow 单一二进制中原生内置了 7 种核心协议与节点：HTTP/HTTPS、WebSocket、TCP、UDP、SSE (服务端推送事件)、GraphQL、以及 Script/Assertion（脚本与断言）节点，并且原生内置了 MCP Server 引擎（9528 共享网关与按流程隔离路由）。Kafka、MCP 客户端工具、gRPC、Redis、MongoDB、SMTP、IMAP 等协议则通过一键侧边进程插件生态提供支持。"
             }
           },
           {
@@ -233,8 +236,7 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
           </div>
           <h3>全域 AI 助手与斜杠指令</h3>
-          <p>输入自然语言自动编排多协议流水线与自适应折行排版。支持斜杠快捷指令 (<code>/fix</code>、<code>/explain</code>、<code>/test</code>)、交互式问询 (<code>ask_user</code>)、白名单安全终端工具、全信任自主执行到底与一键节点报错深度自愈。</p>
-        </div>
+          <p>输入自然语言自动编排多协议流水线与自适应折行排版。支持斜杠快捷指令 (<code>/fix</code>、<code>/explain</code>、<code>/test</code>)、交互式问询 (<code>ask_user</code>)、输入框快速切换供应商、最大执行轮次调节 (<code>aiMaxIterations</code>)、白名单安全终端工具与建流后自动运行验证。</p>
 
         <div class="feature-card">
           <div class="feature-icon">
@@ -256,17 +258,15 @@
           <div class="feature-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m10 10 4 4"/><path d="m14 10-4 4"/></svg>
           </div>
-          <h3>HTTP Ingress 与 Webhook 模拟服务</h3>
-          <p>在工作流中直接启动内嵌 HTTP 服务监听。<code>http:ingress</code> 节点捕获接收外部 Webhook 推送或 HTTP 回调，下游搭配 <code>http:respond</code> 节点按需构造并返回动态响应，轻松实现端到端回调测试与 Mock 验证。</p>
-        </div>
+          <h3>HTTP Ingress、Webhook 模拟与 <code>mpe serve</code></h3>
+          <p>在工作流中直接启动内嵌 HTTP 服务监听。<code>http:ingress</code> 节点捕获接收外部 Webhook 推送，下游搭配 <code>http:respond</code> 返回动态响应。支持通过 <code>mpe serve</code> 启动常驻网关守护进程，提供 Tokio 高并发派发与平滑优雅停机。</p>
 
         <div class="feature-card">
           <div class="feature-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
           </div>
-          <h3>MCP 智能体服务可视化调试与评估</h3>
-          <p>支持通过 stdio 或 SSE 调试 Model Context Protocol (MCP) 服务器。自动发现工具与 Prompt、串联链式调用，并通过可视化断言评估模型输出准确率。</p>
-        </div>
+          <h3>原生 MCP Server 服务发布与可视化调试</h3>
+          <p>宿主内置原生 Model Context Protocol (MCP) Server 引擎，通过 9528 默认共享网关将工作流发布为 LLM 工具。支持一键导出 Cursor 与 Claude Desktop stdio 配置代码段，提供设置中心服务治理面板，并可双向调试外部 MCP 服务。</p>
 
         <div class="feature-card">
           <div class="feature-icon">
@@ -280,9 +280,8 @@
           <div class="feature-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
           </div>
-          <h3>CI/CD 自动化集成与 JUnit 报告</h3>
-          <p>原生生成标准 JUnit XML 测试报告（<code>--report-format junit --report-file results.xml</code>），每个节点精准映射为测试用例，一键无缝接入 GitHub Actions、GitLab CI 与 Jenkins 流水线。</p>
-        </div>
+          <h3>CI/CD 自动化集成与丰富报告</h3>
+          <p>规范化 CLI 退出码 (0/1/2/3)，原生生成三阶段对齐的 JUnit XML 测试报告（<code>--report junit</code>）、自动写入 GitHub Actions Step Summary Markdown 摘要（<code>--summary $GITHUB_STEP_SUMMARY</code>）以及导出独立离线 HTML 报告（<code>--export-html</code>）。</p>
 
         <div class="feature-card">
           <div class="feature-icon">
@@ -409,15 +408,19 @@
         </div>
         <div class="faq-card">
           <h3>内置原生支持哪些协议，哪些协议通过插件扩展？</h3>
-          <p>MPE Flow 单一二进制中原生内置了 7 种核心协议与节点：HTTP/HTTPS（包含客户端请求及内嵌 ingress/respond webhook 模拟服务）、WebSocket、TCP、UDP、SSE (服务端推送事件)、GraphQL、以及 Script/Assertion（脚本与断言）节点。Kafka、MCP、gRPC、Redis、MongoDB、SMTP、IMAP 等其他协议则通过一键侧边进程插件生态提供支持。</p>
+          <p>MPE Flow 单一二进制中原生内置了 7 种核心协议与节点：HTTP/HTTPS（包含客户端请求及内嵌 ingress/respond webhook 模拟服务）、WebSocket、TCP、UDP、SSE (服务端推送事件)、GraphQL、以及 Script/Assertion（脚本与断言）节点。此外，宿主原生内置了 MCP Server 引擎（9528 共享网关）。Kafka、MCP 客户端工具、gRPC、Redis、MongoDB、SMTP、IMAP 等其他协议则通过一键侧边进程插件生态提供支持。</p>
         </div>
         <div class="faq-card">
           <h3>MPE Flow 与 Postman 或 JMeter 相比有什么优势？</h3>
           <p>不同于专注于 HTTP 请求的 Postman，MPE Flow 对长连接与有状态协议（TCP、WebSocket、SSE 流、Kafka 消息队列、MCP 智能体工具）提供一等公民的原生支持，并具备图节点可视化流转、分支路由、变量自动提取、Setup/Main/Teardown 生命周期编排及超高并发压测能力，资源占用极低。</p>
         </div>
         <div class="faq-card">
+          <h3>支持哪些操作系统与运行环境？</h3>
+          <p>MPE Flow 原生支持 Windows（x64 安装包与便携包）、macOS（Intel 与 Apple Silicon 通用 Universal DMG），以及 Linux（同时提供 <code>.deb</code> 安装包、<code>.AppImage</code> 便携 GUI 包与轻量纯 CLI 无头二进制）。</p>
+        </div>
+        <div class="faq-card">
           <h3>MPE Flow 可以集成到 CI/CD 流水线中吗？</h3>
-          <p>完全可以。MPE Flow 采用单二进制双模式架构，内置独立的 <code>mpe</code> CLI 命令。在 GitHub Actions、GitLab CI、Jenkins 或 Docker 容器中直接执行 <code>mpe run flow.mpf -e staging --report-format junit --report-file results.xml</code> 即可无 GUI 依赖高速运行流程并输出结构化测试报告。</p>
+          <p>完全可以。MPE Flow 采用单二进制双模式架构，内置独立的 <code>mpe</code> CLI 命令。在 GitHub Actions、GitLab CI、Jenkins 或 Docker 容器中直接执行 <code>mpe run flow.mpf -e staging --report junit --report-file results.xml --summary $GITHUB_STEP_SUMMARY --export-html report.html</code>，支持标准化退出码（0/1/2/3），无缝渲染流水线 Step Summary 与自包含交互式测试报告。</p>
         </div>
         <div class="faq-card">
           <h3>MPE Flow 是开源免费的吗？</h3>

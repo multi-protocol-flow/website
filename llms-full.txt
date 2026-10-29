@@ -12,7 +12,7 @@ Traditional tools (Postman, Insomnia, JMeter, Bruno) focus predominantly on HTTP
 
 ### Key Architectural Pillars
 
-- **Rust Workspace Engine:** 18 decoupled crates ensuring sub-millisecond step execution, zero garbage collection pauses, and minimal memory usage (<30MB baseline).
+- **Rust Workspace Engine:** 14 decoupled crates ensuring sub-millisecond step execution, zero garbage collection pauses, and minimal memory usage (<30MB baseline).
 - **Single Dual-Mode Binary:** Launching without CLI arguments starts the visual Tauri 2 desktop canvas; supplying CLI arguments switches instantly to headless high-throughput CLI mode with zero GUI overhead.
 - **Offline-First & Sovereign Privacy:** 100% local `.mpf` workflow files and standalone YAML environment definitions with git-ignored `.local.yaml` secret overrides. No mandatory accounts, telemetry lock-in, or third-party cloud synchronization.
 - **Unified Schema & Typing:** Strict JSON Schema validation across all protocol nodes and variable interpolations.
@@ -296,14 +296,19 @@ mpe run ./tests/flows/e2e_checkout.mpf
 # Run with active environment and runtime variable overrides
 mpe run ./tests/flows/e2e_checkout.mpf -e staging --var TIMEOUT=5000 --var RETRIES=3
 
-# Output structured JUnit XML for GitHub Actions / GitLab CI
+# Output structured 3-stage aligned JUnit XML for CI
 mpe run ./tests/flows/e2e_checkout.mpf -e staging --report-format junit --report-file ./test-results/junit.xml
+
+# Generate GitHub Actions Step Summary Markdown and standalone HTML report
+mpe run ./tests/flows/e2e_checkout.mpf -e staging --summary "$GITHUB_STEP_SUMMARY" --export-html ./test-results/report.html
 
 # Output detailed JSON report
 mpe run ./tests/flows/e2e_checkout.mpf --report-format json --report-file ./test-results/report.json
 
 # Fail fast on first error
 mpe run ./tests/flows/e2e_checkout.mpf --fail-fast
+
+# Standardized exit codes: 0 (Success), 1 (Logic/assertion failure), 2 (Config/validation error), 3 (Infra/network timeout)
 ```
 
 ### 5.2 Validating Workflows (`mpe validate`)
@@ -349,9 +354,13 @@ mpe stress run ./flows/api_benchmark.mpf -e staging -u 100 -r 10
 # Override variables for the stress session
 mpe stress run ./flows/api_benchmark.mpf -e staging --var CONCURRENCY_FLAG=true -u 50 -r 5
 ```
-### 5.5 Flow Management & Formatting (`mpe flow`)
+### 5.5 Flow Management, Declarative DSL & Conversion (`mpe flow`)
 
 ```bash
+# Convert between standard .mpf and declarative clean YAML DSL (no canvas coordinates/UUIDs)
+mpe flow convert ./flows/checkout.mpf ./flows/declarative_checkout.yaml
+mpe flow convert ./flows/declarative_checkout.yaml ./flows/checkout.mpf
+
 # Format flow file or convert between YAML and JSON
 mpe flow fmt ./flows/hello.mpf --to yaml
 mpe flow fmt --all --to yaml
@@ -365,7 +374,25 @@ mpe flow show ./flows/checkout.mpf --node node_auth
 # Export flow graph as Mermaid diagram or ASCII graph
 mpe flow export ./flows/checkout.mpf --format mermaid
 ```
-### 5.6 Interactive Debugging (`mpe debug`)
+
+### 5.6 Ingress Mock Daemon Service (`mpe serve`)
+
+```bash
+# Run daemonized HTTP ingress mock service on port 9527 with graceful SIGTERM teardown
+mpe serve -f ./flows/ingress_webhook.mpf -p 9527
+```
+
+### 5.7 Native Model Context Protocol Server (`mpe mcp serve`)
+
+```bash
+# Publish workflow as native MCP server over stdio (for Claude Desktop / Cursor)
+mpe mcp serve -f ./flows/database_tool.mpf --transport stdio
+
+# Host shared MCP gateway on default port 9528 (/mcp for all flows, /{slug}/mcp for isolation)
+mpe mcp serve --port 9528
+```
+
+### 5.8 Interactive Debugging (`mpe debug`)
 
 ```bash
 # Start interactive CLI step debugger with active environment and breakpoint
@@ -377,14 +404,14 @@ MPE Flow's debugging engine supports:
 - **Stepping Controls:** Step Over (`F10`), Step Into (`F11`, enters `flow:sub` nodes to debug child flows), Step Out (`Shift + F11`, completes remaining subflow steps and returns to caller), and Skip Node.
 - **Multi-Level Call Frames (`DebugCallFrame`):** Hierarchical stack trace (`#0 Root Flow -> #1 Subflow`) with visual frame switching and per-frame variable inspection.
 - **In-Flight Mutation:** Live variable pool editing and temporary node configuration updates during active pause.
-### 5.7 CLI AI Copilot Bridge (`mpe ai`)
+### 5.9 CLI AI Copilot Bridge (`mpe ai`)
 
 ```bash
 # Query or drive the AI Copilot directly from the terminal
 mpe ai "Create an HTTP authentication flow and pipe bearer token to WebSocket"
 ```
 
-### 5.8 Open Flow in Desktop GUI (`mpe open`)
+### 5.10 Open Flow in Desktop GUI (`mpe open`)
 
 ```bash
 # Open a workflow file in the running desktop GUI instance
